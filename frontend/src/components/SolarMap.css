@@ -1,0 +1,185 @@
+/* SolarMap.css */
+.solar-map-container {
+  position: relative;
+}
+
+/* Custom marker styles */
+.solar-marker-container {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.solar-marker {
+  width: 30px;
+  height: 30px;
+  border: 2px solid;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  animation: float 3s ease-in-out infinite;
+}
+
+.solar-marker svg {
+  width: 20px;
+  height: 20px;
+}
+
+.solar-marker-pulse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--pulse-color);
+  opacity: 0.6;
+  z-index: 1;
+  animation: pulse 2s infinite;
+}
+
+.energy-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, var(--pulse-color) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0.2;
+  z-index: 0;
+  animation: glow 3s infinite;
+}
+
+/* Power line animation */
+.power-line {
+  stroke-dasharray: 10;
+  animation: dash 20s linear infinite;
+}
+
+/* Sun glow effect */
+.sun-glow {
+  animation: sunPulse 4s ease-in-out infinite;
+}
+
+/* Popup styling */
+.solar-farm-popup .leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  border: 1px solid var(--solar-border);
+  background: var(--solar-card);
+  backdrop-filter: blur(10px);
+}
+
+.solar-farm-popup .leaflet-popup-content {
+  margin: 0;
+  padding: 12px;
+  font-family: 'Inter', sans-serif;
+  min-width: 200px;
+}
+
+/* Cluster styling */
+.marker-cluster-small {
+  background-color: rgba(245, 158, 11, 0.2);
+  border: 2px solid rgba(245, 158, 11, 0.8);
+}
+
+.marker-cluster-small div {
+  background-color: rgba(245, 158, 11, 0.8);
+  color: white;
+}
+
+.marker-cluster-medium {
+  background-color: rgba(59, 130, 246, 0.2);
+  border: 2px solid rgba(59, 130, 246, 0.8);
+}
+
+.marker-cluster-medium div {
+  background-color: rgba(59, 130, 246, 0.8);
+  color: white;
+}
+
+.marker-cluster-large {
+  background-color: rgba(16, 185, 129, 0.2);
+  border: 2px solid rgba(16, 185, 129, 0.8);
+}
+
+.marker-cluster-large div {
+  background-color: rgba(16, 185, 129, 0.8);
+  color: white;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 1000;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    opacity: 0.1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+@keyframes sunPulse {
+  0%, 100% {
+    opacity: 0.05;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+
+/* Leaflet overrides */
+.leaflet-tooltip {
+  background: var(--solar-card);
+  border: 1px solid var(--solar-border);
+  color: var(--solar-primary);
+  backdrop-filter: blur(10px);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.leaflet-tooltip-top:before {
+  border-top-color: var(--solar-border);
+}
+
+.leaflet-popup-tip {
+  background: var(--solar-card);
+}

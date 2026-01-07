@@ -1,0 +1,217 @@
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import { Users as UsersIcon, UserPlus, Search, Filter, RefreshCw, Eye, Edit } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import StatCard from '../../components/ui/stat-card'
+
+const API_BASE_URL = 'http://localhost:8080'
+
+export default function Users() {
+  const navigate = useNavigate()
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterRole, setFilterRole] = useState('ALL')
+  const token = localStorage.getItem('token')
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get(`${API_BASE_URL}/superadmin/users`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      setUsers(response.data.users || [])
+    } catch (error) {
+      console.error('Failed to fetch users:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesRole = filterRole === 'ALL' || user.role === filterRole
+    return matchesSearch && matchesRole
+  })
+
+  const getRoleBadgeColor = (role) => {
+    switch (role) {
+      case 'SUPER_ADMIN': return 'bg-solar-yellow text-solar-dark'
+      case 'ADMIN': return 'bg-solar-orange text-solar-dark'
+      case 'USER': return 'bg-solar-success text-white'
+      default: return 'bg-solar-muted text-solar-primary'
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold sun-glow-text">User Management</h1>
+          <p className="text-solar-muted mt-1">Manage all users across the platform</p>
+        </div>
+        <div className="flex space-x-3">
+          <button
+            onClick={fetchUsers}
+            className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>Refresh</span>
+          </button>
+          <button 
+            onClick={() => navigate('/users/create')}
+            className="flex items-center space-x-2 px-4 py-2 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Add User</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <StatCard
+          title="Total Users"
+          value={users.length}
+          icon={UsersIcon}
+          color="text-solar-yellow"
+          gradient="from-solar-yellow/20 to-solar-orange/10"
+        />
+        <StatCard
+          title="Active Users"
+          value={users.filter(u => u.status === 'ACTIVE').length}
+          icon={UsersIcon}
+          color="text-solar-success"
+          gradient="from-solar-success/20 to-solar-success/5"
+        />
+        <StatCard
+          title="Admins"
+          value={users.filter(u => u.role === 'ADMIN').length}
+          icon={UsersIcon}
+          color="text-solar-orange"
+          gradient="from-solar-orange/20 to-solar-orange/5"
+        />
+        <StatCard
+          title="Super Admins"
+          value={users.filter(u => u.role === 'SUPER_ADMIN').length}
+          icon={UsersIcon}
+          color="text-solar-yellow"
+          gradient="from-solar-yellow/20 to-solar-yellow/5"
+        />
+      </div>
+
+      {/* Filters and Search */}
+      <div className="bg-solar-card rounded-lg p-4 energy-card">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-solar-muted" />
+            <input
+              type="text"
+              placeholder="Search users by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow"
+            />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Filter className="w-4 h-4 text-solar-muted" />
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className="px-3 py-2 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow"
+            >
+              <option value="ALL">All Roles</option>
+              <option value="USER">Users</option>
+              <option value="ADMIN">Admins</option>
+              <option value="SUPER_ADMIN">Super Admins</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Users Table */}
+      <div className="bg-solar-card rounded-lg overflow-hidden energy-card">
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="animate-spin w-8 h-8 border-2 border-solar-yellow border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-solar-muted">Loading users...</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-solar-night/80">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">User</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Region</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Created</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-solar-border">
+                {filteredUsers.map((user) => (
+                  <tr key={user.id} className="hover:bg-solar-night/40">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 bg-solar-yellow rounded-full flex items-center justify-center mr-3">
+                          <span className="text-solar-dark font-semibold text-sm">
+                            {user.name?.charAt(0)?.toUpperCase() || user.email.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-solar-primary">{user.name || 'N/A'}</div>
+                          <div className="text-sm text-solar-muted">{user.email}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        user.status === 'ACTIVE' ? 'bg-solar-success text-white' : 'bg-solar-danger text-white'
+                      }`}>
+                        {user.status || 'ACTIVE'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-solar-muted">
+                      {user.region || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-solar-muted">
+                      {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-3">
+                        <button 
+                          onClick={() => navigate(`/users/${user.id}`)}
+                          className="text-solar-yellow hover:text-solar-orange transition sun-button"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => navigate(`/users/${user.id}/edit`)}
+                          className="text-solar-primary hover:text-solar-yellow transition sun-button"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

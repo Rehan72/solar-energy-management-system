@@ -1,0 +1,27 @@
+esphome:
+  name: solar_node_1
+
+esp32:
+  board: esp32dev
+
+wifi:
+  ssid: "YOUR_WIFI"
+  password: "YOUR_PASS"
+
+api:
+logger:
+ota:
+
+sensor:
+  - platform: adc
+    pin: GPIO34
+    name: "Solar Voltage"
+
+  - platform: ct_clamp
+    pin: GPIO35
+    name: "Solar Current"
+
+  - platform: template
+    name: "Solar Power"
+    lambda: |-
+      return (id(solar_voltage).state * id(solar_current).state) / 1000;

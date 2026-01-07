@@ -1,0 +1,1033 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+   --energy-x: 0px;
+  --energy-y: 0px;
+
+  /* Primary Colors */
+  --solar-primary: #0F172A;       /* Deep navy blue (text/headings) */
+  --solar-yellow: #F59E0B;        /* Golden yellow (energy/sun) */
+  --solar-orange: #EA580C;        /* Vibrant orange (accent/hover) */
+
+  /* Secondary & UI */
+  --solar-muted: #475569;         /* Slate gray (body text) */
+  --solar-bg: #F8FAFC;            /* Light blue-gray (background) */
+  --solar-card: #FFFFFF;          /* White (cards/panels) */
+  --solar-border: #E2E8F0;        /* Light border */
+
+  /* Accents & Data Viz */
+  --solar-success: #10B981;       /* Emerald green (positive data) */
+  --solar-warning: #F59E0B;       /* Warning alerts */
+  --solar-danger: #EF4444;        /* Critical alerts */
+  --solar-panel: #1E40AF;         /* Blue (solar panels) */
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #F9FAFB;
+  color: #1F2937;
+  overflow-x: hidden;
+}
+
+.dark {
+  background: #0B132B;
+  color: #FFFFFF;
+
+  --solar-primary: #F1F5F9;       /* Light blue-gray (text) */
+  --solar-yellow: #FCD34D;        /* Softer yellow */
+  --solar-orange: #FDBA74;        /* Muted orange */
+
+  /* Secondary & UI */
+  --solar-muted: #94A3B8;         /* Light gray (muted text) */
+  --solar-bg: #0F172A;            /* Dark navy (background) */
+  --solar-card: #1E293B;          /* Card background */
+  --solar-border: #334155;        /* Dark border */
+  --solar-night: #0F172A;         /* Night mode background */
+
+  /* Accents */
+  --solar-success: #34D399;       /* Brighter green */
+  --solar-warning: #FBBF24;       /* Brighter warning */
+  --solar-danger: #F87171;        /* Softer red */
+  --solar-panel: #3B82F6;         /* Brighter panel blue */
+}
+
+.dark body {
+  background-color: #0B132B;
+  color: #FFFFFF;
+}
+
+/* Energy Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-10px) rotate(90deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+  75% { transform: translateY(-10px) rotate(270deg); }
+}
+
+@keyframes glow {
+  0%, 100% {
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 215, 0, 0.3);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.4);
+  }
+}
+
+@keyframes pulse-bg {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes light-sweep {
+  0% {
+    transform: translateX(-100%) translateY(-50%) rotate(45deg);
+    opacity: 0;
+  }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% {
+    transform: translateX(100vw) translateY(-50%) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+.energy-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, #FFD700, #FFA500);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+.glow-text {
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.pulse-overlay {
+  animation: pulse-bg 4s ease-in-out infinite;
+}
+
+
+
+/* ===============================
+   ⚡ ENERGY PARTICLES
+================================ */
+
+.energy-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, #FFD166 0%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: floatEnergy 8s linear infinite;
+}
+
+@keyframes floatEnergy {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-140px) scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* ===============================
+   🌟 LIGHT RAYS
+================================ */
+
+/* 🌟 LIGHT RAYS */
+.light-ray {
+  position: absolute;
+  top: -60%;
+  left: 50%;
+  width: 130%;
+  height: 220%;
+  background: linear-gradient(
+    120deg,
+    transparent 40%,
+    rgba(255, 209, 102, 0.18) 50%,
+    transparent 60%
+  );
+  transform: translateX(-50%) rotate(12deg);
+  animation: moveRay 10s linear infinite;
+}
+
+.light-ray.delay-3 {
+  animation-delay: 3s;
+}
+.light-ray.delay-6 {
+  animation-delay: 6s;
+}
+
+@keyframes moveRay {
+  0% {
+    transform: translateX(-70%) rotate(12deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(70%) rotate(12deg);
+    opacity: 0;
+  }
+}
+
+/* 🌑 PULSE OVERLAY */
+.pulse-overlay {
+  animation: pulseDark 6s ease-in-out infinite;
+}
+
+@keyframes pulseDark {
+  0%, 100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ♿ ACCESSIBILITY */
+@media (prefers-reduced-motion: reduce) {
+  .energy-particle,
+  .light-ray,
+  .pulse-overlay {
+    animation: none;
+  }
+}
+
+/* ===============================
+   🌑 PULSING OVERLAY
+================================ */
+
+.pulse-overlay {
+  animation: pulseDark 6s ease-in-out infinite;
+}
+
+@keyframes pulseDark {
+  0%, 100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ===============================
+   🖱️ MOUSE ENERGY PARALLAX
+================================ */
+
+.energy-layer {
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+}
+/* 🌑 Pulse overlay */
+.pulse-overlay {
+  animation: pulseDark 6s ease-in-out infinite;
+}
+
+@keyframes pulseDark {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.5; }
+}
+
+/* ✨ Fade-in for auth card */
+.animate-fade-in {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Auth Page Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+}
+
+/* Pulse overlay animation */
+.pulse-overlay {
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Glow effect for solar theme */
+.solar-glow {
+  box-shadow: 
+    0 0 20px rgba(245, 158, 11, 0.3),
+    0 0 40px rgba(245, 158, 11, 0.2),
+    0 0 60px rgba(245, 158, 11, 0.1);
+}
+
+.dark .solar-glow {
+  box-shadow: 
+    0 0 25px rgba(251, 191, 36, 0.4),
+    0 0 50px rgba(251, 191, 36, 0.2),
+    0 0 75px rgba(251, 191, 36, 0.1);
+}
+
+/* Solar pulse animation */
+@keyframes solar-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 15px rgba(212, 174, 85, 0.5),
+      0 0 30px rgba(212, 174, 85, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 0 25px rgba(212, 174, 85, 0.7),
+      0 0 50px rgba(212, 174, 85, 0.4);
+  }
+}
+
+.solar-pulse {
+  animation: solar-pulse 2s ease-in-out infinite;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+}
+
+/* Enhanced bounce for particles */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite ease-in-out;
+}
+
+/* Multi-layer glow effect */
+.multi-glow {
+  box-shadow: 
+    /* Inner glow */
+    inset 0 0 10px rgba(255, 255, 255, 0.3),
+    /* Middle glow */
+    0 0 15px rgba(212, 174, 85, 0.5),
+    /* Outer glow */
+    0 0 30px rgba(212, 174, 85, 0.3);
+}
+
+.multi-glow:hover {
+  box-shadow: 
+    inset 0 0 15px rgba(255, 255, 255, 0.4),
+    0 0 25px rgba(212, 174, 85, 0.6),
+    0 0 50px rgba(212, 174, 85, 0.4);
+}
+
+/* Sun button hover effect */
+.sun-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.sun-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.sun-button:hover::before {
+  left: 100%;
+}
+
+.sun-button:hover {
+  box-shadow: 
+    0 0 20px rgba(255, 215, 0, 0.6),
+    0 0 40px rgba(255, 165, 0, 0.4),
+    0 0 60px rgba(245, 158, 11, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Sun glow button */
+.sun-glow-button {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #F59E0B 0%, #FFD700 50%, #F59E0B 100%);
+  background-size: 200% 200%;
+  animation: sun-button-shine 3s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+.sun-glow-button:hover {
+  background-position: 100% 50%;
+  box-shadow: 
+    0 0 25px rgba(255, 215, 0, 0.7),
+    0 0 50px rgba(255, 165, 0, 0.5),
+    0 0 75px rgba(245, 158, 11, 0.3);
+  transform: translateY(-2px);
+}
+
+@keyframes sun-button-shine {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* ==============================
+    🌞 SUN BUTTON HOVER & ACTIVE EFFECTS
+================================ */
+
+/* Base sun-button styles with sun reflection */
+.sun-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  isolation: isolate;
+}
+
+/* Sun reflection shine effect on hover */
+.sun-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 248, 220, 0.5),
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Sun glow effect on hover */
+.sun-button:hover::before {
+  left: 100%;
+}
+
+.sun-button:hover {
+  box-shadow:
+    0 0 25px rgba(255, 215, 0, 0.6),
+    0 0 50px rgba(255, 165, 0, 0.4),
+    0 0 75px rgba(245, 158, 11, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Active/pressed state */
+.sun-button:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 0 15px rgba(255, 215, 0, 0.8),
+    0 0 30px rgba(255, 165, 0, 0.6),
+    0 0 45px rgba(245, 158, 11, 0.4);
+}
+
+/* Sun button with gradient background */
+.sun-button-primary {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--solar-yellow) 0%, #FFD700 50%, var(--solar-orange) 100%);
+  background-size: 200% 200%;
+  animation: sun-button-shine 3s ease-in-out infinite;
+  transition: all 0.3s ease;
+  isolation: isolate;
+}
+
+.sun-button-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.sun-button-primary:hover::before {
+  left: 100%;
+}
+
+.sun-button-primary:hover {
+  background-position: 100% 50%;
+  box-shadow:
+    0 0 30px rgba(255, 215, 0, 0.7),
+    0 0 60px rgba(255, 165, 0, 0.5),
+    0 0 90px rgba(245, 158, 11, 0.3);
+  transform: translateY(-2px);
+}
+
+.sun-button-primary:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.9),
+    0 0 40px rgba(255, 165, 0, 0.7),
+    0 0 60px rgba(245, 158, 11, 0.5);
+}
+
+@keyframes sun-button-shine {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Secondary sun button (outline style) */
+.sun-button-secondary {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  isolation: isolate;
+}
+
+.sun-button-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 215, 0, 0.2),
+    rgba(255, 215, 0, 0.3),
+    rgba(255, 215, 0, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.sun-button-secondary:hover::before {
+  left: 100%;
+}
+
+.sun-button-secondary:hover {
+  border-color: var(--solar-yellow);
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.4),
+    0 0 40px rgba(255, 165, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.sun-button-secondary:active {
+  transform: translateY(1px);
+  background: rgba(255, 215, 0, 0.1);
+  box-shadow:
+    0 0 15px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 165, 0, 0.4);
+}
+
+/* ==============================
+    🌟 ENERGY CARD EFFECTS
+================================ */
+
+/* Energy card hover effect */
+.energy-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.energy-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--solar-yellow),
+    var(--solar-orange),
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.energy-card:hover::before {
+  transform: translateX(100%);
+}
+
+.energy-card:hover {
+  box-shadow:
+    0 0 30px rgba(255, 215, 0, 0.2),
+    0 0 60px rgba(245, 158, 11, 0.1);
+  transform: translateY(-4px);
+}
+
+/* ==============================
+    ✨ SUN GLOW TEXT EFFECTS
+================================ */
+
+/* Enhanced glow text with sun reflection */
+.sun-glow-text {
+  background: linear-gradient(180deg, #FFD700 0%, #F59E0B 50%, #EA580C 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 165, 0, 0.3);
+  animation: sun-glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes sun-glow-pulse {
+  0%, 100% {
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 165, 0, 0.3);
+    filter: brightness(1);
+  }
+  50% {
+    text-shadow: 0 0 50px rgba(255, 215, 0, 0.8), 0 0 100px rgba(255, 165, 0, 0.5);
+    filter: brightness(1.3);
+  }
+}
+
+/* Sun reflection text animation */
+.sun-reflection-text {
+  background: linear-gradient(135deg, #F59E0B 0%, #FFD700 30%, #FCD34D 50%, #FFD700 70%, #F59E0B 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 200% 200%;
+  animation: sun-shine 3s ease-in-out infinite alternate;
+  position: relative;
+}
+
+.sun-reflection-text::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-20deg);
+  animation: sun-flash 4s ease-in-out infinite;
+}
+
+@keyframes sun-shine {
+  0% {
+    background-position: 0% 50%;
+    filter: brightness(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: brightness(1.2);
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: brightness(1);
+  }
+}
+
+@keyframes sun-flash {
+  0%, 40% {
+    left: -100%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  60%, 100% {
+    left: 200%;
+    opacity: 0;
+  }
+}
+
+/* ==============================
+    🎯 STAT CARD EFFECTS
+================================ */
+
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 215, 0, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.stat-card:hover::before {
+  left: 100%;
+}
+
+.stat-card:hover {
+  box-shadow:
+    0 0 25px rgba(255, 215, 0, 0.3),
+    0 0 50px rgba(245, 158, 11, 0.2);
+  transform: translateY(-4px);
+}
+
+/* ==============================
+    🔘 INTERACTIVE ELEMENTS
+================================ */
+
+/* Sun icon pulse effect */
+.sun-icon-pulse {
+  animation: sun-pulse 2s ease-in-out infinite;
+}
+
+@keyframes sun-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.9));
+    transform: scale(1.05);
+  }
+}
+
+/* Ripple effect for buttons */
+.sun-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.sun-ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease, opacity 0.6s ease;
+  opacity: 0;
+}
+
+.sun-ripple:active::after {
+  width: 300px;
+  height: 300px;
+  opacity: 1;
+  transition: width 0s, height 0s, opacity 0s;
+}
+
+/* Active sun button with reflection effect */
+.sun-button-active {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+}
+
+/* Sun reflection effect for active buttons */
+.sun-button-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    rgba(255, 248, 220, 0.6),
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: sun-active-shine 2s ease-in-out infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+@keyframes sun-active-shine {
+  0%, 100% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+}
+
+/* Enhanced glow for active sun buttons */
+.sun-button-active {
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.5),
+    0 0 40px rgba(255, 165, 0, 0.3),
+    0 0 60px rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Add to your global CSS */
+
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Performance optimizations */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--solar-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--solar-yellow), var(--solar-orange));
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, var(--solar-orange), var(--solar-yellow));
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Performance classes */
+.transform-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Sun reflection text effect */
+.sun-reflection-text {
+  background: linear-gradient(135deg, #F59E0B 0%, #FFD700 30%, #FCD34D 50%, #FFD700 70%, #F59E0B 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 200% 200%;
+  animation: sun-shine 3s ease-in-out infinite alternate;
+}
+
+.sun-reflection-text::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-20deg);
+  animation: sun-flash 4s ease-in-out infinite;
+}
+
+@keyframes sun-shine {
+  0% {
+    background-position: 0% 50%;
+    filter: brightness(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: brightness(1.2);
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: brightness(1);
+  }
+}
+
+@keyframes sun-flash {
+  0%, 40% {
+    left: -100%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  60%, 100% {
+    left: 200%;
+    opacity: 0;
+  }
+}
+
+/* Enhanced glow text with sun reflection */
+.sun-glow-text {
+  background: linear-gradient(180deg, #FFD700 0%, #F59E0B 50%, #EA580C 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 165, 0, 0.3);
+  animation: sun-glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes sun-glow-pulse {
+  0%, 100% {
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 165, 0, 0.3);
+    filter: brightness(1);
+  }
+  50% {
+    text-shadow: 0 0 50px rgba(255, 215, 0, 0.8), 0 0 100px rgba(255, 165, 0, 0.5);
+    filter: brightness(1.3);
+  }
+}
+
+/* Energy card hover effect */
+.energy-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.energy-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    var(--solar-yellow), 
+    var(--solar-orange), 
+    transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.energy-card:hover::before {
+  transform: translateX(100%);
+}
