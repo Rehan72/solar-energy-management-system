@@ -1,3 +1,4 @@
+import CreateRegion from "../pages/superAdmin/CreateRegion";
 import GlobalDashboard from "../pages/superAdmin/GlobalDashboard";
 import Regions from "../pages/superAdmin/Regions";
 import Admins from "../pages/superAdmin/Admins";
@@ -36,6 +37,12 @@ export default [
   {
     element: Regions,
     path: `/regions`,
+    allowedRoles: ["SUPER_ADMIN"],
+    exact: true
+  },
+  {
+    element: CreateRegion,
+    path: `/regions/create`,
     allowedRoles: ["SUPER_ADMIN"],
     exact: true
   },

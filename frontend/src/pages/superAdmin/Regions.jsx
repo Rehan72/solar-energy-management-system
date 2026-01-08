@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { MapPin, Plus, Search, RefreshCw, Users, Zap, TrendingUp, Globe } from 'lucide-react'
 import StatCard from '../../components/ui/stat-card'
 import { getRequest } from '../../lib/apiService'
 
 export default function Regions() {
+  const navigate = useNavigate()
   const [regions, setRegions] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const token = localStorage.getItem('token')
 
   const fetchRegions = async () => {
     try {
@@ -60,7 +61,10 @@ export default function Regions() {
             <RefreshCw className="w-4 h-4" />
             <span>Refresh</span>
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-solar-panel text-white font-semibold rounded-lg hover:bg-solar-panel/80 transition sun-button">
+          <button 
+            onClick={() => navigate('/regions/create')}
+            className="flex items-center space-x-2 px-4 py-2 bg-solar-panel text-white font-semibold rounded-lg hover:bg-solar-panel/80 transition sun-button"
+          >
             <Plus className="w-4 h-4" />
             <span>Add Region</span>
           </button>
