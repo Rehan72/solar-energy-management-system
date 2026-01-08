@@ -2,44 +2,102 @@ package users
 
 import (
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type CreateUserRequest struct {
-	FirstName    string  `json:"first_name" binding:"required"`
-	LastName     string  `json:"last_name" binding:"required"`
-	Email        string  `json:"email" binding:"required,email"`
-	Password     string  `json:"password" binding:"required,min=6"`
-	Role         string  `json:"role" binding:"required,oneof=USER ADMIN SUPER_ADMIN"`
-	Phone        string  `json:"phone"`
-	ProfileImage string  `json:"profile_image"`
-	AddressLine1 string  `json:"address_line1"`
-	AddressLine2 string  `json:"address_line2"`
-	City         string  `json:"city"`
-	State        string  `json:"state"`
-	Pincode      string  `json:"pincode"`
-	Region       string  `json:"region"`
-	Latitude     float64 `json:"latitude"`
-	Longitude    float64 `json:"longitude"`
+	FirstName         string  `json:"first_name" binding:"required"`
+	LastName          string  `json:"last_name" binding:"required"`
+	Email             string  `json:"email" binding:"required,email"`
+	Password          string  `json:"password" binding:"required,min=6"`
+	Role              string  `json:"role" binding:"required,oneof=USER ADMIN SUPER_ADMIN"`
+	Phone             string  `json:"phone"`
+	ProfileImage      string  `json:"profile_image"`
+	AddressLine1      string  `json:"address_line1"`
+	AddressLine2      string  `json:"address_line2"`
+	City              string  `json:"city"`
+	State             string  `json:"state"`
+	Pincode           string  `json:"pincode"`
+	Region            string  `json:"region"`
+	Latitude          float64 `json:"latitude"`
+	Longitude         float64 `json:"longitude"`
+	AdminID           string  `json:"admin_id"`
+	InstallationStatus string  `json:"installation_status"`
+	PropertyType      string  `json:"property_type"`
+	AvgMonthlyBill    float64 `json:"avg_monthly_bill"`
+	RoofAreaSqft      float64 `json:"roof_area_sqft"`
+	ConnectionType    string  `json:"connection_type"`
+	SubsidyInterest   bool    `json:"subsidy_interest"`
+	PlantCapacityKW   float64 `json:"plant_capacity_kw"`
+	InstallationDate  string  `json:"installation_date"`
+	NetMetering       bool    `json:"net_metering"`
+	InverterBrand     string  `json:"inverter_brand"`
+	DISCOMName        string  `json:"discom_name"`
+	ConsumerNumber    string  `json:"consumer_number"`
+	DeviceLinked      bool    `json:"device_linked"`
+	DeviceID          string  `json:"device_id"`
+	SubsidyApplied    bool    `json:"subsidy_applied"`
+	SubsidyStatus     string  `json:"subsidy_status"`
+	SchemeName        string  `json:"scheme_name"`
+	ApplicationID     string  `json:"application_id"`
 }
 
 type UpdateUserRequest struct {
-	FirstName    string  `json:"first_name"`
-	LastName     string  `json:"last_name"`
-	Email        string  `json:"email"`
-	Role         string  `json:"role"`
-	Phone        string  `json:"phone"`
-	ProfileImage string  `json:"profile_image"`
-	AddressLine1 string  `json:"address_line1"`
-	AddressLine2 string  `json:"address_line2"`
-	City         string  `json:"city"`
-	State        string  `json:"state"`
-	Pincode      string  `json:"pincode"`
-	Region       string  `json:"region"`
-	Latitude     float64 `json:"latitude"`
-	Longitude    float64 `json:"longitude"`
+	FirstName         string  `json:"first_name"`
+	LastName          string  `json:"last_name"`
+	Email             string  `json:"email"`
+	Role              string  `json:"role"`
+	Phone             string  `json:"phone"`
+	ProfileImage      string  `json:"profile_image"`
+	AddressLine1      string  `json:"address_line1"`
+	AddressLine2      string  `json:"address_line2"`
+	City              string  `json:"city"`
+	State             string  `json:"state"`
+	Pincode           string  `json:"pincode"`
+	Region            string  `json:"region"`
+	Latitude          float64 `json:"latitude"`
+	Longitude         float64 `json:"longitude"`
+	AdminID           string  `json:"admin_id" binding:"-"`
+	InstallationStatus string  `json:"installation_status"`
+	PropertyType      string  `json:"property_type"`
+	AvgMonthlyBill    float64 `json:"avg_monthly_bill"`
+	RoofAreaSqft      float64 `json:"roof_area_sqft"`
+	ConnectionType    string  `json:"connection_type"`
+	SubsidyInterest   bool    `json:"subsidy_interest"`
+	PlantCapacityKW   float64 `json:"plant_capacity_kw"`
+	NetMetering       bool    `json:"net_metering"`
+	InverterBrand     string  `json:"inverter_brand"`
+	DISCOMName        string  `json:"discom_name"`
+	ConsumerNumber    string  `json:"consumer_number"`
+	SubsidyApplied    bool    `json:"subsidy_applied"`
+	SubsidyStatus     string  `json:"subsidy_status"`
+	SchemeName        string  `json:"scheme_name"`
+	ApplicationID     string  `json:"application_id"`
+}
+
+type UpdateSolarProfileRequest struct {
+	InstallationStatus string  `json:"installation_status"`
+	PropertyType       string  `json:"property_type"`
+	AvgMonthlyBill     float64 `json:"avg_monthly_bill"`
+	RoofAreaSqft       float64 `json:"roof_area_sqft"`
+	ConnectionType     string  `json:"connection_type"`
+	SubsidyInterest    bool    `json:"subsidy_interest"`
+	PlantCapacityKW    float64 `json:"plant_capacity_kw"`
+	InstallationDate   string  `json:"installation_date"`
+	NetMetering        bool    `json:"net_metering"`
+	InverterBrand      string  `json:"inverter_brand"`
+	DISCOMName         string  `json:"discom_name"`
+	ConsumerNumber     string  `json:"consumer_number"`
+	DeviceLinked       bool    `json:"device_linked"`
+	DeviceID           string  `json:"device_id"`
+	SubsidyApplied     bool    `json:"subsidy_applied"`
+	SubsidyStatus      string  `json:"subsidy_status"`
+	SchemeName         string  `json:"scheme_name"`
+	ApplicationID      string  `json:"application_id"`
 }
 
 func CreateUserHandler(c *gin.Context) {
@@ -69,11 +127,32 @@ func CreateUserHandler(c *gin.Context) {
 		return
 	}
 
-	user, err := CreateUser(req.FirstName, req.LastName, req.Email, string(hashedPassword), req.Role, req.Phone, req.ProfileImage, req.AddressLine1, req.AddressLine2, req.City, req.State, req.Pincode, req.Region, req.Latitude, req.Longitude)
+	user, err := CreateUser(req.FirstName, req.LastName, req.Email, string(hashedPassword), req.Role, req.Phone, req.ProfileImage, req.AddressLine1, req.AddressLine2, req.City, req.State, req.Pincode, req.Region, req.Latitude, req.Longitude, req.AdminID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 		return
 	}
+
+	// Set solar-specific fields if provided
+	if req.InstallationStatus != "" {
+		user.InstallationStatus = InstallationStatus(req.InstallationStatus)
+	}
+	if req.PropertyType != "" {
+		user.PropertyType = PropertyType(req.PropertyType)
+	}
+	user.AvgMonthlyBill = req.AvgMonthlyBill
+	user.RoofAreaSqft = req.RoofAreaSqft
+	if req.ConnectionType != "" {
+		user.ConnectionType = ConnectionType(req.ConnectionType)
+	}
+	user.SubsidyInterest = req.SubsidyInterest
+	user.PlantCapacityKW = req.PlantCapacityKW
+	user.NetMetering = req.NetMetering
+	user.InverterBrand = req.InverterBrand
+	user.DISCOMName = req.DISCOMName
+	user.ConsumerNumber = req.ConsumerNumber
+	
+	UpdateUser(user)
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User created successfully",
@@ -84,11 +163,27 @@ func CreateUserHandler(c *gin.Context) {
 func GetUsersHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
 
+	// Get role from query parameter, default to "ALL" for superadmin, "USER" for admin
+	var roleFilter string
+	if currentUserRole == "SUPER_ADMIN" {
+		roleFilter = c.DefaultQuery("role", "ALL")
+	} else {
+		roleFilter = c.DefaultQuery("role", "USER")
+	}
+
 	var users []*User
 	var err error
 
-	if currentUserRole == "SUPER_ADMIN" || currentUserRole == "ADMIN" {
-		users, err = GetAllUsers()
+	if currentUserRole == "SUPER_ADMIN" {
+		// SuperAdmin can see all users or filter by role if specified
+		if roleFilter == "ALL" {
+			users, err = GetAllUsersIncludingAdmins()
+		} else {
+			users, err = GetUsersByRole(roleFilter)
+		}
+	} else if currentUserRole == "ADMIN" {
+		// Admin can only see users with the specified role (not ADMIN or SUPER_ADMIN)
+		users, err = GetUsersByRole(roleFilter)
 	} else {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Access denied"})
 		return
@@ -122,6 +217,22 @@ func GetUserHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 
+func GetCurrentUserHandler(c *gin.Context) {
+	currentUserID := c.GetString("user_id")
+	if currentUserID == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Not authenticated"})
+		return
+	}
+
+	user, err := GetUserByID(currentUserID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"user": user})
+}
+
 func UpdateUserHandler(c *gin.Context) {
 	id := c.Param("id")
 	var req UpdateUserRequest
@@ -149,7 +260,7 @@ func UpdateUserHandler(c *gin.Context) {
 		return
 	}
 
-	// Update fields
+	// Update basic fields
 	if req.FirstName != "" {
 		user.FirstName = req.FirstName
 	}
@@ -188,6 +299,32 @@ func UpdateUserHandler(c *gin.Context) {
 	}
 	user.Latitude = req.Latitude
 	user.Longitude = req.Longitude
+	user.AdminID = req.AdminID
+	
+	// Update solar-specific fields
+	if req.InstallationStatus != "" {
+		user.InstallationStatus = InstallationStatus(req.InstallationStatus)
+	}
+	if req.PropertyType != "" {
+		user.PropertyType = PropertyType(req.PropertyType)
+	}
+	user.AvgMonthlyBill = req.AvgMonthlyBill
+	user.RoofAreaSqft = req.RoofAreaSqft
+	if req.ConnectionType != "" {
+		user.ConnectionType = ConnectionType(req.ConnectionType)
+	}
+	user.SubsidyInterest = req.SubsidyInterest
+	user.PlantCapacityKW = req.PlantCapacityKW
+	user.NetMetering = req.NetMetering
+	user.InverterBrand = req.InverterBrand
+	user.DISCOMName = req.DISCOMName
+	user.ConsumerNumber = req.ConsumerNumber
+	user.SubsidyApplied = req.SubsidyApplied
+	if req.SubsidyStatus != "" {
+		user.SubsidyStatus = SubsidyStatus(req.SubsidyStatus)
+	}
+	user.SchemeName = req.SchemeName
+	user.ApplicationID = req.ApplicationID
 
 	err = UpdateUser(user)
 	if err != nil {
@@ -196,6 +333,111 @@ func UpdateUserHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully", "user": user})
+}
+
+// UpdateSolarProfileHandler - Updates solar-specific profile for a user
+func UpdateSolarProfileHandler(c *gin.Context) {
+	currentUserID := c.GetString("user_id")
+	if currentUserID == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Not authenticated"})
+		return
+	}
+
+	var req UpdateSolarProfileRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := GetUserByID(currentUserID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Update solar-specific fields
+	if req.InstallationStatus != "" {
+		user.InstallationStatus = InstallationStatus(req.InstallationStatus)
+	}
+	if req.PropertyType != "" {
+		user.PropertyType = PropertyType(req.PropertyType)
+	}
+	user.AvgMonthlyBill = req.AvgMonthlyBill
+	user.RoofAreaSqft = req.RoofAreaSqft
+	if req.ConnectionType != "" {
+		user.ConnectionType = ConnectionType(req.ConnectionType)
+	}
+	user.SubsidyInterest = req.SubsidyInterest
+	user.PlantCapacityKW = req.PlantCapacityKW
+	if req.InstallationDate != "" {
+		if parsedDate, err := time.Parse("2006-01-02", req.InstallationDate); err == nil {
+			user.InstallationDate = parsedDate
+		}
+	}
+	user.NetMetering = req.NetMetering
+	user.InverterBrand = req.InverterBrand
+	user.DISCOMName = req.DISCOMName
+	user.ConsumerNumber = req.ConsumerNumber
+	user.DeviceLinked = req.DeviceLinked
+	user.DeviceID = req.DeviceID
+	user.SubsidyApplied = req.SubsidyApplied
+	if req.SubsidyStatus != "" {
+		user.SubsidyStatus = SubsidyStatus(req.SubsidyStatus)
+	}
+	user.SchemeName = req.SchemeName
+	user.ApplicationID = req.ApplicationID
+
+	err = UpdateUser(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update solar profile"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Solar profile updated successfully",
+		"user":    user,
+	})
+}
+
+// GetSolarProfileHandler - Returns solar profile for current user
+func GetSolarProfileHandler(c *gin.Context) {
+	currentUserID := c.GetString("user_id")
+	if currentUserID == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Not authenticated"})
+		return
+	}
+
+	user, err := GetUserByID(currentUserID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Return solar profile data
+	solarProfile := SolarProfile{
+		UserID:             user.ID,
+		InstallationStatus: user.InstallationStatus,
+		PropertyType:       user.PropertyType,
+		AvgMonthlyBill:     user.AvgMonthlyBill,
+		RoofAreaSqft:       user.RoofAreaSqft,
+		ConnectionType:     user.ConnectionType,
+		SubsidyInterest:    user.SubsidyInterest,
+		PlantCapacityKW:    user.PlantCapacityKW,
+		InstallationDate:   user.InstallationDate,
+		NetMetering:        user.NetMetering,
+		InverterBrand:      user.InverterBrand,
+		DISCOMName:         user.DISCOMName,
+		ConsumerNumber:     user.ConsumerNumber,
+		DeviceLinked:       user.DeviceLinked,
+		DeviceID:           user.DeviceID,
+		LastDataReceived:   user.LastDataReceived,
+		SubsidyApplied:     user.SubsidyApplied,
+		SubsidyStatus:      user.SubsidyStatus,
+		SchemeName:         user.SchemeName,
+		ApplicationID:      user.ApplicationID,
+	}
+
+	c.JSON(http.StatusOK, gin.H{"solar_profile": solarProfile})
 }
 
 func DeleteUserHandler(c *gin.Context) {
@@ -227,18 +469,21 @@ func GetAdminsHandler(c *gin.Context) {
 		return
 	}
 
-	users, err := GetAllUsers()
+	// Get users with role ADMIN directly
+	admins, err := GetUsersByRole("ADMIN")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch admins"})
 		return
 	}
 
-	admins := []*User{}
-	for _, u := range users {
-		if u.Role == "ADMIN" {
-			admins = append(admins, u)
-		}
-	}
-
 	c.JSON(http.StatusOK, gin.H{"admins": admins})
+}
+
+// Helper function to parse float from string
+func parseFloat(s string) float64 {
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return 0
+	}
+	return f
 }

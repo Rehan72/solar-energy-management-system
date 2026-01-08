@@ -16,7 +16,7 @@ export default function Master() {
               path={route.path}
               exact={route.exact}
               element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={route.allowedRoles}>
                   <route.element />
                  </ProtectedRoute>
               }

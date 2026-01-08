@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { isAuthenticated, isTokenExpired, logout } from '../lib/auth';
+import { isAuthenticated, isTokenExpired, logout, getUserRole } from '../lib/auth';
 import { notify } from '../lib/toast';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -30,6 +31,7 @@ const ProtectedRoute = ({ children }) => {
       }
 
       setIsAuth(isAuthenticated());
+      setUserRole(getUserRole());
       setLoading(false);
     };
 
@@ -47,6 +49,14 @@ const ProtectedRoute = ({ children }) => {
   if (!isAuth) {
     // Redirect to login page with return url
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Check role-based access if roles are specified
+  if (allowedRoles && allowedRoles.length > 0) {
+    if (!userRole || !allowedRoles.includes(userRole)) {
+      // Redirect to dashboard if user doesn't have required role
+      return <Navigate to="/dashboard" replace />;
+    }
   }
 
   return children;

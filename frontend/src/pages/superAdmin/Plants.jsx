@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Zap, Plus, Search, Filter, RefreshCw, MapPin, Battery, TrendingUp } from 'lucide-react'
 import StatCard from '../../components/ui/stat-card'
 import { getRequest } from '../../lib/apiService'
 
 export default function Plants() {
+  const navigate = useNavigate()
   const [plants, setPlants] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterRegion, setFilterRegion] = useState('ALL')
-  const token = localStorage.getItem('token')
 
   const fetchPlants = async () => {
     try {
@@ -58,7 +59,10 @@ export default function Plants() {
             <RefreshCw className="w-4 h-4" />
             <span>Refresh</span>
           </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-solar-success text-white font-semibold rounded-lg hover:bg-solar-success/80 transition sun-button">
+          <button 
+            onClick={() => navigate('/plants/create')}
+            className="flex items-center space-x-2 px-4 py-2 bg-solar-success text-white font-semibold rounded-lg hover:bg-solar-success/80 transition sun-button"
+          >
             <Plus className="w-4 h-4" />
             <span>Add Plant</span>
           </button>
@@ -180,7 +184,10 @@ export default function Plants() {
               </div>
 
               <div className="mt-4 pt-4 border-t border-solar-border">
-                <button className="w-full px-4 py-2 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button">
+                <button 
+                  onClick={() => navigate(`/plants/${plant.id}/edit`)}
+                  className="w-full px-4 py-2 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button"
+                >
                   View Details
                 </button>
               </div>

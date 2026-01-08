@@ -7,6 +7,7 @@ import (
 	"sems-backend/internal/devices"
 	"sems-backend/internal/energy"
 	"sems-backend/internal/middleware"
+	"sems-backend/internal/plants"
 	"sems-backend/internal/users"
 
 	"github.com/gin-contrib/cors"
@@ -46,7 +47,7 @@ func main() {
 	// Seed endpoint to create initial super admin (for testing)
 	r.POST("/seed/superadmin", func(c *gin.Context) {
 		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
-		_, err := users.CreateUser("Super", "Admin", "admin@solar.com", string(hashedPassword), "SUPER_ADMIN", "", "", "", "", "", "", "", "", 0, 0)
+		_, err := users.CreateUser("Super", "Admin", "admin@solar.com", string(hashedPassword), "SUPER_ADMIN", "", "", "", "", "", "", "", "", 0, 0, "")
 		if err != nil {
 			c.JSON(500, gin.H{"error": "Failed to create super admin", "details": err.Error()})
 			return
@@ -65,8 +66,20 @@ func main() {
 	user := r.Group("/user")
 	user.Use(middleware.AuthMiddleware(), middleware.RequireRole("USER", "ADMIN", "SUPER_ADMIN"))
 	{
+		user.GET("/profile", users.GetCurrentUserHandler)
+		user.PUT("/profile", users.UpdateUserHandler)
+		user.GET("/solar-profile", users.GetSolarProfileHandler)
+		user.PUT("/solar-profile", users.UpdateSolarProfileHandler)
 		user.GET("/energy/current", energy.CurrentEnergy)
 		user.POST("/energy/predict", energy.GetSolarPrediction)
+		user.GET("/energy/history", energy.GetEnergyHistoryHandler)
+		user.GET("/energy/analytics", energy.GetEnergyAnalyticsHandler)
+		// Device management for users
+		user.GET("/devices", devices.GetDevicesHandler)
+		user.GET("/devices/:id", devices.GetDeviceHandler)
+		user.PUT("/devices/:id", devices.UpdateDeviceHandler)
+		user.DELETE("/devices/:id", devices.DeleteDeviceHandler)
+		user.POST("/devices/:id/regenerate-key", devices.RegenerateAPIKeyHandler)
 	}
 
 	// INSTALLER Routes
@@ -86,6 +99,12 @@ func main() {
 		admin.PUT("/users/:id", users.UpdateUserHandler)
 		admin.DELETE("/users/:id", users.DeleteUserHandler)
 		admin.GET("/analytics", func(c *gin.Context) { c.JSON(200, gin.H{"message": "System analytics"}) })
+		
+		// Device management for admins
+		admin.GET("/devices", devices.GetAllDevicesHandler)
+		admin.GET("/devices/:id", devices.GetDeviceHandler)
+		admin.PUT("/devices/:id", devices.UpdateDeviceHandler)
+		admin.DELETE("/devices/:id", devices.DeleteDeviceHandler)
 	}
 
 	// SUPER_ADMIN Routes
@@ -98,6 +117,14 @@ func main() {
 		superAdmin.PUT("/admins/:id", users.UpdateUserHandler)
 		superAdmin.DELETE("/admins/:id", users.DeleteUserHandler)
 		superAdmin.GET("/users", users.GetUsersHandler) // all users
+		superAdmin.GET("/global/stats", users.GetGlobalStatsHandler)
+		
+		// Plants routes
+		superAdmin.GET("/plants", plants.GetPlantsHandler)
+		superAdmin.POST("/plants", plants.CreatePlantHandler)
+		superAdmin.GET("/plants/:id", plants.GetPlantHandler)
+		superAdmin.PUT("/plants/:id", plants.UpdatePlantHandler)
+		superAdmin.DELETE("/plants/:id", plants.DeletePlantHandler)
 	}
 
 	// GOVERNMENT Routes

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Users as UsersIcon, UserPlus, Search, Filter, RefreshCw, Eye, Edit } from 'lucide-react'
+import { Users as UsersIcon, UserPlus, Search, Filter, RefreshCw, Eye, Edit, User } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../../components/ui/stat-card'
 import { getRequest } from '../../lib/apiService'
@@ -9,8 +9,6 @@ export default function Users() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterRole, setFilterRole] = useState('ALL')
-  const token = localStorage.getItem('token')
 
   const fetchUsers = async () => {
     try {
@@ -29,17 +27,17 @@ export default function Users() {
   }, [])
 
   const filteredUsers = users.filter(user => {
-    const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRole = filterRole === 'ALL' || user.role === filterRole
-    return matchesSearch && matchesRole
+    const matchesSearch = user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (user.first_name && user.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                          (user.last_name && user.last_name.toLowerCase().includes(searchTerm.toLowerCase()))
+    return matchesSearch
   })
 
   const getRoleBadgeColor = (role) => {
     switch (role) {
-      case 'SUPER_ADMIN': return 'bg-solar-yellow text-solar-dark'
-      case 'ADMIN': return 'bg-solar-orange text-solar-dark'
       case 'USER': return 'bg-solar-success text-white'
+      case 'ADMIN': return 'bg-solar-orange text-white'
+      case 'SUPER_ADMIN': return 'bg-solar-danger text-white'
       default: return 'bg-solar-muted text-solar-primary'
     }
   }
@@ -74,31 +72,31 @@ export default function Users() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard
           title="Total Users"
-          value={users.length}
+          value={users.filter(u => u.role === 'USER').length}
           icon={UsersIcon}
           color="text-solar-yellow"
           gradient="from-solar-yellow/20 to-solar-orange/10"
         />
         <StatCard
-          title="Active Users"
-          value={users.filter(u => u.status === 'ACTIVE').length}
-          icon={UsersIcon}
-          color="text-solar-success"
-          gradient="from-solar-success/20 to-solar-success/5"
-        />
-        <StatCard
-          title="Admins"
+          title="Total Admins"
           value={users.filter(u => u.role === 'ADMIN').length}
           icon={UsersIcon}
           color="text-solar-orange"
           gradient="from-solar-orange/20 to-solar-orange/5"
         />
         <StatCard
-          title="Super Admins"
-          value={users.filter(u => u.role === 'SUPER_ADMIN').length}
+          title="Active Users"
+          value={users.filter(u => u.is_active && u.role === 'USER').length}
           icon={UsersIcon}
-          color="text-solar-yellow"
-          gradient="from-solar-yellow/20 to-solar-yellow/5"
+          color="text-solar-success"
+          gradient="from-solar-success/20 to-solar-success/5"
+        />
+        <StatCard
+          title="Pending Installation"
+          value={users.filter(u => u.role === 'USER' && (u.installation_status === 'NOT_INSTALLED' || u.installation_status === 'INSTALLATION_PLANNED')).length}
+          icon={UsersIcon}
+          color="text-solar-warning"
+          gradient="from-solar-warning/20 to-solar-warning/5"
         />
       </div>
 
@@ -114,19 +112,6 @@ export default function Users() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow"
             />
-          </div>
-          <div className="flex items-center space-x-2">
-            <Filter className="w-4 h-4 text-solar-muted" />
-            <select
-              value={filterRole}
-              onChange={(e) => setFilterRole(e.target.value)}
-              className="px-3 py-2 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow"
-            >
-              <option value="ALL">All Roles</option>
-              <option value="USER">Users</option>
-              <option value="ADMIN">Admins</option>
-              <option value="SUPER_ADMIN">Super Admins</option>
-            </select>
           </div>
         </div>
       </div>
@@ -158,11 +143,13 @@ export default function Users() {
                       <div className="flex items-center">
                         <div className="w-8 h-8 bg-solar-yellow rounded-full flex items-center justify-center mr-3">
                           <span className="text-solar-dark font-semibold text-sm">
-                            {user.name?.charAt(0)?.toUpperCase() || user.email.charAt(0).toUpperCase()}
+                            {(user.first_name || user.email).charAt(0).toUpperCase()}
                           </span>
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-solar-primary">{user.name || 'N/A'}</div>
+                          <div className="text-sm font-medium text-solar-primary">
+                            {user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : (user.email || 'N/A')}
+                          </div>
                           <div className="text-sm text-solar-muted">{user.email}</div>
                         </div>
                       </div>
@@ -174,9 +161,9 @@ export default function Users() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        user.status === 'ACTIVE' ? 'bg-solar-success text-white' : 'bg-solar-danger text-white'
+                        user.is_active ? 'bg-solar-success text-white' : 'bg-solar-danger text-white'
                       }`}>
-                        {user.status || 'ACTIVE'}
+                        {user.is_active ? 'ACTIVE' : 'INACTIVE'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-solar-muted">

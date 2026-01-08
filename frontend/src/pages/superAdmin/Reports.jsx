@@ -1,216 +1,144 @@
-import { useState, useEffect } from 'react'
-import { BarChart3, Download, Calendar, TrendingUp, Users, Zap, DollarSign, RefreshCw, FileText } from 'lucide-react'
+import { useState } from 'react'
+import { Download, FileText, BarChart3, TrendingUp, Users, Zap, DollarSign, Calendar } from 'lucide-react'
 import StatCard from '../../components/ui/stat-card'
-import { getRequest } from '../../lib/apiService'
 
-function Reports() {
-  const [reports, setReports] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [selectedPeriod, setSelectedPeriod] = useState('monthly')
-  const token = localStorage.getItem('token')
+export default function Reports() {
+  const [selectedReport, setSelectedReport] = useState('overview')
+  const [dateRange, setDateRange] = useState('month')
 
-  const fetchReports = async () => {
-    try {
-      setLoading(true)
-      const response = await getRequest(`/superadmin/reports?period=${selectedPeriod}`)
-      setReports(response.data.reports || [])
-    } catch (error) {
-      console.error('Failed to fetch reports:', error)
-    } finally {
-      setLoading(false)
+  const reports = [
+    { id: 'overview', name: 'System Overview', icon: BarChart3, description: 'Complete system performance summary' },
+    { id: 'energy', name: 'Energy Generation', icon: Zap, description: 'Solar energy generation reports' },
+    { id: 'users', name: 'User Analysis', icon: Users, description: 'User growth and engagement metrics' },
+    { id: 'revenue', name: 'Revenue Report', icon: DollarSign, description: 'Financial performance and revenue' },
+  ]
+
+  const sampleData = {
+    overview: {
+      totalEnergy: '24,456 kWh',
+      totalUsers: 1250,
+      totalRevenue: '₹4.8L',
+      growth: '+12.5%',
+    },
+    energy: {
+      peakGeneration: '4.8 kW',
+      avgDaily: '22.3 kWh',
+      efficiency: '94.2%',
+      co2Saved: '156.8 tons',
+    },
+    users: {
+      newUsers: 145,
+      activeUsers: 890,
+      installations: 78,
+      satisfaction: '4.8/5',
+    },
+    revenue: {
+      total: '₹4,85,000',
+      avgPerUser: '₹388',
+      growth: '+8.3%',
+      projections: '₹6.2L',
     }
   }
 
-  useEffect(() => {
-    fetchReports()
-  }, [selectedPeriod])
+  const data = sampleData[selectedReport] || sampleData.overview
 
-  const reportTypes = [
-    {
-      title: 'User Activity Report',
-      description: 'Detailed user engagement and activity metrics',
-      icon: Users,
-      color: 'text-solar-yellow',
-      bgColor: 'bg-solar-yellow/10'
-    },
-    {
-      title: 'Energy Generation Report',
-      description: 'Solar energy production and efficiency analysis',
-      icon: Zap,
-      color: 'text-solar-success',
-      bgColor: 'bg-solar-success/10'
-    },
-    {
-      title: 'Financial Report',
-      description: 'Revenue, savings, and ROI calculations',
-      icon: DollarSign,
-      color: 'text-solar-orange',
-      bgColor: 'bg-solar-orange/10'
-    },
-    {
-      title: 'System Performance Report',
-      description: 'Platform uptime and system health metrics',
-      icon: TrendingUp,
-      color: 'text-solar-panel',
-      bgColor: 'bg-solar-panel/10'
-    }
-  ]
+  const handleDownload = (reportType) => {
+    notify.success(`Downloading ${reportType} report...`)
+  }
 
-  const quickStats = [
-    { label: 'Total Reports Generated', value: '247', icon: FileText, color: 'text-solar-primary', gradient: 'from-solar-primary/20 to-solar-primary/5' },
-    { label: 'This Month', value: '34', icon: Calendar, color: 'text-solar-yellow', gradient: 'from-solar-yellow/20 to-solar-orange/10' },
-    { label: 'Active Downloads', value: '12', icon: Download, color: 'text-solar-success', gradient: 'from-solar-success/20 to-solar-success/5' },
-    { label: 'Scheduled Reports', value: '8', icon: BarChart3, color: 'text-solar-orange', gradient: 'from-solar-orange/20 to-solar-orange/5' }
-  ]
+  const notify = {
+    success: (msg) => console.log(msg),
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold sun-glow-text">Reports & Analytics</h1>
-          <p className="text-solar-muted mt-1">Generate and download comprehensive system reports</p>
+          <h1 className="text-2xl font-bold sun-glow-text">Reports</h1>
+          <p className="text-solar-muted mt-1">Generate and download system reports</p>
         </div>
-        <div className="flex space-x-3">
-          <button
-            onClick={fetchReports}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button"
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span>Refresh</span>
-          </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-solar-warning text-solar-dark font-semibold rounded-lg hover:bg-solar-warning/80 transition sun-button">
-            <Download className="w-4 h-4" />
-            <span>Export All</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {quickStats.map((stat, index) => (
-          <StatCard
-            key={index}
-            title={stat.label}
-            value={stat.value}
-            icon={stat.icon}
-            color={stat.color}
-            gradient={stat.gradient}
-          />
-        ))}
-      </div>
-
-      {/* Period Selector */}
-      <div className="bg-solar-card rounded-lg p-4 energy-card">
         <div className="flex items-center space-x-4">
-          <span className="text-solar-primary font-medium">Report Period:</span>
-          <div className="flex space-x-2">
-            {['weekly', 'monthly', 'quarterly', 'yearly'].map((period) => (
-              <button
-                key={period}
-                onClick={() => setSelectedPeriod(period)}
-                className={`px-4 py-2 rounded-lg font-medium transition sun-button ${
-                  selectedPeriod === period
-                    ? 'bg-solar-yellow text-solar-dark'
-                    : 'bg-solar-night/80 text-solar-muted hover:bg-solar-panel/20'
-                }`}
-              >
-                {period.charAt(0).toUpperCase() + period.slice(1)}
-              </button>
-            ))}
-          </div>
+          <select 
+            value={dateRange} 
+            onChange={(e) => setDateRange(e.target.value)}
+            className="h-10 bg-solar-card text-solar-primary border border-solar-border rounded-lg px-3"
+          >
+            <option value="week">Last Week</option>
+            <option value="month">Last Month</option>
+            <option value="quarter">Last Quarter</option>
+            <option value="year">Last Year</option>
+          </select>
         </div>
       </div>
 
-      {/* Report Types */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {reportTypes.map((report, index) => (
-          <div key={index} className="bg-gradient-to-br from-solar-card to-solar-night/30 rounded-xl p-8 energy-card border border-solar-border/50 shadow-xl">
-            <div className="flex items-start space-x-4">
-              <div className={`w-12 h-12 ${report.bgColor} rounded-lg flex items-center justify-center`}>
-                <report.icon className={`w-6 h-6 ${report.color}`} />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-solar-primary mb-2">{report.title}</h3>
-                <p className="text-solar-muted mb-4">{report.description}</p>
-                <div className="flex space-x-2">
-                  <button className="px-4 py-2 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button">
-                    Generate Report
-                  </button>
-                  <button className="px-4 py-2 bg-solar-panel/20 text-solar-panel font-semibold rounded-lg hover:bg-solar-panel/30 transition sun-button">
-                    Schedule
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Report Type Selection */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {reports.map((report) => (
+          <button
+            key={report.id}
+            onClick={() => setSelectedReport(report.id)}
+            className={`p-4 rounded-xl border transition-all duration-300 text-left ${
+              selectedReport === report.id
+                ? 'bg-solar-card border-solar-yellow shadow-lg shadow-solar-yellow/10'
+                : 'bg-solar-card border-solar-border hover:border-solar-yellow/50'
+            }`}
+          >
+            <report.icon className={`w-8 h-8 mb-3 ${selectedReport === report.id ? 'text-solar-yellow' : 'text-solar-muted'}`} />
+            <h3 className="font-semibold text-solar-primary">{report.name}</h3>
+            <p className="text-sm text-solar-muted mt-1">{report.description}</p>
+          </button>
         ))}
+      </div>
+
+      {/* Report Content */}
+      <div className="bg-solar-card rounded-xl p-6 energy-card">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-solar-primary capitalize">{selectedReport} Report</h2>
+          <button
+            onClick={() => handleDownload(selectedReport)}
+            className="flex items-center space-x-2 px-4 py-2 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition"
+          >
+            <Download className="w-4 h-4" />
+            <span>Download PDF</span>
+          </button>
+        </div>
+
+        {/* Stats based on report type */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Object.entries(data).map(([key, value]) => (
+            <div key={key} className="bg-solar-night/30 rounded-lg p-4">
+              <p className="text-sm text-solar-muted capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+              <p className="text-2xl font-bold text-solar-primary mt-1">{value}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Recent Reports */}
-      <div className="bg-solar-card rounded-lg overflow-hidden energy-card">
-        <div className="p-6 border-b border-solar-border">
-          <h2 className="text-xl font-semibold text-solar-primary">Recent Reports</h2>
+      <div className="bg-solar-card rounded-xl p-6 energy-card">
+        <h2 className="text-xl font-bold text-solar-primary mb-4">Recent Reports</h2>
+        <div className="space-y-3">
+          {[
+            { name: 'Monthly Energy Report - December 2024', date: 'Jan 1, 2025', size: '2.4 MB' },
+            { name: 'User Growth Analysis Q4 2024', date: 'Jan 1, 2025', size: '1.8 MB' },
+            { name: 'Revenue Summary - November 2024', date: 'Dec 1, 2024', size: '1.2 MB' },
+            { name: 'System Performance Report', date: 'Nov 15, 2024', size: '3.1 MB' },
+          ].map((report, index) => (
+            <div key={index} className="flex items-center justify-between p-4 bg-solar-night/20 rounded-lg hover:bg-solar-night/40 transition">
+              <div className="flex items-center space-x-3">
+                <FileText className="w-5 h-5 text-solar-yellow" />
+                <div>
+                  <p className="font-medium text-solar-primary">{report.name}</p>
+                  <p className="text-sm text-solar-muted">{report.date} • {report.size}</p>
+                </div>
+              </div>
+              <button className="p-2 text-solar-muted hover:text-solar-yellow transition">
+                <Download className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
         </div>
-        {loading ? (
-          <div className="p-8 text-center">
-            <div className="animate-spin w-8 h-8 border-2 border-solar-yellow border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-solar-muted">Loading reports...</p>
-          </div>
-        ) : reports.length === 0 ? (
-          <div className="p-8 text-center">
-            <FileText className="w-16 h-16 text-solar-muted mx-auto mb-4" />
-            <p className="text-solar-muted">No reports generated yet</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-solar-night/80">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Report Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Generated</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Size</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-solar-border">
-                {reports.map((report, index) => (
-                  <tr key={index} className="hover:bg-solar-night/40">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <FileText className="w-4 h-4 text-solar-yellow mr-3" />
-                        <span className="text-sm font-medium text-solar-primary">{report.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-solar-panel/20 text-solar-panel">
-                        {report.type}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-solar-muted">
-                      {report.generated_at || 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-solar-muted">
-                      {report.size || 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button className="text-solar-yellow hover:text-solar-orange transition sun-button mr-3">
-                        Download
-                      </button>
-                      <button className="text-solar-muted hover:text-solar-primary transition">
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
       </div>
     </div>
   )
 }
-
-export default Reports

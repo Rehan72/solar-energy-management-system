@@ -1,30 +1,41 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, User, X, Columns2, SheetIcon, Users, Shield, User2Icon, OrigamiIcon, LogOut } from "lucide-react";
+import { Home, User, X, Columns2, SheetIcon, Users, User2Icon, OrigamiIcon, LogOut, Cpu, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Calendar } from "lucide-react";
-import { logout } from "../lib/auth";
+import { logout, getUserRole } from "../lib/auth";
 
 function Navbar({ sidebarOpen, setSidebarOpen }) {
   const [isOpen, setIsOpen] = useState(true);
-   const { pathname } = useLocation()
+  const { pathname } = useLocation();
+  const userRole = getUserRole();
 
   const toggleSidebar = () => {
     setIsOpen((prev) => !prev);
   };
 
-  const menu = [
+  // Menu for regular users (solar customers)
+  const userMenu = [
+    { name: "My Devices", path: "/devices", icon: <Cpu size={18} /> },
+    { name: "Energy Analytics", path: "/energy-analytics", icon: <Zap size={18} /> },
+    { name: "Profile", path: "/profile", icon: <User size={18} /> },
+  ];
+
+  // Menu for admins (platform administrators)
+  const adminMenu = [
     { name: "GlobalDashboard", path: "/dashboard", icon: <Home size={18} /> },
     { name: "Regions", path: "/regions", icon: <OrigamiIcon size={18} /> },
-    { name: "Plants", path: "/plants", icon: <Users size={18} /> },
+    { name: "Plants", path: "/plants", icon: <Zap size={18} /> },
+    { name: "Admin Devices", path: "/admin/devices", icon: <Cpu size={18} /> },
     { name: "Admin List", path: "/admins", icon: <Users size={18} /> },
     { name: "User List", path: "/users", icon: <User2Icon size={18} /> },
     { name: "Reports", path: "/reports", icon: <SheetIcon size={18} /> },
-    { name: "Profile", path: "/profile", icon: <User size={18} /> },
-    { name: "Event", path: "/event", icon:<Calendar size={18} /> },
-    
+    { name: "Event", path: "/event", icon: <Calendar size={18} /> },
   ];
+
+  // Build menu based on user role
+  const menu = userRole === "USER" ? userMenu : adminMenu;
 
   const handleLogout = () => {
     logout();

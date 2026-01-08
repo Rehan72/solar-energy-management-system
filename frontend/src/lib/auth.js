@@ -1,5 +1,3 @@
-import { useNavigate } from "react-router-dom";
-
 // Get stored token
 export const getToken = () => {
   return localStorage.getItem("token");
@@ -9,6 +7,12 @@ export const getToken = () => {
 export const getUser = () => {
   const user = localStorage.getItem("user");
   return user ? JSON.parse(user) : null;
+};
+
+// Get user role
+export const getUserRole = () => {
+  const user = getUser();
+  return user?.role || null;
 };
 
 // Check if user is authenticated
