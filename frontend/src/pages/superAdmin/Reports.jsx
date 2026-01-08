@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { BarChart3, Download, Calendar, TrendingUp, Users, Zap, DollarSign, RefreshCw, FileText } from 'lucide-react'
 import StatCard from '../../components/ui/stat-card'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { getRequest } from '../../lib/apiService'
 
 function Reports() {
   const [reports, setReports] = useState([])
@@ -14,9 +12,7 @@ function Reports() {
   const fetchReports = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${API_BASE_URL}/superadmin/reports?period=${selectedPeriod}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await getRequest(`/superadmin/reports?period=${selectedPeriod}`)
       setReports(response.data.reports || [])
     } catch (error) {
       console.error('Failed to fetch reports:', error)

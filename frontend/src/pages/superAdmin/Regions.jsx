@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { MapPin, Plus, Search, RefreshCw, Users, Zap, TrendingUp, Globe } from 'lucide-react'
 import StatCard from '../../components/ui/stat-card'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { getRequest } from '../../lib/apiService'
 
 export default function Regions() {
   const [regions, setRegions] = useState([])
@@ -14,9 +12,7 @@ export default function Regions() {
   const fetchRegions = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${API_BASE_URL}/superadmin/regions`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await getRequest('/superadmin/regions')
       setRegions(response.data.regions || [])
     } catch (error) {
       console.error('Failed to fetch regions:', error)

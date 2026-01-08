@@ -1,151 +1,79 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { Shield, UserPlus, Search, Filter, RefreshCw, MapPin, Mail, Calendar, Edit, Trash2, Eye } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../../components/ui/stat-card'
-import DataTable from '../../components/common/DataTable'
-import { Button } from '@/components/ui/button'
-
-const API_BASE_URL = 'http://localhost:8080'
+import CardTable from '../../components/common/CardTable'
+import SearchBar from '../../components/common/Search'
+import SunLoader from '../../components/SunLoader'
+import { getRequest, deleteRequest } from '../../lib/apiService'
 
 export default function Admins() {
   const navigate = useNavigate()
   const [admins, setAdmins] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [filterRegion, setFilterRegion] = useState('ALL')
-  const token = localStorage.getItem('token')
+  const [loading, setLoading] = useState(true)
 
   const fetchAdmins = async () => {
+    setLoading(true)
     try {
-      const response = await axios.get(`${API_BASE_URL}/superadmin/admins`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await getRequest('/superadmin/admins')
       // Combine first_name and last_name into name field
       const adminsData = (response.data.admins || []).map(admin => ({
         ...admin,
-        name: `${admin.first_name || ''} ${admin.last_name || ''}`.trim()
+        name: `${admin.first_name || ''} ${admin.last_name || ''}`.trim(),
+        phone: admin.phone || 'N/A',
+        address: admin.region || 'N/A',
+        joinDate: admin.created_at ? new Date(admin.created_at).toLocaleDateString() : 'N/A',
+        role: 'Admin',
+        status: admin.status || 'ACTIVE',
+        gender: admin.gender || 'N/A',
+        age: admin.age || 'N/A',
+        nationality: admin.nationality || 'N/A',
+        department: admin.region || 'N/A',
       }))
       setAdmins(adminsData)
     } catch (error) {
       console.error('Failed to fetch admins:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleDeleteAdmin = async (id) => {
+  const handleDeleteAdmin = async (admin) => {
     if (!confirm('Are you sure you want to delete this admin? This action cannot be undone.')) return
     
     try {
-      await axios.delete(`${API_BASE_URL}/superadmin/admins/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      await deleteRequest(`/superadmin/admins/${admin.id}`)
       fetchAdmins()
     } catch (error) {
       console.error('Failed to delete admin:', error)
-      alert(error.response?.data?.error || 'Failed to delete admin')
     }
+  }
+
+  const handleEditAdmin = (admin) => {
+    navigate(`/admins/${admin.id}`)
+  }
+
+  const handleViewAdmin = (admin) => {
+    navigate(`/admins/${admin.id}?view=true`)
   }
 
   useEffect(() => {
     fetchAdmins()
   }, [])
 
-  const filteredAdmins = admins.filter(admin => {
-    const fullName = `${admin.first_name || ''} ${admin.last_name || ''}`.trim().toLowerCase()
-    const searchTermLower = searchTerm.toLowerCase()
-    const matchesSearch = admin.email?.toLowerCase().includes(searchTermLower) ||
-                         fullName.includes(searchTermLower) ||
-                         admin.first_name?.toLowerCase().includes(searchTermLower) ||
-                         admin.last_name?.toLowerCase().includes(searchTermLower)
-    const matchesRegion = filterRegion === 'ALL' || admin.region === filterRegion
-    return matchesSearch && matchesRegion
-  })
 
-  // Define columns for DataTable
-  const columns = [
-    {
-      accessorKey: 'name',
-      header: 'Full Name',
-    },
-    {
-      accessorKey: 'email',
-      header: 'Email',
-    },
-    {
-      accessorKey: 'status',
-      header: 'Status',
-      cell: (row) => {
-        const statusColors = {
-          ACTIVE: 'bg-solar-success text-white',
-          INACTIVE: 'bg-solar-danger text-white',
-          PENDING: 'bg-solar-warning text-solar-dark',
-        }
-        return (
-          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColors[row.status] || 'bg-solar-muted text-solar-primary'}`}>
-            {row.status || 'ACTIVE'}
-          </span>
-        )
-      },
-    },
-    {
-      accessorKey: 'region',
-      header: 'Region',
-    },
-    {
-      accessorKey: 'users_count',
-      header: 'Users',
-    },
-    {
-      accessorKey: 'plants_count',
-      header: 'Plants',
-    },
-    {
-      accessorKey: 'created_at',
-      header: 'Joined',
-      cell: (row) => row.created_at ? new Date(row.created_at).toLocaleDateString() : 'N/A',
-    },
-    {
-      header: 'Actions',
-      cell: (row) => (
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              navigate(`/admins/${row.id}`)
-            }}
-          >
-            <Eye className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              navigate(`/admins/${row.id}/edit`)
-            }}
-          >
-            <Edit className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              handleDeleteAdmin(row.id)
-            }}
-            className="text-red-500 hover:text-red-700"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
-        </div>
-      ),
-      className: 'w-36',
-    },
-  ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Loading overlay */}
+      {loading && (
+        <div className="absolute inset-0 bg-solar-bg/80 z-50 flex flex-col items-center justify-center">
+          <SunLoader message="Loading admins..." size="large" />
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -203,16 +131,13 @@ export default function Admins() {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-solar-card rounded-lg p-4 energy-card">
+      <div className="bg-solar-card rounded-lg p-4 ">
         <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-solar-muted" />
-            <input
-              type="text"
+          <div className="flex-1">
+            <SearchBar
               placeholder="Search admins by name or email..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow"
+              onChange={({ value }) => setSearchTerm(value)}
             />
           </div>
           <div className="flex items-center space-x-2">
@@ -232,15 +157,21 @@ export default function Admins() {
         </div>
       </div>
 
-      {/* Admins Table */}
-      <DataTable
-        columns={columns}
-        data={filteredAdmins}
+      {/* Admins Card Table */}
+      <CardTable
+        users={admins}
         title="Admins"
-        initialPageSize={10}
-        pageSizeOptions={[5, 10, 20, 50]}
-        emptyMessage="No admins found"
-        onRowClick={(row) => navigate(`/admins/${row.id}`)}
+        subtitle="No admins found. Try adjusting your search or filters."
+        onEdit={handleEditAdmin}
+        onView={handleViewAdmin}
+        onDelete={handleDeleteAdmin}
+        showPagination={true}
+        paginationInfo={{
+          currentPageItems: admins.length,
+          totalItems: admins.length,
+          previousPage: false,
+          nextPage: false,
+        }}
       />
     </div>
   )

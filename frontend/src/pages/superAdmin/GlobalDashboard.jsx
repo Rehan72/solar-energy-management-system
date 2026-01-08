@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { Activity, TrendingUp, Users, Zap, DollarSign, RefreshCw, BarChart3, Globe } from 'lucide-react'
 import StatCard from '../../components/ui/stat-card'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { getRequest } from '../../lib/apiService'
 
 export default function GlobalDashboard() {
   const [globalStats, setGlobalStats] = useState({
@@ -22,9 +20,7 @@ export default function GlobalDashboard() {
   const fetchGlobalStats = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${API_BASE_URL}/superadmin/global/stats`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await getRequest('/superadmin/global/stats')
       if (response.data) {
         setGlobalStats(prev => ({ ...prev, ...response.data }))
       }

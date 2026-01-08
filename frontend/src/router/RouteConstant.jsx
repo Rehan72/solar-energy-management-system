@@ -39,14 +39,14 @@ export default [
       exact: true
     },
     {
-      element: AdminDetail,
-      path: `/admins/:id`,
+      element: CreateAdmin,
+      path: `/admins/:id/edit`,
       //permission: RoutePermission?.PLATFORM_ADMIN,
       exact: true
     },
     {
-      element: AdminEdit,
-      path: `/admins/:id/edit`,
+      element: CreateAdmin,
+      path: `/admins/:id`,
       //permission: RoutePermission?.PLATFORM_ADMIN,
       exact: true
     },

@@ -1,10 +1,9 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
-
-const API_BASE_URL = "http://localhost:8080";
+import { postRequest } from "../lib/apiService";
+import { notify } from "../lib/toast";
 
 function Register() {
   const [name, setName] = useState("");
@@ -17,18 +16,15 @@ function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/auth/register`, {
+      await postRequest("/auth/register", {
         name,
         email,
         password,
       });
-      alert("Registration successful! Please login.");
+      notify.success("Registration successful! Please login.");
       navigate("/login");
     } catch (error) {
-      alert(
-        "Registration failed: " +
-          (error.response?.data?.error || "Unknown error")
-      );
+      notify.error("Registration failed: " + (error.response?.data?.error || "Unknown error"));
     }
     setLoading(false);
   };

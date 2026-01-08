@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { LogOut, User, RefreshCw, BarChart3, Users, Activity, Settings, Shield, Globe, Zap } from 'lucide-react'
 import StatCard from '../ui/stat-card'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { getRequest } from '../../lib/apiService'
 
 function SuperAdminDashboard() {
   const [stats, setStats] = useState({
@@ -21,10 +19,10 @@ function SuperAdminDashboard() {
   const fetchStats = async () => {
     try {
       const [usersRes, adminsRes, plantsRes, regionsRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/superadmin/stats/users`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(`${API_BASE_URL}/superadmin/stats/admins`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(`${API_BASE_URL}/superadmin/stats/plants`, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(`${API_BASE_URL}/superadmin/stats/regions`, { headers: { Authorization: `Bearer ${token}` } })
+        getRequest('/superadmin/stats/users'),
+        getRequest('/superadmin/stats/admins'),
+        getRequest('/superadmin/stats/plants'),
+        getRequest('/superadmin/stats/regions')
       ])
 
       setStats({

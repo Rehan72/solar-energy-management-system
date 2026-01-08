@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { Users as UsersIcon, UserPlus, Search, Filter, RefreshCw, Eye, Edit } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../../components/ui/stat-card'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { getRequest } from '../../lib/apiService'
 
 export default function Users() {
   const navigate = useNavigate()
@@ -17,9 +15,7 @@ export default function Users() {
   const fetchUsers = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${API_BASE_URL}/superadmin/users`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await getRequest('/superadmin/users')
       setUsers(response.data.users || [])
     } catch (error) {
       console.error('Failed to fetch users:', error)
@@ -107,7 +103,7 @@ export default function Users() {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-solar-card rounded-lg p-4 energy-card">
+      <div className="bg-solar-card rounded-lg p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-solar-muted" />
@@ -136,7 +132,7 @@ export default function Users() {
       </div>
 
       {/* Users Table */}
-      <div className="bg-solar-card rounded-lg overflow-hidden energy-card">
+      <div className="bg-solar-card rounded-lg overflow-hidden">
         {loading ? (
           <div className="p-8 text-center">
             <div className="animate-spin w-8 h-8 border-2 border-solar-yellow border-t-transparent rounded-full mx-auto mb-4"></div>

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import axios from 'axios'
 import { Shield, ArrowLeft, User, Mail, Calendar, Edit, Trash2, MapPin } from 'lucide-react'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { getRequest, deleteRequest } from '../../lib/apiService'
+import { notify } from '../../lib/toast'
 
 export default function AdminDetail() {
   const navigate = useNavigate()
@@ -16,9 +15,7 @@ export default function AdminDetail() {
   useEffect(() => {
     const fetchAdmin = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/superadmin/admins/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        const response = await getRequest(`/superadmin/admins/${id}`)
         setAdmin(response.data.admin || response.data)
       } catch (error) {
         console.error('Failed to fetch admin:', error)
@@ -34,13 +31,11 @@ export default function AdminDetail() {
     if (!confirm('Are you sure you want to delete this admin? This action cannot be undone.')) return
     
     try {
-      await axios.delete(`${API_BASE_URL}/superadmin/admins/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      await deleteRequest(`/superadmin/admins/${id}`)
       navigate('/admins')
     } catch (error) {
       console.error('Failed to delete admin:', error)
-      alert(error.response?.data?.error || 'Failed to delete admin')
+      notify.error(error.response?.data?.error || 'Failed to delete admin')
     }
   }
 

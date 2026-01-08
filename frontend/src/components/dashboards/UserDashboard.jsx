@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
 import { Sun, Battery, Zap, TrendingUp, LogOut, User, RefreshCw } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../ui/stat-card'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { getRequest, postRequest } from '../../lib/apiService'
 
 function UserDashboard() {
   const [energyData, setEnergyData] = useState({ solar: 0, load: 0, battery: 0, grid: 0 })
@@ -16,9 +14,7 @@ function UserDashboard() {
 
   const fetchEnergyData = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/user/energy/current`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await getRequest('/user/energy/current')
       setEnergyData(response.data)
     } catch (error) {
       console.error('Failed to fetch energy data:', error)
@@ -27,9 +23,7 @@ function UserDashboard() {
 
   const fetchPrediction = async () => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/user/energy/predict`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await postRequest('/user/energy/predict', {})
       setPrediction(response.data)
     } catch (error) {
       console.error('Failed to fetch prediction:', error)

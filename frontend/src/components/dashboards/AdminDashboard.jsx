@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { LogOut, User, RefreshCw, BarChart3, Users, Activity } from 'lucide-react'
 import UserTable from '../common/UserTable'
 import StatCard from '../ui/stat-card'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { getRequest } from '../../lib/apiService'
 
 function AdminDashboard() {
   const [users, setUsers] = useState([])
@@ -16,9 +14,7 @@ function AdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/admin/users`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await getRequest('/admin/users')
       setUsers(response.data.users)
     } catch (error) {
       console.error('Failed to fetch users:', error)
@@ -27,9 +23,7 @@ function AdminDashboard() {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/admin/analytics`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await getRequest('/admin/analytics')
       setAnalytics(response.data)
     } catch (error) {
       console.error('Failed to fetch analytics:', error)

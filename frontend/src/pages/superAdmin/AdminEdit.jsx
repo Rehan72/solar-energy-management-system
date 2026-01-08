@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import axios from 'axios'
 import { Shield, ArrowLeft, User, Mail, MapPin, Lock, CheckCircle } from 'lucide-react'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { getRequest, putRequest } from '../../lib/apiService'
+import { notify } from '../../lib/toast'
 
 export default function AdminEdit() {
   const navigate = useNavigate()
@@ -40,9 +39,7 @@ export default function AdminEdit() {
   useEffect(() => {
     const fetchAdmin = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/superadmin/admins/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        const response = await getRequest(`/superadmin/admins/${id}`)
         const admin = response.data.admin || response.data
         setFormData({
           first_name: admin.first_name || '',
@@ -104,9 +101,7 @@ export default function AdminEdit() {
         updateData.password = formData.password
       }
 
-      await axios.put(`${API_BASE_URL}/superadmin/admins/${id}`, updateData, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      await putRequest(`/superadmin/admins/${id}`, updateData)
       
       setSuccess(true)
       setTimeout(() => {

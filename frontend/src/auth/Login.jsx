@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
-import api from "../lib/axios";
 import { login } from "../lib/auth";
 import { notify } from "../lib/toast";
+import { postRequest } from "../lib/apiService";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -16,7 +16,7 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await api.post("/auth/login", {
+      const response = await postRequest("/auth/login", {
         email,
         password,
       });

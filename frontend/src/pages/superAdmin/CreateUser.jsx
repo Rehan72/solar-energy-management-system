@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import { Users, ArrowLeft, User, Mail, Lock, CheckCircle } from 'lucide-react'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { postRequest } from '../../lib/apiService'
+import { notify } from '../../lib/toast'
 
 export default function CreateUser() {
   const navigate = useNavigate()
@@ -48,23 +47,22 @@ export default function CreateUser() {
     setError('')
 
     try {
-      await axios.post(`${API_BASE_URL}/admin/users`, {
+      await postRequest('/admin/users', {
         first_name: formData.first_name,
         last_name: formData.last_name,
         email: formData.email,
         password: formData.password,
         role: 'USER'
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       })
       
       setSuccess(true)
+      notify.success('User created successfully!')
       setTimeout(() => {
         navigate('/users')
       }, 2000)
     } catch (error) {
-      console.error('Failed to create user:', error)
       setError(error.response?.data?.error || 'Failed to create user. Please try again.')
+      notify.error(error.response?.data?.error || 'Failed to create user. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -114,7 +112,7 @@ export default function CreateUser() {
       </div>
 
       {/* Form */}
-      <div className="bg-solar-card rounded-lg p-6 energy-card">
+      <div className="bg-solar-card rounded-lg p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div className="bg-solar-danger/20 border border-solar-danger text-solar-danger px-4 py-3 rounded-lg">

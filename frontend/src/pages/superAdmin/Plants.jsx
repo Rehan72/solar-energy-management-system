@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { Zap, Plus, Search, Filter, RefreshCw, MapPin, Battery, TrendingUp } from 'lucide-react'
 import StatCard from '../../components/ui/stat-card'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { getRequest } from '../../lib/apiService'
 
 export default function Plants() {
   const [plants, setPlants] = useState([])
@@ -15,9 +13,7 @@ export default function Plants() {
   const fetchPlants = async () => {
     try {
       setLoading(true)
-      const response = await axios.get(`${API_BASE_URL}/superadmin/plants`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      const response = await getRequest('/superadmin/plants')
       setPlants(response.data.plants || [])
     } catch (error) {
       console.error('Failed to fetch plants:', error)

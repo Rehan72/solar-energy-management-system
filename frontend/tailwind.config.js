@@ -10,7 +10,6 @@ export default {
     extend: {
       colors: {
         solar: {
-          // Light Mode
           primary: 'var(--solar-primary)',
           yellow: 'var(--solar-yellow)',
           orange: 'var(--solar-orange)',
@@ -19,8 +18,6 @@ export default {
           card: 'var(--solar-card)',
           border: 'var(--solar-border)',
           night: 'var(--solar-night)',
-
-          // Functional
           success: 'var(--solar-success)',
           warning: 'var(--solar-warning)',
           danger: 'var(--solar-danger)',

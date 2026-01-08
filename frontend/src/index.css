@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import "tailwindcss";
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -66,6 +65,8 @@ body {
   color: #FFFFFF;
 }
 
+@import "tailwindcss";
+
 /* Energy Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -118,11 +119,9 @@ body {
   animation: pulse-bg 4s ease-in-out infinite;
 }
 
-
-
 /* ===============================
    ⚡ ENERGY PARTICLES
-================================ */
+ ================================ */
 
 .energy-particle {
   position: absolute;
@@ -150,7 +149,7 @@ body {
 
 /* ===============================
    🌟 LIGHT RAYS
-================================ */
+ ================================ */
 
 /* 🌟 LIGHT RAYS */
 .light-ray {
@@ -215,7 +214,7 @@ body {
 
 /* ===============================
    🌑 PULSING OVERLAY
-================================ */
+ ================================ */
 
 .pulse-overlay {
   animation: pulseDark 6s ease-in-out infinite;
@@ -232,7 +231,7 @@ body {
 
 /* ===============================
    🖱️ MOUSE ENERGY PARALLAX
-================================ */
+ ================================ */
 
 .energy-layer {
   transition: transform 0.1s ease-out;
@@ -464,7 +463,7 @@ body {
 
 /* ==============================
     🌞 SUN BUTTON HOVER & ACTIVE EFFECTS
-================================ */
+ ================================ */
 
 /* Base sun-button styles with sun reflection */
 .sun-button {
@@ -624,7 +623,7 @@ body {
 
 /* ==============================
     🌟 ENERGY CARD EFFECTS
-================================ */
+ ================================ */
 
 /* Energy card hover effect */
 .energy-card {
@@ -663,7 +662,7 @@ body {
 
 /* ==============================
     ✨ SUN GLOW TEXT EFFECTS
-================================ */
+ ================================ */
 
 /* Enhanced glow text with sun reflection */
 .sun-glow-text {
@@ -740,7 +739,7 @@ body {
 
 /* ==============================
     🎯 STAT CARD EFFECTS
-================================ */
+ ================================ */
 
 .stat-card {
   position: relative;
@@ -777,7 +776,7 @@ body {
 
 /* ==============================
     🔘 INTERACTIVE ELEMENTS
-================================ */
+ ================================ */
 
 /* Sun icon pulse effect */
 .sun-icon-pulse {

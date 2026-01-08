@@ -1,15 +1,22 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
-import { Shield, ArrowLeft, User, Mail, MapPin, Lock, CheckCircle, Camera, Upload, Navigation } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Shield, ArrowLeft, User, Mail, MapPin, Lock, CheckCircle, Edit, Eye, EyeOff } from 'lucide-react'
 import LocationPicker from '../../components/LocationPicker'
 import ProfileImageUpload from '../../components/ProfileImageUpload'
 import SunLoader from '../../components/SunLoader'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { notify } from '../../lib/toast'
+import { getRequest, postRequest, putRequest } from '../../lib/apiService'
 
 export default function CreateAdmin() {
   const navigate = useNavigate()
+  const { id } = useParams()
+  const [searchParams] = useSearchParams()
+  const viewParam = searchParams.get('view')
+  
+  const isEditMode = !!id && !viewParam
+  const isViewMode = viewParam === 'true'
+  const token = localStorage.getItem('token')
+
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -29,8 +36,10 @@ export default function CreateAdmin() {
   })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(false)
   const [success, setSuccess] = useState(false)
-  const token = localStorage.getItem('token')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const regions = [
     'Delhi',
@@ -54,22 +63,57 @@ export default function CreateAdmin() {
     'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi'
   ]
 
+  // Fetch admin data for edit/view mode
+  useEffect(() => {
+    if (id) {
+      fetchAdminData()
+    }
+  }, [id])
+
+  const fetchAdminData = async () => {
+    setInitialLoading(true)
+    try {
+      const response = await getRequest(`/superadmin/admins/${id}`)
+      const admin = response.data.user || response.data
+      setFormData({
+        first_name: admin.first_name || '',
+        last_name: admin.last_name || '',
+        email: admin.email || '',
+        password: '',
+        confirmPassword: '',
+        region: admin.region || '',
+        phone: admin.phone || '',
+        profile_image: admin.profile_image || '',
+        address_line1: admin.address_line1 || '',
+        address_line2: admin.address_line2 || '',
+        city: admin.city || '',
+        state: admin.state || '',
+        pincode: admin.pincode || '',
+        latitude: admin.latitude || null,
+        longitude: admin.longitude || null
+      })
+    } catch (error) {
+      console.error('Failed to fetch admin:', error)
+      setErrors({ submit: 'Failed to load admin data' })
+    } finally {
+      setInitialLoading(false)
+    }
+  }
+
   const handleChange = (field, value) => {
+    if (isViewMode) return
     setFormData(prev => ({ ...prev, [field]: value }))
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }))
     }
   }
-
-
 
   const validateForm = () => {
     const newErrors = {}
     if (!formData.first_name.trim()) newErrors.first_name = 'First name is required'
     if (!formData.last_name.trim()) newErrors.last_name = 'Last name is required'
     if (!formData.email.trim()) newErrors.email = 'Email is required'
-    if (!formData.password) newErrors.password = 'Password is required'
+    if (!isEditMode && !formData.password) newErrors.password = 'Password is required'
     if (formData.password && formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters'
     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match'
     if (!formData.region) newErrors.region = 'Region is required'
@@ -93,36 +137,118 @@ export default function CreateAdmin() {
     setErrors({})
 
     try {
-      await axios.post(`${API_BASE_URL}/superadmin/admins`, {
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        email: formData.email,
-        password: formData.password,
-        role: 'ADMIN',
-        region: formData.region,
-        phone: formData.phone,
-        profile_image: formData.profile_image,
-        address_line1: formData.address_line1,
-        address_line2: formData.address_line2,
-        city: formData.city,
-        state: formData.state,
-        pincode: formData.pincode,
-        latitude: formData.latitude,
-        longitude: formData.longitude
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      
-      setSuccess(true)
-      setTimeout(() => {
-        navigate('/admins')
-      }, 2000)
+      if (isEditMode) {
+        // Update existing admin
+        await putRequest(`/superadmin/admins/${id}`, {
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          email: formData.email,
+          role: 'ADMIN',
+          region: formData.region,
+          phone: formData.phone,
+          profile_image: formData.profile_image,
+          address_line1: formData.address_line1,
+          address_line2: formData.address_line2,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+          latitude: formData.latitude,
+          longitude: formData.longitude,
+          ...(formData.password && { password: formData.password })
+        })
+        
+        notify.success('Admin updated successfully!')
+        setSuccess(true)
+        setTimeout(() => {
+          navigate('/admins')
+        }, 2000)
+      } else {
+        // Create new admin
+        await postRequest('/superadmin/admins', {
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          email: formData.email,
+          password: formData.password,
+          role: 'ADMIN',
+          region: formData.region,
+          phone: formData.phone,
+          profile_image: formData.profile_image,
+          address_line1: formData.address_line1,
+          address_line2: formData.address_line2,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+          latitude: formData.latitude,
+          longitude: formData.longitude
+        })
+        
+        notify.success('Admin created successfully!')
+        setSuccess(true)
+        setTimeout(() => {
+          navigate('/admins')
+        }, 2000)
+      }
     } catch (error) {
-      console.error('Failed to create admin:', error)
-      setErrors({ submit: error.response?.data?.error || 'Failed to create admin. Please try again.' })
+      console.error('Failed to save admin:', error)
+      notify.error(error.response?.data?.error || `Failed to ${isEditMode ? 'update' : 'create'} admin. Please try again.`)
+      setErrors({ submit: error.response?.data?.error || `Failed to ${isEditMode ? 'update' : 'create'} admin. Please try again.` })
     } finally {
       setLoading(false)
     }
+  }
+
+  // Get title and description based on mode
+  const getPageInfo = () => {
+    if (isViewMode) {
+      return {
+        title: 'View Admin',
+        description: 'Admin details',
+        icon: Eye,
+        successTitle: 'Admin Details Viewed',
+        buttonText: 'Viewed'
+      }
+    } else if (isEditMode) {
+      return {
+        title: 'Edit Admin',
+        description: 'Update admin information',
+        icon: Edit,
+        successTitle: 'Admin Updated Successfully!',
+        buttonText: 'Update Admin'
+      }
+    } else {
+      return {
+        title: 'Create Admin',
+        description: 'Add a new regional administrator',
+        icon: Shield,
+        successTitle: 'Admin Created Successfully!',
+        buttonText: 'Create Admin'
+      }
+    }
+  }
+
+  const pageInfo = getPageInfo()
+  const IconComponent = pageInfo.icon
+
+  if (initialLoading) {
+    return (
+      <div className="w-full">
+        <div className="flex items-center space-x-4 mb-6">
+          <button
+            onClick={() => navigate('/admins')}
+            className="p-2 bg-solar-card rounded-lg hover:bg-solar-panel/20"
+          >
+            <ArrowLeft className="w-5 h-5 text-solar-primary" />
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold sun-glow-text">Loading...</h1>
+            <p className="text-solar-muted mt-1">Fetching admin data</p>
+          </div>
+        </div>
+        <div className="bg-solar-card rounded-lg p-8 w-full flex flex-col items-center justify-center h-64">
+          <SunLoader message="Loading admin data..." size="large" />
+        </div>
+      </div>
+    )
   }
 
   if (success) {
@@ -136,8 +262,8 @@ export default function CreateAdmin() {
             <ArrowLeft className="w-5 h-5 text-solar-primary" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold sun-glow-text">Create Admin</h1>
-            <p className="text-solar-muted mt-1">Add a new regional administrator</p>
+            <h1 className="text-2xl font-bold sun-glow-text">{pageInfo.title}</h1>
+            <p className="text-solar-muted mt-1">{pageInfo.description}</p>
           </div>
         </div>
 
@@ -145,15 +271,31 @@ export default function CreateAdmin() {
           <div className="w-16 h-16 bg-solar-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-solar-success" />
           </div>
-          <h2 className="text-xl font-semibold text-solar-primary mb-2">Admin Created Successfully!</h2>
+          <h2 className="text-xl font-semibold text-solar-primary mb-2">{pageInfo.successTitle}</h2>
           <p className="text-solar-muted">Redirecting to admins list...</p>
         </div>
       </div>
     )
   }
 
+  // Helper function to get input class based on mode
+  const getInputClass = (fieldName) => {
+    const baseClass = `w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors[fieldName] ? 'border-solar-danger' : 'border-solar-yellow'}`
+    if (isViewMode) {
+      return `${baseClass} opacity-70 cursor-not-allowed`
+    }
+    return baseClass
+  }
+
   return (
-    <div className="w-full">
+    <div className="w-full relative">
+      {/* Full page loading overlay */}
+      {loading && (
+        <div className="absolute inset-0 bg-solar-bg/80 z-50 flex flex-col items-center justify-center">
+          <SunLoader message={isEditMode ? 'Updating Admin...' : 'Creating Admin...'} size="large" />
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center space-x-4 mb-6">
         <button
@@ -163,8 +305,11 @@ export default function CreateAdmin() {
           <ArrowLeft className="w-5 h-5 text-solar-primary" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold sun-glow-text">Create Admin</h1>
-          <p className="text-solar-muted mt-1">Add a new regional administrator</p>
+          <h1 className="text-2xl font-bold sun-glow-text flex items-center">
+            <IconComponent className="w-6 h-6 mr-2" />
+            {pageInfo.title}
+          </h1>
+          <p className="text-solar-muted mt-1">{pageInfo.description}</p>
         </div>
       </div>
 
@@ -177,21 +322,23 @@ export default function CreateAdmin() {
             </div>
           )}
 
-          {/* Profile Image Upload */}
-          <ProfileImageUpload
-            profileImagePreview={formData.profile_image}
-            onImageUpload={(result, error) => {
-              if (error) {
-                setErrors(prev => ({ ...prev, profile_image: error }))
-              } else {
-                setFormData(prev => ({ ...prev, profile_image: result }))
-                setErrors(prev => ({ ...prev, profile_image: '' }))
-              }
-            }}
-            error={errors.profile_image}
-            variant="drag-drop"
-            optional={true}
-          />
+          {/* Profile Image Upload - Read only for view mode */}
+          {!isViewMode && (
+            <ProfileImageUpload
+              profileImagePreview={formData.profile_image}
+              onImageUpload={(result, error) => {
+                if (error) {
+                  setErrors(prev => ({ ...prev, profile_image: error }))
+                } else {
+                  setFormData(prev => ({ ...prev, profile_image: result }))
+                  setErrors(prev => ({ ...prev, profile_image: '' }))
+                }
+              }}
+              error={errors.profile_image}
+              variant="drag-drop"
+              optional={true}
+            />
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* First Name */}
@@ -204,7 +351,8 @@ export default function CreateAdmin() {
                 type="text"
                 value={formData.first_name}
                 onChange={(e) => handleChange('first_name', e.target.value)}
-                className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.first_name ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                disabled={isViewMode}
+                className={getInputClass('first_name')}
                 style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                 placeholder="Enter first name"
               />
@@ -221,7 +369,8 @@ export default function CreateAdmin() {
                 type="text"
                 value={formData.last_name}
                 onChange={(e) => handleChange('last_name', e.target.value)}
-                className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.last_name ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                disabled={isViewMode}
+                className={getInputClass('last_name')}
                 style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                 placeholder="Enter last name"
               />
@@ -238,7 +387,8 @@ export default function CreateAdmin() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
-                className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.email ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                disabled={isViewMode}
+                className={getInputClass('email')}
                 style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                 placeholder="admin@example.com"
               />
@@ -255,7 +405,8 @@ export default function CreateAdmin() {
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => handleChange('phone', e.target.value)}
-                className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                disabled={isViewMode}
+                className={isViewMode ? 'w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary opacity-70 cursor-not-allowed' : 'w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2'}
                 style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                 placeholder="+91 9876543210"
               />
@@ -270,7 +421,8 @@ export default function CreateAdmin() {
               <select
                 value={formData.region}
                 onChange={(e) => handleChange('region', e.target.value)}
-                className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary focus:outline-none focus:ring-2 ${errors.region ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                disabled={isViewMode}
+                className={isViewMode ? 'w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary opacity-70 cursor-not-allowed' : `w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary focus:outline-none focus:ring-2 ${errors.region ? 'border-solar-danger' : 'border-solar-yellow'}`}
                 style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
               >
                 <option value="">Select a region</option>
@@ -281,39 +433,61 @@ export default function CreateAdmin() {
               {errors.region && <p className="text-sm text-red-800 mt-1">{errors.region}</p>}
             </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-solar-primary mb-2">
-                <Lock className="w-4 h-4 inline mr-2" />
-                Password
-              </label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={(e) => handleChange('password', e.target.value)}
-                className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.password ? 'border-solar-danger' : 'border-solar-yellow'}`}
-                style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                placeholder="Min. 6 characters"
-              />
-              {errors.password && <p className="text-sm text-red-800 mt-1">{errors.password}</p>}
-            </div>
+            {/* Password - Only show for create mode */}
+            {!isViewMode && (
+              <div className="relative">
+                <label className="block text-sm font-medium text-solar-primary mb-2">
+                  <Lock className="w-4 h-4 inline mr-2" />
+                  {isEditMode ? 'New Password (leave blank to keep current)' : 'Password'}
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={(e) => handleChange('password', e.target.value)}
+                    className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 pr-10 ${errors.password ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                    style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
+                    placeholder={isEditMode ? "Leave blank to keep current password" : "Min. 6 characters"}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-solar-muted hover:text-solar-primary"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-sm text-red-800 mt-1">{errors.password}</p>}
+              </div>
+            )}
 
-            {/* Confirm Password */}
-            <div>
-              <label className="block text-sm font-medium text-solar-primary mb-2">
-                <Lock className="w-4 h-4 inline mr-2" />
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.confirmPassword ? 'border-solar-danger' : 'border-solar-yellow'}`}
-                style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                placeholder="Confirm password"
-              />
-              {errors.confirmPassword && <p className="text-sm text-red-800 mt-1">{errors.confirmPassword}</p>}
-            </div>
+            {/* Confirm Password - Only show for create mode */}
+            {!isViewMode && (
+              <div className="relative">
+                <label className="block text-sm font-medium text-solar-primary mb-2">
+                  <Lock className="w-4 h-4 inline mr-2" />
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={formData.confirmPassword}
+                    onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                    className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 pr-10 ${errors.confirmPassword ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                    style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
+                    placeholder="Confirm password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-solar-muted hover:text-solar-primary"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                {errors.confirmPassword && <p className="text-sm text-red-800 mt-1">{errors.confirmPassword}</p>}
+              </div>
+            )}
           </div>
 
           {/* Address Section */}
@@ -332,7 +506,8 @@ export default function CreateAdmin() {
                   type="text"
                   value={formData.address_line1}
                   onChange={(e) => handleChange('address_line1', e.target.value)}
-                  className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.address_line1 ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                  disabled={isViewMode}
+                  className={getInputClass('address_line1')}
                   style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                   placeholder="Street address, house number"
                 />
@@ -348,7 +523,8 @@ export default function CreateAdmin() {
                   type="text"
                   value={formData.address_line2}
                   onChange={(e) => handleChange('address_line2', e.target.value)}
-                  className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                  disabled={isViewMode}
+                  className={isViewMode ? 'w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary opacity-70 cursor-not-allowed' : 'w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2'}
                   style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                   placeholder="Apartment, suite, landmark (optional)"
                 />
@@ -363,7 +539,8 @@ export default function CreateAdmin() {
                   type="text"
                   value={formData.city}
                   onChange={(e) => handleChange('city', e.target.value)}
-                  className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.city ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                  disabled={isViewMode}
+                  className={getInputClass('city')}
                   style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                   placeholder="Enter city"
                 />
@@ -378,7 +555,8 @@ export default function CreateAdmin() {
                 <select
                   value={formData.state}
                   onChange={(e) => handleChange('state', e.target.value)}
-                  className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary focus:outline-none focus:ring-2 ${errors.state ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                  disabled={isViewMode}
+                  className={isViewMode ? 'w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary opacity-70 cursor-not-allowed' : `w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary focus:outline-none focus:ring-2 ${errors.state ? 'border-solar-danger' : 'border-solar-yellow'}`}
                   style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                 >
                   <option value="">Select a state</option>
@@ -398,7 +576,8 @@ export default function CreateAdmin() {
                   type="text"
                   value={formData.pincode}
                   onChange={(e) => handleChange('pincode', e.target.value)}
-                  className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.pincode ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                  disabled={isViewMode}
+                  className={getInputClass('pincode')}
                   style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                   placeholder="Enter pincode"
                   maxLength={6}
@@ -409,14 +588,16 @@ export default function CreateAdmin() {
           </div>
 
           {/* Location Picker Component */}
-          <LocationPicker
-            latitude={formData.latitude}
-            longitude={formData.longitude}
-            onLocationChange={({ latitude, longitude }) => {
-              setFormData(prev => ({ ...prev, latitude, longitude }))
-            }}
-            placeholder="Search for admin location (e.g., Delhi, India)"
-          />
+          {!isViewMode && (
+            <LocationPicker
+              latitude={formData.latitude}
+              longitude={formData.longitude}
+              onLocationChange={({ latitude, longitude }) => {
+                setFormData(prev => ({ ...prev, latitude, longitude }))
+              }}
+              placeholder="Search for admin location (e.g., Delhi, India)"
+            />
+          )}
 
           {/* Role Info */}
           <div className="bg-solar-yellow/10 border border-solar-yellow/30 rounded-lg p-4">
@@ -425,38 +606,53 @@ export default function CreateAdmin() {
               <div>
                 <h4 className="text-sm font-semibold text-solar-yellow">Admin Permissions</h4>
                 <p className="text-sm text-solar-muted mt-1">
-                  This admin will have access to manage users within their assigned region and view solar plant data.
+                  {isViewMode 
+                    ? 'This admin has access to manage users within their assigned region and view solar plant data.'
+                    : 'This admin will have access to manage users within their assigned region and view solar plant data.'}
                 </p>
               </div>
             </div>
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={() => navigate('/admins')}
-              className="px-6 py-3 bg-solar-card hover:bg-solar-panel/20 text-solar-primary font-semibold rounded-lg sun-button"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex items-center space-x-2 px-6 py-3 bg-solar-orange text-white font-semibold rounded-lg hover:bg-solar-orange/80 sun-button disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <>
-                  <SunLoader message="Creating Admin..." />
-                </>
-              ) : (
-                <>
-                  <Shield className="w-5 h-5" />
-                  <span>Create Admin</span>
-                </>
-              )}
-            </button>
-          </div>
+          {!isViewMode && (
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                onClick={() => navigate('/admins')}
+                className="px-6 py-3 bg-solar-card hover:bg-solar-panel/20 text-solar-primary font-semibold rounded-lg sun-button"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex items-center space-x-2 px-6 py-3 bg-solar-orange text-white font-semibold rounded-lg hover:bg-solar-orange/80 sun-button disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <SunLoader message={isEditMode ? 'Updating Admin...' : 'Creating Admin...'} />
+                ) : (
+                  <>
+                    <Shield className="w-5 h-5" />
+                    <span>{pageInfo.buttonText}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* View mode back button */}
+          {isViewMode && (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => navigate('/admins')}
+                className="px-6 py-3 bg-solar-card hover:bg-solar-panel/20 text-solar-primary font-semibold rounded-lg sun-button"
+              >
+                Back to Admins
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </div>

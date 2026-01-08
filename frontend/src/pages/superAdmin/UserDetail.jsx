@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import axios from 'axios'
 import { Users, ArrowLeft, User, Mail, Calendar, Shield, MapPin, Edit, Trash2 } from 'lucide-react'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { getRequest, deleteRequest } from '../../lib/apiService'
+import { notify } from '../../lib/toast'
 
 export default function UserDetail() {
   const navigate = useNavigate()
@@ -16,9 +15,7 @@ export default function UserDetail() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/superadmin/admins/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        const response = await getRequest(`/superadmin/admins/${id}`)
         setUser(response.data.user)
       } catch (error) {
         console.error('Failed to fetch user:', error)
@@ -34,13 +31,11 @@ export default function UserDetail() {
     if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return
     
     try {
-      await axios.delete(`${API_BASE_URL}/superadmin/admins/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      await deleteRequest(`/superadmin/admins/${id}`)
       navigate('/users')
     } catch (error) {
       console.error('Failed to delete user:', error)
-      alert('Failed to delete user')
+      notify.error('Failed to delete user')
     }
   }
 
