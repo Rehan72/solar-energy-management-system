@@ -4,6 +4,7 @@ import { Sun, Battery, Zap, TrendingUp, LogOut, User, RefreshCw } from 'lucide-r
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../ui/stat-card'
 import { getRequest, postRequest } from '../../lib/apiService'
+import LivePowerDashboard from './LivePowerDashboard'
 
 function UserDashboard() {
   const [energyData, setEnergyData] = useState({ solar: 0, load: 0, battery: 0, grid: 0 })
@@ -173,6 +174,12 @@ function UserDashboard() {
               </BarChart>
             </ResponsiveContainer>
           </div>
+        </div>
+
+        {/* Live Power Dashboard */}
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-solar-primary mb-4">Live Power Monitoring</h3>
+          <LivePowerDashboard />
         </div>
 
         {/* System Status */}

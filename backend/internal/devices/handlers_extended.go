@@ -82,10 +82,10 @@ func UpdateDeviceHandler(c *gin.Context) {
 
 	// Update fields
 	if req.Name != "" {
-		device.Name = req.Name
+		device.Name = &req.Name
 	}
 	if req.Location != "" {
-		device.Location = req.Location
+		device.Location = &req.Location
 	}
 	if req.IsActive != nil {
 		device.IsActive = *req.IsActive
@@ -158,7 +158,7 @@ func GetAllDevicesHandler(c *gin.Context) {
 
 	devices, err := GetAllDevices(searchTerm, statusFilter)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch devices"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch devices", "details": err.Error()})
 		return
 	}
 

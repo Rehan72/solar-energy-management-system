@@ -110,9 +110,7 @@ func GetAllRegions() ([]Region, error) {
 	err := database.DB.QueryRow("SELECT name FROM sqlite_master WHERE type='table' AND name='regions'").Scan(&tableName)
 	if err != nil || tableName != "regions" {
 		createTable()
-		// Seed the database with demo regions
-		seedRegions()
-		return getDemoRegions(), nil
+		return []Region{}, nil
 	}
 
 	rows, err := database.DB.Query(`SELECT id, name, state, country, timezone, description, status, latitude, longitude, expected_users, expected_plants, capacity_mw, created_at, updated_at FROM regions`)
@@ -140,13 +138,8 @@ func GetAllRegions() ([]Region, error) {
 	}
 
 	if len(regions) == 0 {
-		// Seed the database with demo regions
-		seedRegions()
-		return getDemoRegions(), nil
+		return []Region{}, nil
 	}
-
-	// Seed any missing demo regions
-	seedMissingRegions(regions)
 
 	return regions, nil
 }

@@ -51,13 +51,13 @@ func main() {
 
 	// Seed endpoint to create initial super admin (for testing)
 	r.POST("/seed/superadmin", func(c *gin.Context) {
-		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
-		_, err := users.CreateUser("Super", "Admin", "admin@solar.com", string(hashedPassword), "SUPER_ADMIN", "", "", "", "", "", "", "", "", 0, 0, "")
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("SuperAdmin@123"), bcrypt.DefaultCost)
+		_, err := users.CreateUser("Super", "Admin", "superAdmin@solar.com", string(hashedPassword), "SUPER_ADMIN", "", "", "", "", "", "", "", "", 0, 0, "")
 		if err != nil {
 			c.JSON(500, gin.H{"error": "Failed to create super admin", "details": err.Error()})
 			return
 		}
-		c.JSON(200, gin.H{"message": "Super admin created successfully", "email": "admin@solar.com", "password": "admin123"})
+		c.JSON(200, gin.H{"message": "Super admin created successfully", "email": "superAdmin@solar.com", "password": "SuperAdmin@123"})
 	})
 
 	// Public auth routes
@@ -96,7 +96,7 @@ func main() {
 
 	// SUPER_ADMIN Routes
 	superAdmin := r.Group("/superadmin")
-	// superAdmin.Use(middleware.AuthMiddleware(), middleware.RequireRole("SUPER_ADMIN"))
+	superAdmin.Use(middleware.AuthMiddleware(), middleware.RequireRole("SUPER_ADMIN"))
 	{
 		superAdmin.GET("/admins", users.GetAdminsHandler)
 		superAdmin.POST("/admins", users.CreateUserHandler)

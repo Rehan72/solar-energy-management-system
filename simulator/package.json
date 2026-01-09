@@ -1,0 +1,29 @@
+{
+  "name": "sems-simulator",
+  "version": "1.0.0",
+  "description": "Solar Energy Management System - Advanced Simulator for testing and development",
+  "main": "solarSimulator.js",
+  "type": "module",
+  "scripts": {
+    "start": "node solarSimulator.js",
+    "start:multi": "node solarSimulator.js --multi",
+    "start:debug": "node solarSimulator.js --debug",
+    "start:custom": "node solarSimulator.js"
+  },
+  "keywords": [
+    "solar",
+    "energy",
+    "simulator",
+    "esp32",
+    "iot",
+    "sems"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

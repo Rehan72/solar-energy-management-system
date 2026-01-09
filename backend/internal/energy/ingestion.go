@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"sems-backend/internal/database"
 	"sems-backend/internal/devices"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,31 @@ func IngestData(c *gin.Context) {
 	var req DataIngestionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	// Demo mode: accept API keys starting with "sim_" or "demo_" for testing
+	if strings.HasPrefix(req.APIKey, "sim_") || strings.HasPrefix(req.APIKey, "demo_") {
+		// Insert energy data with demo device ID
+		demoDeviceID, _ := uuid.Parse("00000000-0000-0000-0000-000000000001")
+		energyData := &EnergyData{
+			ID:           uuid.New(),
+			DeviceID:     demoDeviceID,
+			Timestamp:    time.Now(),
+			SolarPower:   req.SolarPower,
+			LoadPower:    req.LoadPower,
+			BatteryLevel: req.BatteryLevel,
+			GridPower:    req.GridPower,
+			Temperature:  req.Temperature,
+			Humidity:     req.Humidity,
+		}
+
+		if err := insertEnergyData(energyData); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save data: " + err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Data ingested successfully (demo mode)"})
 		return
 	}
 
@@ -82,14 +108,16 @@ func getDeviceByAPIKey(apiKey string) (*devices.Device, error) {
 }
 
 func insertEnergyData(data *EnergyData) error {
+	// Map simulator fields to database columns:
+	// solar_power -> power, load_power -> energy_consumed
 	query := `
-		INSERT INTO energy_data (id, device_id, timestamp, solar_power, load_power, battery_level, grid_power, temperature, humidity)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+		INSERT INTO energy_data (id, device_id, timestamp, power, energy_consumed, battery_level, temperature, humidity, grid_status)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 1)`
 
 	_, err := database.DB.Exec(query,
 		data.ID, data.DeviceID, data.Timestamp,
 		data.SolarPower, data.LoadPower, data.BatteryLevel,
-		data.GridPower, data.Temperature, data.Humidity,
+		data.Temperature, data.Humidity,
 	)
 
 	return err

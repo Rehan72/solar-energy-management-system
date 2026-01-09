@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { LogOut, User, RefreshCw, BarChart3, Users, Activity, Settings, Shield, Globe, Zap } from 'lucide-react'
 import StatCard from '../ui/stat-card'
 import { getRequest } from '../../lib/apiService'
+import LivePowerDashboard from './LivePowerDashboard'
 
 function SuperAdminDashboard() {
   const [stats, setStats] = useState({
@@ -167,6 +168,12 @@ function SuperAdminDashboard() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Live Power Dashboard */}
+        <div className="bg-solar-card rounded-lg shadow p-6 energy-card">
+          <h2 className="text-xl font-semibold text-solar-primary mb-4">Live Power Monitoring</h2>
+          <LivePowerDashboard />
         </div>
 
         {/* Recent Activity */}

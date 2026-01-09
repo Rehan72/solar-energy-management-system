@@ -4,6 +4,7 @@ import { LogOut, User, RefreshCw, BarChart3, Users, Activity } from 'lucide-reac
 import UserTable from '../common/UserTable'
 import StatCard from '../ui/stat-card'
 import { getRequest } from '../../lib/apiService'
+import LivePowerDashboard from './LivePowerDashboard'
 
 function AdminDashboard() {
   const [users, setUsers] = useState([])
@@ -121,6 +122,12 @@ function AdminDashboard() {
           ) : (
             <p className="text-solar-muted">Loading analytics...</p>
           )}
+        </div>
+
+        {/* Live Power Dashboard */}
+        <div className="bg-solar-card rounded-lg shadow p-6 energy-card">
+          <h3 className="text-lg font-semibold text-solar-primary mb-4">Live Power Monitoring</h3>
+          <LivePowerDashboard />
         </div>
 
         {/* User Management Section */}

@@ -120,6 +120,7 @@ export default function GlobalDashboard() {
       </div>
 
       {/* System Overview */}
+      
       <div className="bg-gradient-to-br from-solar-card to-solar-night/30 rounded-xl p-8 energy-card border border-solar-border/50 shadow-xl">
         <h2 className="text-2xl font-bold sun-glow-text mb-6 text-center">System Overview</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

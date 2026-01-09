@@ -1,6 +1,6 @@
 import axios from "axios";
 import { logout } from "./auth";
-import { notify } from "./toast";
+import { showSolarToast as notify } from "./toast";
 
 // API Base URL
 const API_BASE_URL = "http://localhost:8080";

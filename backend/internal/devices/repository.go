@@ -30,12 +30,14 @@ func nullTimeToTime(n sql.NullTime) *time.Time {
 }
 
 func CreateDevice(userID uuid.UUID, name, deviceType, location string) (*Device, error) {
+	namePtr := &name
+	locationPtr := &location
 	device := &Device{
 		ID:         uuid.New(),
 		UserID:     &userID,
-		Name:       name,
+		Name:       namePtr,
 		DeviceType: deviceType,
-		Location:   location,
+		Location:   locationPtr,
 		APIKey:     generateAPIKey(),
 		IsActive:   true,
 	}
@@ -105,17 +107,23 @@ func GetDevicesByUserID(userID uuid.UUID, deviceType string, activeOnly bool) ([
 	var devices []*Device
 	for rows.Next() {
 		device := &Device{}
-		var userIDStr string
+		var deviceID sql.NullString
+		var userIDStr sql.NullString
+		var name sql.NullString
+		var location sql.NullString
 		var lastSeen sql.NullTime
 		err := rows.Scan(
-			&device.ID, &device.DeviceID, &userIDStr, &device.Name, &device.DeviceType,
-			&device.Location, &device.APIKey, &device.IsActive, &lastSeen,
+			&device.ID, &deviceID, &userIDStr, &name, &device.DeviceType,
+			&location, &device.APIKey, &device.IsActive, &lastSeen,
 			&device.CreatedAt, &device.UpdatedAt, &device.UserName,
 		)
 		if err != nil {
 			return nil, err
 		}
-		device.UserID = stringToUUID(userIDStr)
+		device.DeviceID = nullStringToString(deviceID)
+		device.UserID = stringToUUID(userIDStr.String)
+		device.Name = nullStringToString(name)
+		device.Location = nullStringToString(location)
 		device.LastSeen = nullTimeToTime(lastSeen)
 		devices = append(devices, device)
 	}
@@ -124,6 +132,10 @@ func GetDevicesByUserID(userID uuid.UUID, deviceType string, activeOnly bool) ([
 }
 
 func GetAllDevices(searchTerm string, statusFilter string) ([]*Device, error) {
+	if database.DB == nil {
+		return []*Device{}, nil
+	}
+
 	query := `
 		SELECT d.id, d.device_id, d.user_id, d.name, d.device_type, d.location, d.api_key, d.is_active, d.last_seen, d.created_at, d.updated_at,
 			   COALESCE(u.first_name || ' ' || u.last_name, 'Unassigned') as user_name
@@ -157,17 +169,23 @@ func GetAllDevices(searchTerm string, statusFilter string) ([]*Device, error) {
 	var devices []*Device
 	for rows.Next() {
 		device := &Device{}
-		var userIDStr string
+		var deviceID sql.NullString
+		var userIDStr sql.NullString
+		var name sql.NullString
+		var location sql.NullString
 		var lastSeen sql.NullTime
 		err := rows.Scan(
-			&device.ID, &device.DeviceID, &userIDStr, &device.Name, &device.DeviceType,
-			&device.Location, &device.APIKey, &device.IsActive, &lastSeen,
+			&device.ID, &deviceID, &userIDStr, &name, &device.DeviceType,
+			&location, &device.APIKey, &device.IsActive, &lastSeen,
 			&device.CreatedAt, &device.UpdatedAt, &device.UserName,
 		)
 		if err != nil {
 			return nil, err
 		}
-		device.UserID = stringToUUID(userIDStr)
+		device.DeviceID = nullStringToString(deviceID)
+		device.UserID = stringToUUID(userIDStr.String)
+		device.Name = nullStringToString(name)
+		device.Location = nullStringToString(location)
 		device.LastSeen = nullTimeToTime(lastSeen)
 		devices = append(devices, device)
 	}
@@ -184,11 +202,14 @@ func GetDeviceByID(id uuid.UUID) (*Device, error) {
 		LEFT JOIN users u ON d.user_id = u.id
 		WHERE d.id = $1`
 
-	var userIDStr string
+	var deviceID sql.NullString
+	var userIDStr sql.NullString
+	var name sql.NullString
+	var location sql.NullString
 	var lastSeen sql.NullTime
 	err := database.DB.QueryRow(query, id).Scan(
-		&device.ID, &device.DeviceID, &userIDStr, &device.Name, &device.DeviceType,
-		&device.Location, &device.APIKey, &device.IsActive, &lastSeen,
+		&device.ID, &deviceID, &userIDStr, &name, &device.DeviceType,
+		&location, &device.APIKey, &device.IsActive, &lastSeen,
 		&device.CreatedAt, &device.UpdatedAt, &device.UserName,
 	)
 
@@ -196,7 +217,10 @@ func GetDeviceByID(id uuid.UUID) (*Device, error) {
 		return nil, err
 	}
 
-	device.UserID = stringToUUID(userIDStr)
+	device.DeviceID = nullStringToString(deviceID)
+	device.UserID = stringToUUID(userIDStr.String)
+	device.Name = nullStringToString(name)
+	device.Location = nullStringToString(location)
 	device.LastSeen = nullTimeToTime(lastSeen)
 	return device, nil
 }
@@ -229,11 +253,14 @@ func GetDeviceByAPIKey(apiKey string) (*Device, error) {
 		LEFT JOIN users u ON d.user_id = u.id
 		WHERE d.api_key = $1 AND d.is_active = true`
 
-	var userIDStr string
+	var deviceID sql.NullString
+	var userIDStr sql.NullString
+	var name sql.NullString
+	var location sql.NullString
 	var lastSeen sql.NullTime
 	err := database.DB.QueryRow(query, apiKey).Scan(
-		&device.ID, &device.DeviceID, &userIDStr, &device.Name, &device.DeviceType,
-		&device.Location, &device.APIKey, &device.IsActive, &lastSeen,
+		&device.ID, &deviceID, &userIDStr, &name, &device.DeviceType,
+		&location, &device.APIKey, &device.IsActive, &lastSeen,
 		&device.CreatedAt, &device.UpdatedAt, &device.UserName,
 	)
 
@@ -241,7 +268,10 @@ func GetDeviceByAPIKey(apiKey string) (*Device, error) {
 		return nil, err
 	}
 
-	device.UserID = stringToUUID(userIDStr)
+	device.DeviceID = nullStringToString(deviceID)
+	device.UserID = stringToUUID(userIDStr.String)
+	device.Name = nullStringToString(name)
+	device.Location = nullStringToString(location)
 	device.LastSeen = nullTimeToTime(lastSeen)
 	return device, nil
 }

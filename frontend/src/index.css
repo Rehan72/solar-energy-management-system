@@ -1005,6 +1005,75 @@ html {
   }
 }
 
+/* ==============================
+    🎯 TOAST NOTIFICATION ANIMATIONS
+  ================================ */
+
+/* Toast container animation - enter from right */
+.solar-toast-container {
+  animation: toast-slide-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform-origin: top right;
+}
+
+@keyframes toast-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateX(100%) scale(0.8);
+    filter: blur(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Toast exit animation */
+.solar-toast-container[data-expanded="true"] {
+  animation: toast-slide-out 0.3s ease-in forwards;
+}
+
+@keyframes toast-slide-out {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%) scale(0.8);
+    filter: blur(8px);
+  }
+}
+
+/* Toast icon pulse animation */
+@keyframes toast-icon-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Toast subtle glow effect */
+.solar-toast-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--solar-yellow), transparent);
+  opacity: 0.5;
+}
+
+/* Toast hover effect */
+.solar-toast-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(245, 158, 11, 0.1);
+}
+
 /* Energy card hover effect */
 .energy-card {
   position: relative;
