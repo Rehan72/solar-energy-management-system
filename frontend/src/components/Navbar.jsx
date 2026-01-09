@@ -24,18 +24,38 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
 
   // Menu for admins (platform administrators)
   const adminMenu = [
-    { name: "GlobalDashboard", path: "/dashboard", icon: <Home size={18} /> },
+    { name: "Dashboard", path: "/dashboard", icon: <Home size={18} /> },
     { name: "Regions", path: "/regions", icon: <OrigamiIcon size={18} /> },
     { name: "Plants", path: "/plants", icon: <Zap size={18} /> },
-    { name: "Admin Devices", path: "/admin/devices", icon: <Cpu size={18} /> },
-    { name: "Admin List", path: "/admins", icon: <Users size={18} /> },
-    { name: "User List", path: "/users", icon: <User2Icon size={18} /> },
+    { name: "Devices", path: "/admin/devices", icon: <Cpu size={18} /> },
+    { name: "Admins", path: "/admins", icon: <Users size={18} /> },
+    { name: "Users", path: "/users", icon: <User2Icon size={18} /> },
     { name: "Reports", path: "/reports", icon: <SheetIcon size={18} /> },
     { name: "Event", path: "/event", icon: <Calendar size={18} /> },
   ];
 
+  // Menu for super admins (full system access)
+  const superAdminMenu = [
+    { name: "Dashboard", path: "/dashboard", icon: <Home size={18} /> },
+    { name: "Regions", path: "/regions", icon: <OrigamiIcon size={18} /> },
+    { name: "Plants", path: "/plants", icon: <Zap size={18} /> },
+    { name: "All Devices", path: "/superadmin/all-devices", icon: <Cpu size={18} /> },
+    { name: "Energy Analytics", path: "/superadmin/all-energy", icon: <Zap size={18} /> },
+    { name: "Admins", path: "/admins", icon: <Users size={18} /> },
+    { name: "Users", path: "/users", icon: <User2Icon size={18} /> },
+    { name: "Reports", path: "/reports", icon: <SheetIcon size={18} /> },
+    { name: "Event", path: "/event", icon: <Calendar size={18} /> },
+    { name: "Profile", path: "/superadmin/profile", icon: <User size={18} /> },
+  ];
+
   // Build menu based on user role
-  const menu = userRole === "USER" ? userMenu : adminMenu;
+  const getMenu = () => {
+    if (userRole === "SUPER_ADMIN") return superAdminMenu;
+    if (userRole === "ADMIN") return adminMenu;
+    return userMenu;
+  };
+  
+  const menu = getMenu();
 
   const handleLogout = () => {
     logout();

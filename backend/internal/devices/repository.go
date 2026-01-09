@@ -80,9 +80,29 @@ func stringToUUID(s string) *uuid.UUID {
 func GetDevicesByUserID(userID uuid.UUID, deviceType string, activeOnly bool) ([]*Device, error) {
 	query := `
 		SELECT d.id, d.device_id, d.user_id, d.name, d.device_type, d.location, d.api_key, d.is_active, d.last_seen, d.created_at, d.updated_at,
-			   COALESCE(u.first_name || ' ' || u.last_name, 'Unassigned') as user_name
+			   COALESCE(u.first_name || ' ' || u.last_name, 'Unassigned') as user_name,
+			   COALESCE(power.current_power, 0) as current_power,
+			   COALESCE(power.today_energy, 0) as today_energy,
+			   COALESCE(power.peak_power, 0) as peak_power,
+			   COALESCE(power.avg_power, 0) as avg_power,
+			   COALESCE(power.avg_battery, 0) as avg_battery,
+			   COALESCE(power.total_consumption, 0) as total_consumption,
+			   COALESCE(power.efficiency, 0) as efficiency
 		FROM devices d
 		LEFT JOIN users u ON d.user_id = u.id
+		LEFT JOIN LATERAL (
+			SELECT device_id,
+				   MAX(solar_power) as current_power,
+				   SUM(solar_power) as today_energy,
+				   AVG(solar_power) as avg_power,
+				   MAX(solar_power) as peak_power,
+				   AVG(battery_level) as avg_battery,
+				   SUM(load_power) as total_consumption,
+				   0 as efficiency
+			FROM energy_data
+			WHERE device_id = d.id AND timestamp >= NOW() - INTERVAL '24 hours'
+			GROUP BY device_id
+		) power ON true
 		WHERE d.user_id = $1`
 
 	args := []interface{}{userID}
@@ -116,6 +136,8 @@ func GetDevicesByUserID(userID uuid.UUID, deviceType string, activeOnly bool) ([
 			&device.ID, &deviceID, &userIDStr, &name, &device.DeviceType,
 			&location, &device.APIKey, &device.IsActive, &lastSeen,
 			&device.CreatedAt, &device.UpdatedAt, &device.UserName,
+			&device.CurrentPower, &device.TodayEnergy, &device.PeakPower,
+			&device.AvgPower, &device.AvgBattery, &device.TotalConsumption, &device.Efficiency,
 		)
 		if err != nil {
 			return nil, err
@@ -138,9 +160,29 @@ func GetAllDevices(searchTerm string, statusFilter string) ([]*Device, error) {
 
 	query := `
 		SELECT d.id, d.device_id, d.user_id, d.name, d.device_type, d.location, d.api_key, d.is_active, d.last_seen, d.created_at, d.updated_at,
-			   COALESCE(u.first_name || ' ' || u.last_name, 'Unassigned') as user_name
+			   COALESCE(u.first_name || ' ' || u.last_name, 'Unassigned') as user_name,
+			   COALESCE(power.current_power, 0) as current_power,
+			   COALESCE(power.today_energy, 0) as today_energy,
+			   COALESCE(power.peak_power, 0) as peak_power,
+			   COALESCE(power.avg_power, 0) as avg_power,
+			   COALESCE(power.avg_battery, 0) as avg_battery,
+			   COALESCE(power.total_consumption, 0) as total_consumption,
+			   COALESCE(power.efficiency, 0) as efficiency
 		FROM devices d
 		LEFT JOIN users u ON d.user_id = u.id
+		LEFT JOIN LATERAL (
+			SELECT device_id,
+				   MAX(solar_power) as current_power,
+				   SUM(solar_power) as today_energy,
+				   AVG(solar_power) as avg_power,
+				   MAX(solar_power) as peak_power,
+				   AVG(battery_level) as avg_battery,
+				   SUM(load_power) as total_consumption,
+				   0 as efficiency
+			FROM energy_data
+			WHERE device_id = d.id AND timestamp >= NOW() - INTERVAL '24 hours'
+			GROUP BY device_id
+		) power ON true
 		WHERE 1=1`
 
 	args := []interface{}{}
@@ -178,6 +220,8 @@ func GetAllDevices(searchTerm string, statusFilter string) ([]*Device, error) {
 			&device.ID, &deviceID, &userIDStr, &name, &device.DeviceType,
 			&location, &device.APIKey, &device.IsActive, &lastSeen,
 			&device.CreatedAt, &device.UpdatedAt, &device.UserName,
+			&device.CurrentPower, &device.TodayEnergy, &device.PeakPower,
+			&device.AvgPower, &device.AvgBattery, &device.TotalConsumption, &device.Efficiency,
 		)
 		if err != nil {
 			return nil, err

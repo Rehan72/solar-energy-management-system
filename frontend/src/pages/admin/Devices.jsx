@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Cpu, RefreshCw, Trash2, Edit, Wifi, WifiOff, Power, PowerOff, Search, Filter, User } from 'lucide-react'
+import { Cpu, RefreshCw, Trash2, Edit, Wifi, WifiOff, Power, PowerOff, Search, Filter, User, Zap, Sun, Battery, Activity } from 'lucide-react'
 import { getRequest, putRequest, deleteRequest } from '../../lib/apiService'
 import { notify } from '../../lib/toast'
 import StatCard from '../../components/ui/stat-card'
@@ -13,6 +13,8 @@ export default function AdminDevices() {
   const [filterStatus, setFilterStatus] = useState('ALL')
   const [selectedDevice, setSelectedDevice] = useState(null)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showPowerModal, setShowPowerModal] = useState(false)
+  const [powerDetails, setPowerDetails] = useState(null)
   const [editForm, setEditForm] = useState({ name: '', location: '', is_active: true, assigned_to: null })
 
   const fetchDevices = async () => {
@@ -66,6 +68,17 @@ export default function AdminDevices() {
     } catch { notify.error('Failed to update device') }
   }
 
+  const fetchDevicePower = async (device) => {
+    try {
+      const response = await getRequest(`/admin/devices/${device.id}/power`)
+      setPowerDetails(response.data)
+      setSelectedDevice(device)
+      setShowPowerModal(true)
+    } catch {
+      notify.error('Failed to fetch power details')
+    }
+  }
+
   const filteredDevices = devices.filter(device => {
     const matchesSearch = device.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          device.device_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -79,6 +92,10 @@ export default function AdminDevices() {
   const activeDevices = devices.filter(d => d.is_active).length
   const inactiveDevices = devices.filter(d => !d.is_active).length
   const totalUsers = new Set(devices.map(d => d.assigned_to).filter(Boolean)).size
+
+  // Calculate total power stats
+  const totalCurrentPower = devices.reduce((sum, d) => sum + (d.current_power || 0), 0)
+  const totalTodayEnergy = devices.reduce((sum, d) => sum + (d.today_energy || 0), 0)
 
   return (
     <div className="space-y-6">
@@ -97,7 +114,7 @@ export default function AdminDevices() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
         <StatCard 
           title="Total Devices" 
           value={devices.length} 
@@ -125,6 +142,20 @@ export default function AdminDevices() {
           icon={User} 
           color="text-solar-primary" 
           gradient="from-solar-primary/20 to-solar-panel/10" 
+        />
+        <StatCard 
+          title="Current Power" 
+          value={`${totalCurrentPower.toFixed(1)} W`} 
+          icon={Sun} 
+          color="text-solar-yellow" 
+          gradient="from-solar-yellow/20 to-solar-orange/10" 
+        />
+        <StatCard 
+          title="Today's Energy" 
+          value={`${totalTodayEnergy.toFixed(1)} kWh`} 
+          icon={Zap} 
+          color="text-solar-orange" 
+          gradient="from-solar-orange/20 to-solar-orange/5" 
         />
       </div>
 
@@ -175,6 +206,7 @@ export default function AdminDevices() {
                   <th className="text-left p-4 text-sm font-semibold text-solar-muted">Device</th>
                   <th className="text-left p-4 text-sm font-semibold text-solar-muted">Type</th>
                   <th className="text-left p-4 text-sm font-semibold text-solar-muted">Location</th>
+                  <th className="text-left p-4 text-sm font-semibold text-solar-muted">Power (Current/Today)</th>
                   <th className="text-left p-4 text-sm font-semibold text-solar-muted">Assigned To</th>
                   <th className="text-left p-4 text-sm font-semibold text-solar-muted">Status</th>
                   <th className="text-left p-4 text-sm font-semibold text-solar-muted">Last Seen</th>
@@ -198,6 +230,18 @@ export default function AdminDevices() {
                     <td className="p-4 text-solar-primary capitalize">{device.device_type || 'ESP32'}</td>
                     <td className="p-4 text-solar-primary">{device.location || 'N/A'}</td>
                     <td className="p-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-1" title="Current Power">
+                          <Sun className="w-3 h-3 text-solar-yellow" />
+                          <span className="text-sm text-solar-primary">{device.current_power?.toFixed(1) || 0}W</span>
+                        </div>
+                        <div className="flex items-center space-x-1" title="Today's Energy">
+                          <Zap className="w-3 h-3 text-solar-orange" />
+                          <span className="text-sm text-solar-primary">{device.today_energy?.toFixed(2) || 0}kWh</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-4">
                       {device.assigned_to ? (
                         <div className="flex items-center space-x-2">
                           <User className="w-4 h-4 text-solar-muted" />
@@ -217,6 +261,13 @@ export default function AdminDevices() {
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex items-center justify-end space-x-2">
+                        <button 
+                          onClick={() => fetchDevicePower(device)}
+                          className="p-2 text-solar-primary hover:text-solar-yellow rounded-lg hover:bg-solar-panel/20 transition"
+                          title="Power Details"
+                        >
+                          <Power className="w-4 h-4" />
+                        </button>
                         <button 
                           onClick={() => handleEditDevice(device)}
                           className="p-2 text-solar-primary hover:text-solar-yellow rounded-lg hover:bg-solar-panel/20 transition"
@@ -283,6 +334,67 @@ export default function AdminDevices() {
             <div className="flex justify-end space-x-3 mt-6">
               <Button onClick={() => setShowEditModal(false)} className="bg-gray-300 text-gray-700 hover:bg-gray-400">Cancel</Button>
               <Button onClick={handleSaveEdit} className="bg-solar-yellow text-solar-dark hover:bg-solar-orange">Save Changes</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Power Details Modal */}
+      {showPowerModal && powerDetails && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-solar-card rounded-xl p-6 w-full max-w-lg border border-solar-border">
+            <h2 className="text-xl font-bold text-solar-primary mb-4 flex items-center">
+              <Power className="w-5 h-5 text-solar-yellow mr-2" />
+              Device Power Details
+            </h2>
+            <div className="mb-4 p-3 bg-solar-night/30 rounded-lg">
+              <p className="text-sm text-solar-muted">Device</p>
+              <p className="text-lg font-semibold text-solar-primary">{powerDetails.device_name}</p>
+            </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-solar-night/30 rounded-lg p-4 text-center">
+                  <Sun className="w-6 h-6 text-solar-yellow mx-auto mb-2" />
+                  <p className="text-sm text-solar-muted">Current Power</p>
+                  <p className="text-2xl font-bold text-solar-primary">{powerDetails.current_power?.toFixed(2) || 0} W</p>
+                </div>
+                <div className="bg-solar-night/30 rounded-lg p-4 text-center">
+                  <Zap className="w-6 h-6 text-solar-orange mx-auto mb-2" />
+                  <p className="text-sm text-solar-muted">Today's Energy</p>
+                  <p className="text-2xl font-bold text-solar-primary">{powerDetails.today_energy?.toFixed(2) || 0} kWh</p>
+                </div>
+                <div className="bg-solar-night/30 rounded-lg p-4 text-center">
+                  <Activity className="w-6 h-6 text-solar-success mx-auto mb-2" />
+                  <p className="text-sm text-solar-muted">Peak Power</p>
+                  <p className="text-2xl font-bold text-solar-primary">{powerDetails.peak_power?.toFixed(2) || 0} W</p>
+                </div>
+                <div className="bg-solar-night/30 rounded-lg p-4 text-center">
+                  <Battery className="w-6 h-6 text-solar-success mx-auto mb-2" />
+                  <p className="text-sm text-solar-muted">Avg Battery</p>
+                  <p className="text-2xl font-bold text-solar-primary">{powerDetails.avg_battery?.toFixed(1) || 0}%</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-solar-night/30 rounded-lg p-3">
+                  <p className="text-sm text-solar-muted">Average Power</p>
+                  <p className="text-lg font-semibold text-solar-primary">{powerDetails.avg_power?.toFixed(2) || 0} W</p>
+                </div>
+                <div className="bg-solar-night/30 rounded-lg p-3">
+                  <p className="text-sm text-solar-muted">Total Consumption</p>
+                  <p className="text-lg font-semibold text-solar-primary">{powerDetails.total_consumption?.toFixed(2) || 0} kWh</p>
+                </div>
+              </div>
+              <div className="bg-solar-yellow/10 rounded-lg p-3">
+                <p className="text-sm text-solar-muted">System Efficiency</p>
+                <p className="text-lg font-semibold text-solar-yellow">{powerDetails.efficiency?.toFixed(1) || 0}%</p>
+              </div>
+              <div className="flex justify-between items-center pt-2">
+                <span className="text-sm text-solar-muted">Status: {powerDetails.status}</span>
+                <span className="text-sm text-solar-muted">Last Updated: {powerDetails.last_updated}</span>
+              </div>
+            </div>
+            <div className="flex justify-end mt-6">
+              <Button onClick={() => setShowPowerModal(false)} className="bg-solar-yellow text-solar-dark hover:bg-solar-orange">Close</Button>
             </div>
           </div>
         </div>

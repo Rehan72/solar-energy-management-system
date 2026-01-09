@@ -19,7 +19,7 @@ export default function EnergyAnalytics() {
         getRequest('/user/energy/history', { days: period })
       ])
       setAnalytics(analyticsRes.data.analytics)
-      setHistory(formattedHistory)
+      setHistory(historyRes.data.history || [])
     } catch (error) {
       console.error('Failed to fetch energy analytics:', error)
       notify.error('Failed to load energy analytics')

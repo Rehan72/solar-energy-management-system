@@ -21,6 +21,7 @@ import AdminDevices from "../pages/admin/Devices";
 import Profile from "../pages/user/Profile";
 import Devices from "../pages/user/Devices";
 import EnergyAnalytics from "../pages/user/EnergyAnalytics";
+import SuperAdminDashboard from "../components/dashboards/SuperAdminDashboard";
 
 export const routeParams = "management";
 
@@ -31,6 +32,12 @@ export default [
     path: `/dashboard`,
     allowedRoles: ["SUPER_ADMIN"],
     exact: true
+  },
+  {
+   element:SuperAdminDashboard,
+   path: `/superadmin/dashboard`,
+   allowedRoles: ["SUPER_ADMIN"],
+   exact: true
   },
   {
     element: AdminAnalytics,
@@ -138,6 +145,24 @@ export default [
     element: AdminDevices,
     path: `/admin/devices`,
     allowedRoles: ["ADMIN", "SUPER_ADMIN"],
+    exact: true
+  },
+  {
+    element: Devices,
+    path: `/superadmin/all-devices`,
+    allowedRoles: ["SUPER_ADMIN"],
+    exact: true
+  },
+  {
+    element: EnergyAnalytics,
+    path: `/superadmin/all-energy`,
+    allowedRoles: ["SUPER_ADMIN"],
+    exact: true
+  },
+  {
+    element: Profile,
+    path: `/superadmin/profile`,
+    allowedRoles: ["SUPER_ADMIN"],
     exact: true
   },
   {

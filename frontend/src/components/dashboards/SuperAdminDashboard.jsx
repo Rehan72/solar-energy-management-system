@@ -65,7 +65,9 @@ function SuperAdminDashboard() {
     { title: 'Manage Admins', icon: Shield, path: '/superadmin/admins', color: 'text-solar-orange' },
     { title: 'Manage Plants', icon: Zap, path: '/superadmin/plants', color: 'text-solar-success' },
     { title: 'Manage Regions', icon: Globe, path: '/superadmin/regions', color: 'text-solar-panel' },
-    { title: 'View Reports', icon: BarChart3, path: '/superadmin/reports', color: 'text-solar-warning' },
+    { title: 'All Devices', icon: Activity, path: '/superadmin/all-devices', color: 'text-solar-warning' },
+    { title: 'Energy Analytics', icon: BarChart3, path: '/superadmin/all-energy', color: 'text-solar-primary' },
+    { title: 'View Reports', icon: BarChart3, path: '/superadmin/reports', color: 'text-solar-muted' },
     { title: 'System Settings', icon: Settings, path: '/superadmin/settings', color: 'text-solar-muted' }
   ]
 

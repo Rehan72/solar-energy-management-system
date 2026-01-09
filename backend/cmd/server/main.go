@@ -81,10 +81,12 @@ func main() {
 		user.GET("/energy/analytics", energy.GetEnergyAnalyticsHandler)
 		// Device management for users
 		user.GET("/devices", devices.GetDevicesHandler)
+		user.POST("/devices", devices.CreateUserDeviceHandler)
 		user.GET("/devices/:id", devices.GetDeviceHandler)
 		user.PUT("/devices/:id", devices.UpdateDeviceHandler)
 		user.DELETE("/devices/:id", devices.DeleteDeviceHandler)
 		user.POST("/devices/:id/regenerate-key", devices.RegenerateAPIKeyHandler)
+		user.GET("/devices/:id/power", devices.GetDevicePowerHandler)
 	}
 
 	// INSTALLER Routes
@@ -105,6 +107,16 @@ func main() {
 		superAdmin.DELETE("/admins/:id", users.DeleteUserHandler)
 		superAdmin.GET("/users", users.GetUsersHandler) // all users
 		superAdmin.GET("/global/stats", users.GetGlobalStatsHandler)
+		
+		// SuperAdmin Device Management - View ALL devices across all users
+		superAdmin.GET("/devices", devices.GetAllDevicesHandler)
+		superAdmin.GET("/devices/:id", devices.GetDeviceHandler)
+		superAdmin.GET("/devices/:id/power", devices.GetDevicePowerHandler)
+		
+		// SuperAdmin Energy Analytics - View ALL energy data
+		superAdmin.GET("/energy/analytics", energy.GetEnergyAnalyticsHandler)
+		superAdmin.GET("/energy/history", energy.GetEnergyHistoryHandler)
+		superAdmin.GET("/energy/current", energy.CurrentEnergy)
 
 		// Regions routes
 		superAdmin.GET("/regions", regions.GetRegionsHandler)
@@ -136,6 +148,7 @@ func main() {
 		// Device management for admins
 		admin.GET("/devices", devices.GetAllDevicesHandler)
 		admin.GET("/devices/:id", devices.GetDeviceHandler)
+		admin.GET("/devices/:id/power", devices.GetDevicePowerHandler)
 		admin.PUT("/devices/:id", devices.UpdateDeviceHandler)
 		admin.DELETE("/devices/:id", devices.DeleteDeviceHandler)
 	}

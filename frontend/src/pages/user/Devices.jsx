@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Cpu, Plus, RefreshCw, Trash2, Edit, Key, Wifi, WifiOff, Power, PowerOff } from 'lucide-react'
+import { Cpu, Plus, RefreshCw, Trash2, Edit, Wifi, WifiOff, Power, Zap, Sun, Battery, Activity } from 'lucide-react'
 import { getRequest, postRequest, deleteRequest } from '../../lib/apiService'
 import { notify } from '../../lib/toast'
 import StatCard from '../../components/ui/stat-card'
@@ -11,9 +11,8 @@ export default function Devices() {
   const [loading, setLoading] = useState(true)
   const [showAddModal, setShowAddModal] = useState(false)
   const [newDevice, setNewDevice] = useState({ name: '', device_type: 'esp32', location: '' })
-  const [selectedDevice, setSelectedDevice] = useState(null)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [editForm, setEditForm] = useState({ name: '', location: '', is_active: true })
+  const [showPowerModal, setShowPowerModal] = useState(false)
+  const [powerDetails, setPowerDetails] = useState(null)
 
   const fetchDevices = async () => {
     try {
@@ -31,7 +30,7 @@ export default function Devices() {
 
   const handleAddDevice = async () => {
     try {
-      await postRequest('/installer/devices', newDevice)
+      await postRequest('/user/devices', newDevice)
       notify.success('Device created successfully')
       setShowAddModal(false)
       setNewDevice({ name: '', device_type: 'esp32', location: '' })
@@ -54,6 +53,16 @@ export default function Devices() {
       notify.success(`Device ${device.is_active ? 'deactivated' : 'activated'}`)
       fetchDevices()
     } catch { notify.error('Failed to update device status') }
+  }
+
+  const fetchDevicePower = async (device) => {
+    try {
+      const response = await getRequest(`/user/devices/${device.id}/power`)
+      setPowerDetails(response.data)
+      setShowPowerModal(true)
+    } catch {
+      notify.error('Failed to fetch power details')
+    }
   }
 
   const activeDevices = devices.filter(d => d.is_active).length
@@ -104,16 +113,42 @@ export default function Devices() {
                   <div>
                     <h3 className="font-semibold text-solar-primary">{device.name}</h3>
                     <p className="text-sm text-solar-muted capitalize">{device.device_type}</p>
+                    {device.location && <p className="text-xs text-solar-muted">{device.location}</p>}
                   </div>
                 </div>
                 <span className={`px-2 py-1 rounded-full text-xs font-semibold ${device.is_active ? 'bg-solar-success/20 text-solar-success' : 'bg-solar-warning/20 text-solar-warning'}`}>
                   {device.is_active ? 'Active' : 'Inactive'}
                 </span>
               </div>
+
+              {/* Power Details Preview */}
+              <div className="grid grid-cols-2 gap-2 mb-4 p-3 bg-solar-night/30 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <Sun className="w-4 h-4 text-solar-yellow" />
+                  <span className="text-sm text-solar-muted">Current:</span>
+                  <span className="text-sm font-semibold text-solar-primary">{device.current_power || 0} W</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Zap className="w-4 h-4 text-solar-orange" />
+                  <span className="text-sm text-solar-muted">Today:</span>
+                  <span className="text-sm font-semibold text-solar-primary">{device.today_energy || 0} kWh</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Battery className="w-4 h-4 text-solar-success" />
+                  <span className="text-sm text-solar-muted">Battery:</span>
+                  <span className="text-sm font-semibold text-solar-primary">{device.avg_battery || 0}%</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Activity className="w-4 h-4 text-solar-primary" />
+                  <span className="text-sm text-solar-muted">Peak:</span>
+                  <span className="text-sm font-semibold text-solar-primary">{device.peak_power || 0} W</span>
+                </div>
+              </div>
+
               <div className="flex items-center justify-between pt-4 border-t border-solar-border/50">
                 <div className="flex space-x-2">
-                  <button onClick={() => { setSelectedDevice(device); setEditForm({ name: device.name, location: device.location, is_active: device.is_active }); setShowEditModal(true); }} className="p-2 text-solar-primary hover:text-solar-yellow rounded-lg hover:bg-solar-panel/20 transition">
-                    <Edit className="w-4 h-4" />
+                  <button onClick={() => fetchDevicePower(device)} className="p-2 text-solar-primary hover:text-solar-yellow rounded-lg hover:bg-solar-panel/20 transition" title="View Power Details">
+                    <Power className="w-4 h-4" />
                   </button>
                   <button onClick={() => handleToggleActive(device)} className={`p-2 rounded-lg hover:bg-solar-panel/20 transition ${device.is_active ? 'text-solar-warning' : 'text-solar-success'}`}>
                     {device.is_active ? <PowerOff className="w-4 h-4" /> : <Power className="w-4 h-4" />}
@@ -128,6 +163,7 @@ export default function Devices() {
         </div>
       )}
 
+      {/* Add Device Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-solar-card rounded-xl p-6 w-full max-w-md border border-solar-border">
@@ -152,6 +188,63 @@ export default function Devices() {
             <div className="flex justify-end space-x-3 mt-6">
               <Button onClick={() => setShowAddModal(false)} className="bg-gray-300 text-gray-700 hover:bg-gray-400">Cancel</Button>
               <Button onClick={handleAddDevice} disabled={!newDevice.name} className="bg-solar-yellow text-solar-dark hover:bg-solar-orange">Add Device</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Power Details Modal */}
+      {showPowerModal && powerDetails && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-solar-card rounded-xl p-6 w-full max-w-lg border border-solar-border">
+            <h2 className="text-xl font-bold text-solar-primary mb-4 flex items-center">
+              <Power className="w-5 h-5 text-solar-yellow mr-2" />
+              Device Power Details
+            </h2>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-solar-night/30 rounded-lg p-4 text-center">
+                  <Sun className="w-6 h-6 text-solar-yellow mx-auto mb-2" />
+                  <p className="text-sm text-solar-muted">Current Power</p>
+                  <p className="text-2xl font-bold text-solar-primary">{powerDetails.current_power?.toFixed(2) || 0} W</p>
+                </div>
+                <div className="bg-solar-night/30 rounded-lg p-4 text-center">
+                  <Zap className="w-6 h-6 text-solar-orange mx-auto mb-2" />
+                  <p className="text-sm text-solar-muted">Today's Energy</p>
+                  <p className="text-2xl font-bold text-solar-primary">{powerDetails.today_energy?.toFixed(2) || 0} kWh</p>
+                </div>
+                <div className="bg-solar-night/30 rounded-lg p-4 text-center">
+                  <Activity className="w-6 h-6 text-solar-success mx-auto mb-2" />
+                  <p className="text-sm text-solar-muted">Peak Power</p>
+                  <p className="text-2xl font-bold text-solar-primary">{powerDetails.peak_power?.toFixed(2) || 0} W</p>
+                </div>
+                <div className="bg-solar-night/30 rounded-lg p-4 text-center">
+                  <Battery className="w-6 h-6 text-solar-success mx-auto mb-2" />
+                  <p className="text-sm text-solar-muted">Avg Battery</p>
+                  <p className="text-2xl font-bold text-solar-primary">{powerDetails.avg_battery?.toFixed(1) || 0}%</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-solar-night/30 rounded-lg p-3">
+                  <p className="text-sm text-solar-muted">Average Power</p>
+                  <p className="text-lg font-semibold text-solar-primary">{powerDetails.avg_power?.toFixed(2) || 0} W</p>
+                </div>
+                <div className="bg-solar-night/30 rounded-lg p-3">
+                  <p className="text-sm text-solar-muted">Total Consumption</p>
+                  <p className="text-lg font-semibold text-solar-primary">{powerDetails.total_consumption?.toFixed(2) || 0} kWh</p>
+                </div>
+              </div>
+              <div className="bg-solar-yellow/10 rounded-lg p-3">
+                <p className="text-sm text-solar-muted">System Efficiency</p>
+                <p className="text-lg font-semibold text-solar-yellow">{powerDetails.efficiency?.toFixed(1) || 0}%</p>
+              </div>
+              <div className="flex justify-between items-center pt-2">
+                <span className="text-sm text-solar-muted">Status: {powerDetails.status}</span>
+                <span className="text-sm text-solar-muted">Last Updated: {powerDetails.last_updated}</span>
+              </div>
+            </div>
+            <div className="flex justify-end mt-6">
+              <Button onClick={() => setShowPowerModal(false)} className="bg-solar-yellow text-solar-dark hover:bg-solar-orange">Close</Button>
             </div>
           </div>
         </div>
