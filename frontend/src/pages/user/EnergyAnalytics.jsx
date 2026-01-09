@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts'
 import { Sun, Zap, Battery, TrendingUp, RefreshCw, DollarSign, Leaf, BarChart3 } from 'lucide-react'
 import { getRequest } from '../../lib/apiService'
+import { notify } from '../../lib/toast'
 import StatCard from '../../components/ui/stat-card'
 
 export default function EnergyAnalytics() {
@@ -18,18 +19,10 @@ export default function EnergyAnalytics() {
         getRequest('/user/energy/history', { days: period })
       ])
       setAnalytics(analyticsRes.data.analytics)
-      
-      // Transform history data for charts
-      const formattedHistory = (historyRes.data.history || []).map(h => ({
-        time: new Date(h.timestamp).toLocaleDateString(),
-        solar: h.solar_power,
-        load: h.load_power,
-        grid: h.grid_power,
-        battery: h.battery_level
-      }))
       setHistory(formattedHistory)
     } catch (error) {
       console.error('Failed to fetch energy analytics:', error)
+      notify.error('Failed to load energy analytics')
     } finally {
       setLoading(false)
     }

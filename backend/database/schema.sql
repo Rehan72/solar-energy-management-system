@@ -158,12 +158,42 @@ CREATE TRIGGER update_solar_profiles_updated_at BEFORE UPDATE ON solar_profiles
 -- Index for solar_profiles
 CREATE INDEX idx_solar_profiles_user_id ON solar_profiles(user_id);
 
+-- Regions table for administrative divisions
+CREATE TABLE regions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) NOT NULL,
+    state VARCHAR(100) NOT NULL,
+    country VARCHAR(100) NOT NULL DEFAULT 'India',
+    timezone VARCHAR(50) NOT NULL DEFAULT 'Asia/Kolkata',
+    description TEXT,
+    status VARCHAR(20) DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'INACTIVE')),
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
+    expected_users INTEGER DEFAULT 0,
+    expected_plants INTEGER DEFAULT 0,
+    capacity_mw DECIMAL(10, 2) DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Trigger for regions updated_at
+CREATE TRIGGER update_regions_updated_at BEFORE UPDATE ON regions
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Index for regions
+CREATE INDEX idx_regions_id ON regions(id);
+CREATE INDEX idx_regions_name ON regions(name);
+CREATE INDEX idx_regions_state ON regions(state);
+
 -- Solar Plants table for tracking solar power plants
+-- Plants DEPEND on Regions (One-to-Many relationship)
+-- Each plant belongs to exactly one region
 CREATE TABLE solar_plants (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
     location VARCHAR(500) NOT NULL,
-    region VARCHAR(100) NOT NULL,
+    region_id UUID REFERENCES regions(id) ON DELETE SET NULL, -- Foreign key to regions table
+    region VARCHAR(100) NOT NULL, -- Region name for display purposes
     capacity_kw DECIMAL(10, 2) NOT NULL,
     current_output_kw DECIMAL(10, 2) DEFAULT 0,
     efficiency DECIMAL(5, 2) DEFAULT 85.00,
@@ -179,22 +209,32 @@ CREATE TABLE solar_plants (
 CREATE TRIGGER update_solar_plants_updated_at BEFORE UPDATE ON solar_plants
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Index for solar_plants
+-- Indexes for solar_plants
+CREATE INDEX idx_solar_plants_id ON solar_plants(id);
+CREATE INDEX idx_solar_plants_region_id ON solar_plants(region_id);
 CREATE INDEX idx_solar_plants_region ON solar_plants(region);
 CREATE INDEX idx_solar_plants_status ON solar_plants(status);
-
--- Insert sample solar plants
-INSERT INTO solar_plants (name, location, region, capacity_kw, current_output_kw, efficiency, latitude, longitude, status)
-VALUES
-    ('Delhi Solar Farm Phase 1', 'Sector 15, Rohini, Delhi - 110085', 'Delhi', 1000.0, 850.0, 85.0, 28.7300, 77.0900, 'ACTIVE'),
-    ('Mumbai Solar Hub', 'Andheri East, Mumbai - 400069', 'Mumbai', 2500.0, 2100.0, 84.0, 19.1197, 72.8468, 'ACTIVE'),
-    ('Patna Solar Station', 'Kankarbagh, Patna - 800020', 'Patna', 500.0, 380.0, 76.0, 25.5927, 85.0900, 'ACTIVE'),
-    ('Ahmedabad Green Energy', 'SG Highway, Ahmedabad - 380015', 'Ahmedabad', 1500.0, 1200.0, 80.0, 23.0225, 72.5714, 'ACTIVE');
 
 -- Insert default super admin user (password: admin123 - hash this in production)
 -- In production, use proper password hashing
 INSERT INTO users (email, password_hash, first_name, last_name, role)
 VALUES ('admin@solar.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Super', 'Admin', 'SUPER_ADMIN');
+
+-- Insert sample regions
+INSERT INTO regions (id, name, state, country, timezone, status, expected_users, expected_plants, capacity_mw)
+VALUES 
+    ('11111111-1111-1111-1111-111111111111', 'Delhi', 'Delhi', 'India', 'Asia/Kolkata', 'ACTIVE', 150, 5, 500),
+    ('22222222-2222-2222-2222-222222222222', 'Mumbai', 'Maharashtra', 'India', 'Asia/Kolkata', 'ACTIVE', 200, 8, 800),
+    ('33333333-3333-3333-3333-333333333333', 'Patna', 'Bihar', 'India', 'Asia/Kolkata', 'ACTIVE', 80, 3, 300),
+    ('44444444-4444-4444-4444-444444444444', 'Ahmedabad', 'Gujarat', 'India', 'Asia/Kolkata', 'ACTIVE', 120, 4, 400);
+
+-- Insert sample solar plants with region_id references
+INSERT INTO solar_plants (name, location, region_id, region, capacity_kw, current_output_kw, efficiency, latitude, longitude, status)
+VALUES
+    ('Delhi Solar Farm Phase 1', 'Sector 15, Rohini, Delhi - 110085', '11111111-1111-1111-1111-111111111111', 'Delhi', 1000.0, 850.0, 85.0, 28.7300, 77.0900, 'ACTIVE'),
+    ('Mumbai Solar Hub', 'Andheri East, Mumbai - 400069', '22222222-2222-2222-2222-222222222222', 'Mumbai', 2500.0, 2100.0, 84.0, 19.1197, 72.8468, 'ACTIVE'),
+    ('Patna Solar Station', 'Kankarbagh, Patna - 800020', '33333333-3333-3333-3333-333333333333', 'Patna', 500.0, 380.0, 76.0, 25.5927, 85.0900, 'ACTIVE'),
+    ('Ahmedabad Green Energy', 'SG Highway, Ahmedabad - 380015', '44444444-4444-4444-4444-444444444444', 'Ahmedabad', 1500.0, 1200.0, 80.0, 23.0225, 72.5714, 'ACTIVE');
 
 -- Insert sample devices
 INSERT INTO devices (device_id, api_key, name, location, latitude, longitude)

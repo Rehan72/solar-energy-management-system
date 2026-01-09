@@ -10,7 +10,8 @@ import (
 type CreatePlantRequest struct {
 	Name            string   `json:"name" binding:"required"`
 	Location        string   `json:"location" binding:"required"`
-	Region          string   `json:"region" binding:"required"`
+	RegionID        string   `json:"region_id" binding:"required"` // UUID of the region
+	Region          string   `json:"region"`                       // For display purposes (name of region)
 	CapacityKW      float64  `json:"capacity_kw" binding:"required,gt=0"`
 	CurrentOutputKW float64  `json:"current_output_kw"`
 	Efficiency      float64  `json:"efficiency"`
@@ -23,6 +24,7 @@ type CreatePlantRequest struct {
 type UpdatePlantRequest struct {
 	Name            string   `json:"name"`
 	Location        string   `json:"location"`
+	RegionID        string   `json:"region_id"`
 	Region          string   `json:"region"`
 	CapacityKW      float64  `json:"capacity_kw"`
 	CurrentOutputKW float64  `json:"current_output_kw"`
@@ -48,10 +50,22 @@ func CreatePlantHandler(c *gin.Context) {
 		req.Efficiency = 85.0
 	}
 
+	// Parse RegionID
+	var regionID *uuid.UUID
+	if req.RegionID != "" {
+		parsed, err := uuid.Parse(req.RegionID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid region ID format"})
+			return
+		}
+		regionID = &parsed
+	}
+
 	plant := &Plant{
 		ID:              uuid.New(),
 		Name:            req.Name,
 		Location:        req.Location,
+		RegionID:        regionID,
 		Region:          req.Region,
 		CapacityKW:      req.CapacityKW,
 		CurrentOutputKW: req.CurrentOutputKW,
@@ -140,6 +154,14 @@ func UpdatePlantHandler(c *gin.Context) {
 	}
 	if req.Location != "" {
 		existing.Location = req.Location
+	}
+	if req.RegionID != "" {
+		parsed, err := uuid.Parse(req.RegionID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid region ID format"})
+			return
+		}
+		existing.RegionID = &parsed
 	}
 	if req.Region != "" {
 		existing.Region = req.Region

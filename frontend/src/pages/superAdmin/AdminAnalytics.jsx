@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
 import { Users, Zap, TrendingUp, DollarSign, Activity, BarChart3, RefreshCw, Globe } from 'lucide-react'
 import { getRequest } from '../../lib/apiService'
+import { notify } from '../../lib/toast'
 import StatCard from '../../components/ui/stat-card'
 
 export default function AdminAnalytics() {
@@ -27,6 +28,7 @@ export default function AdminAnalytics() {
       })
     } catch (error) {
       // Use defaults on error
+      notify.error('Failed to load analytics data')
       setStats({
         totalUsers: 1250,
         totalEnergy: 24456,

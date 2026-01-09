@@ -3,6 +3,8 @@ import { Users as UsersIcon, UserPlus, Search, Filter, RefreshCw, Eye, Edit, Use
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../../components/ui/stat-card'
 import { getRequest } from '../../lib/apiService'
+import { notify } from '../../lib/toast'
+import SunLoader from '../../components/SunLoader'
 
 export default function Users() {
   const navigate = useNavigate()
@@ -17,6 +19,7 @@ export default function Users() {
       setUsers(response.data.users || [])
     } catch (error) {
       console.error('Failed to fetch users:', error)
+      notify.error('Failed to load users')
     } finally {
       setLoading(false)
     }
@@ -43,7 +46,13 @@ export default function Users() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Loading overlay */}
+      {loading && (
+        <div className="absolute inset-0 bg-solar-bg/80 z-50 flex flex-col items-center justify-center">
+          <SunLoader message="Loading users..." size="large" />
+        </div>
+      )}
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>

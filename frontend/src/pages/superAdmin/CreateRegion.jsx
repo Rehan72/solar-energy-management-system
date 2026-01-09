@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { Label } from '../../components/ui/label'
 import LocationPicker from '../../components/LocationPicker'
+import SunLoader from '../../components/SunLoader'
 
 export default function CreateRegion() {
   const navigate = useNavigate()
@@ -17,7 +18,10 @@ export default function CreateRegion() {
     country: 'India',
     timezone: 'Asia/Kolkata',
     description: '',
-    status: 'ACTIVE'
+    status: 'ACTIVE',
+    expected_users: 0,
+    expected_plants: 0,
+    capacity_mw: 0
   })
   const [coordinates, setCoordinates] = useState({ latitude: null, longitude: null })
   const [errors, setErrors] = useState({})
@@ -72,12 +76,15 @@ export default function CreateRegion() {
     try {
       setLoading(true)
       const payload = {
-        ...formData,
+        name: formData.name,
         state: formData.state,
         country: formData.country,
         timezone: formData.timezone,
         description: formData.description,
         status: formData.status,
+        expected_users: Number(formData.expected_users) || 0,
+        expected_plants: Number(formData.expected_plants) || 0,
+        capacity_mw: Number(formData.capacity_mw) || 0,
         latitude: coordinates.latitude,
         longitude: coordinates.longitude
       }
@@ -94,6 +101,7 @@ export default function CreateRegion() {
 
   return (
     <div className="space-y-6">
+      {loading && <SunLoader message="Creating region..." />}
       {/* Header */}
       <div className="flex items-center space-x-4">
         <button 

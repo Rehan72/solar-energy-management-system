@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/button'
 import LocationPicker from '../../components/LocationPicker'
 import { getRequest, putRequest } from '../../lib/apiService'
 import { notify } from '../../lib/toast'
+import SunLoader from '../../components/SunLoader'
 
 export default function EditUser() {
   const navigate = useNavigate()
@@ -348,6 +349,7 @@ export default function EditUser() {
 
   return (
     <div className="space-y-6">
+      {saving && <SunLoader message="Saving changes..." />}
       {/* Progress Steps */}
       <div className="flex justify-center items-center space-x-4 mb-6">
         {[1, 2, 3].map((s) => (

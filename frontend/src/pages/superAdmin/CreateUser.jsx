@@ -5,6 +5,7 @@ import LocationPicker from '../../components/LocationPicker'
 import ProfileImageUpload from '../../components/ProfileImageUpload'
 import { postRequest, getRequest } from '../../lib/apiService'
 import { notify } from '../../lib/toast'
+import SunLoader from '../../components/SunLoader'
 
 export default function CreateUser() {
   const navigate = useNavigate()
@@ -198,6 +199,7 @@ export default function CreateUser() {
 
   return (
     <div className="space-y-6">
+      {loading && <SunLoader message="Creating user..." />}
       {/* Header */}
       <div className="flex items-center space-x-4">
         <button

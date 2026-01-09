@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import UserDashboard from '../components/dashboards/UserDashboard'
 import AdminDashboard from '../components/dashboards/AdminDashboard'
 import SuperAdminDashboard from '../components/dashboards/SuperAdminDashboard'
+import SunLoader from '../components/SunLoader'
 
 function Dashboard() {
   const [user, setUser] = useState(null)
@@ -18,7 +19,7 @@ function Dashboard() {
   }, [token, navigate])
 
   if (!user) {
-    return <div>Loading...</div>
+    return <SunLoader message="Loading your dashboard..." />
   }
 
   const role = user.role

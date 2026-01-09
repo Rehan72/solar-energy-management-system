@@ -1,10 +1,14 @@
 import CreateRegion from "../pages/superAdmin/CreateRegion";
+import EditRegion from "../pages/superAdmin/EditRegion";
+import RegionDetail from "../pages/superAdmin/RegionDetail";
 import GlobalDashboard from "../pages/superAdmin/GlobalDashboard";
 import Regions from "../pages/superAdmin/Regions";
 import Admins from "../pages/superAdmin/Admins";
 import CreateAdmin from "../pages/superAdmin/CreateAdmin";
 import Plants from "../pages/superAdmin/Plants";
 import CreatePlant from "../pages/superAdmin/CreatePlant";
+import EditPlant from "../pages/superAdmin/EditPlant";
+import PlantDetail from "../pages/superAdmin/PlantDetail";
 import Users from "../pages/superAdmin/Users";
 import CreateUser from "../pages/superAdmin/CreateUser";
 import UserDetail from "../pages/superAdmin/UserDetail";
@@ -47,6 +51,18 @@ export default [
     exact: true
   },
   {
+    element: EditRegion,
+    path: `/regions/:id/edit`,
+    allowedRoles: ["SUPER_ADMIN"],
+    exact: true
+  },
+  {
+    element: RegionDetail,
+    path: `/regions/:id`,
+    allowedRoles: ["SUPER_ADMIN"],
+    exact: true
+  },
+  {
     element: Admins,
     path: `/admins`,
     allowedRoles: ["SUPER_ADMIN"],
@@ -83,7 +99,13 @@ export default [
     exact: true
   },
   {
-    element: Plants,
+    element: PlantDetail,
+    path: `/plants/:id`,
+    allowedRoles: ["SUPER_ADMIN", "ADMIN"],
+    exact: true
+  },
+  {
+    element: EditPlant,
     path: `/plants/:id/edit`,
     allowedRoles: ["SUPER_ADMIN"],
     exact: true

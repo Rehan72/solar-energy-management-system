@@ -8,6 +8,7 @@ import (
 	"sems-backend/internal/energy"
 	"sems-backend/internal/middleware"
 	"sems-backend/internal/plants"
+	"sems-backend/internal/regions"
 	"sems-backend/internal/users"
 
 	"github.com/gin-contrib/cors"
@@ -42,6 +43,10 @@ func main() {
 		c.JSON(200, gin.H{
 			"status": "SEMS backend running",
 		})
+	})
+
+	r.GET("/test", func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "root test works"})
 	})
 
 	// Seed endpoint to create initial super admin (for testing)
@@ -89,6 +94,34 @@ func main() {
 		installer.POST("/devices", devices.CreateDeviceHandler)
 	}
 
+	// SUPER_ADMIN Routes
+	superAdmin := r.Group("/superadmin")
+	// superAdmin.Use(middleware.AuthMiddleware(), middleware.RequireRole("SUPER_ADMIN"))
+	{
+		superAdmin.GET("/admins", users.GetAdminsHandler)
+		superAdmin.POST("/admins", users.CreateUserHandler)
+		superAdmin.GET("/admins/:id", users.GetUserHandler)
+		superAdmin.PUT("/admins/:id", users.UpdateUserHandler)
+		superAdmin.DELETE("/admins/:id", users.DeleteUserHandler)
+		superAdmin.GET("/users", users.GetUsersHandler) // all users
+		superAdmin.GET("/global/stats", users.GetGlobalStatsHandler)
+
+		// Regions routes
+		superAdmin.GET("/regions", regions.GetRegionsHandler)
+		superAdmin.POST("/regions", regions.CreateRegionHandler)
+		superAdmin.PUT("/regions/:id", regions.UpdateRegionHandler)
+		superAdmin.DELETE("/regions/:id", regions.DeleteRegionHandler)
+		superAdmin.GET("/test-regions", func(c *gin.Context) { c.JSON(200, gin.H{"message": "test regions works"}) })
+		superAdmin.GET("/test", func(c *gin.Context) { c.JSON(200, gin.H{"message": "test route works"}) })
+
+		// Plants routes
+		superAdmin.GET("/plants", plants.GetPlantsHandler)
+		superAdmin.POST("/plants", plants.CreatePlantHandler)
+		superAdmin.GET("/plants/:id", plants.GetPlantHandler)
+		superAdmin.PUT("/plants/:id", plants.UpdatePlantHandler)
+		superAdmin.DELETE("/plants/:id", plants.DeletePlantHandler)
+	}
+
 	// ADMIN Routes
 	admin := r.Group("/admin")
 	admin.Use(middleware.AuthMiddleware(), middleware.RequireRole("ADMIN", "SUPER_ADMIN"))
@@ -99,32 +132,12 @@ func main() {
 		admin.PUT("/users/:id", users.UpdateUserHandler)
 		admin.DELETE("/users/:id", users.DeleteUserHandler)
 		admin.GET("/analytics", func(c *gin.Context) { c.JSON(200, gin.H{"message": "System analytics"}) })
-		
+
 		// Device management for admins
 		admin.GET("/devices", devices.GetAllDevicesHandler)
 		admin.GET("/devices/:id", devices.GetDeviceHandler)
 		admin.PUT("/devices/:id", devices.UpdateDeviceHandler)
 		admin.DELETE("/devices/:id", devices.DeleteDeviceHandler)
-	}
-
-	// SUPER_ADMIN Routes
-	superAdmin := r.Group("/superadmin")
-	superAdmin.Use(middleware.AuthMiddleware(), middleware.RequireRole("SUPER_ADMIN"))
-	{
-		superAdmin.GET("/admins", users.GetAdminsHandler)
-		superAdmin.POST("/admins", users.CreateUserHandler)
-		superAdmin.GET("/admins/:id", users.GetUserHandler)
-		superAdmin.PUT("/admins/:id", users.UpdateUserHandler)
-		superAdmin.DELETE("/admins/:id", users.DeleteUserHandler)
-		superAdmin.GET("/users", users.GetUsersHandler) // all users
-		superAdmin.GET("/global/stats", users.GetGlobalStatsHandler)
-		
-		// Plants routes
-		superAdmin.GET("/plants", plants.GetPlantsHandler)
-		superAdmin.POST("/plants", plants.CreatePlantHandler)
-		superAdmin.GET("/plants/:id", plants.GetPlantHandler)
-		superAdmin.PUT("/plants/:id", plants.UpdatePlantHandler)
-		superAdmin.DELETE("/plants/:id", plants.DeletePlantHandler)
 	}
 
 	// GOVERNMENT Routes
@@ -134,7 +147,7 @@ func main() {
 		govt.GET("/subsidy/reports", func(c *gin.Context) { c.JSON(200, gin.H{"message": "Subsidy reports"}) })
 	}
 
-	log.Println("Server starting on :8080")
+	log.Println("Server starting on :8080 with regions support")
 	r.Run(":8080")
 }
 

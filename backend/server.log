@@ -1,0 +1,212 @@
+2026/01/09 13:26:00 ✅ Database connection established successfully
+2026/01/09 13:26:00 ✅ Migration 1 executed successfully
+2026/01/09 13:26:00 ✅ Migration 2 executed successfully
+2026/01/09 13:26:00 ✅ Migration 3 executed successfully
+2026/01/09 13:26:00 ✅ Migration 4 executed successfully
+2026/01/09 13:26:00 ✅ Migration 5 executed successfully
+2026/01/09 13:26:00 ✅ Migration 6 executed successfully
+2026/01/09 13:26:00 ✅ Migration 7 executed successfully
+2026/01/09 13:26:00 Failed to run migrations, continuing in demo mode: failed to execute migration 8: duplicate column name: profile_image
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /health                   --> main.main.func1 (4 handlers)
+[GIN-debug] GET    /test                     --> main.main.func2 (4 handlers)
+[GIN-debug] POST   /seed/superadmin          --> main.main.func3 (4 handlers)
+[GIN-debug] POST   /auth/register            --> sems-backend/internal/auth.Register (4 handlers)
+[GIN-debug] POST   /auth/login               --> sems-backend/internal/auth.Login (4 handlers)
+[GIN-debug] POST   /iot/data                 --> sems-backend/internal/energy.IngestData (4 handlers)
+[GIN-debug] GET    /user/profile             --> sems-backend/internal/users.GetCurrentUserHandler (6 handlers)
+[GIN-debug] PUT    /user/profile             --> sems-backend/internal/users.UpdateUserHandler (6 handlers)
+[GIN-debug] GET    /user/solar-profile       --> sems-backend/internal/users.GetSolarProfileHandler (6 handlers)
+[GIN-debug] PUT    /user/solar-profile       --> sems-backend/internal/users.UpdateSolarProfileHandler (6 handlers)
+[GIN-debug] GET    /user/energy/current      --> sems-backend/internal/energy.CurrentEnergy (6 handlers)
+[GIN-debug] POST   /user/energy/predict      --> sems-backend/internal/energy.GetSolarPrediction (6 handlers)
+[GIN-debug] GET    /user/energy/history      --> sems-backend/internal/energy.GetEnergyHistoryHandler (6 handlers)
+[GIN-debug] GET    /user/energy/analytics    --> sems-backend/internal/energy.GetEnergyAnalyticsHandler (6 handlers)
+[GIN-debug] GET    /user/devices             --> sems-backend/internal/devices.GetDevicesHandler (6 handlers)
+[GIN-debug] GET    /user/devices/:id         --> sems-backend/internal/devices.GetDeviceHandler (6 handlers)
+[GIN-debug] PUT    /user/devices/:id         --> sems-backend/internal/devices.UpdateDeviceHandler (6 handlers)
+[GIN-debug] DELETE /user/devices/:id         --> sems-backend/internal/devices.DeleteDeviceHandler (6 handlers)
+[GIN-debug] POST   /user/devices/:id/regenerate-key --> sems-backend/internal/devices.RegenerateAPIKeyHandler (6 handlers)
+[GIN-debug] POST   /installer/devices        --> sems-backend/internal/devices.CreateDeviceHandler (6 handlers)
+[GIN-debug] GET    /superadmin/admins        --> sems-backend/internal/users.GetAdminsHandler (4 handlers)
+[GIN-debug] POST   /superadmin/admins        --> sems-backend/internal/users.CreateUserHandler (4 handlers)
+[GIN-debug] GET    /superadmin/admins/:id    --> sems-backend/internal/users.GetUserHandler (4 handlers)
+[GIN-debug] PUT    /superadmin/admins/:id    --> sems-backend/internal/users.UpdateUserHandler (4 handlers)
+[GIN-debug] DELETE /superadmin/admins/:id    --> sems-backend/internal/users.DeleteUserHandler (4 handlers)
+[GIN-debug] GET    /superadmin/users         --> sems-backend/internal/users.GetUsersHandler (4 handlers)
+[GIN-debug] GET    /superadmin/global/stats  --> sems-backend/internal/users.GetGlobalStatsHandler (4 handlers)
+[GIN-debug] GET    /superadmin/regions       --> sems-backend/internal/regions.GetRegionsHandler (4 handlers)
+[GIN-debug] POST   /superadmin/regions       --> sems-backend/internal/regions.CreateRegionHandler (4 handlers)
+[GIN-debug] PUT    /superadmin/regions/:id   --> sems-backend/internal/regions.UpdateRegionHandler (4 handlers)
+[GIN-debug] DELETE /superadmin/regions/:id   --> sems-backend/internal/regions.DeleteRegionHandler (4 handlers)
+[GIN-debug] GET    /superadmin/test-regions  --> main.main.func4 (4 handlers)
+[GIN-debug] GET    /superadmin/test          --> main.main.func5 (4 handlers)
+[GIN-debug] GET    /superadmin/plants        --> sems-backend/internal/plants.GetPlantsHandler (4 handlers)
+[GIN-debug] POST   /superadmin/plants        --> sems-backend/internal/plants.CreatePlantHandler (4 handlers)
+[GIN-debug] GET    /superadmin/plants/:id    --> sems-backend/internal/plants.GetPlantHandler (4 handlers)
+[GIN-debug] PUT    /superadmin/plants/:id    --> sems-backend/internal/plants.UpdatePlantHandler (4 handlers)
+[GIN-debug] DELETE /superadmin/plants/:id    --> sems-backend/internal/plants.DeletePlantHandler (4 handlers)
+[GIN-debug] GET    /admin/users              --> sems-backend/internal/users.GetUsersHandler (6 handlers)
+[GIN-debug] POST   /admin/users              --> sems-backend/internal/users.CreateUserHandler (6 handlers)
+[GIN-debug] GET    /admin/users/:id          --> sems-backend/internal/users.GetUserHandler (6 handlers)
+[GIN-debug] PUT    /admin/users/:id          --> sems-backend/internal/users.UpdateUserHandler (6 handlers)
+[GIN-debug] DELETE /admin/users/:id          --> sems-backend/internal/users.DeleteUserHandler (6 handlers)
+[GIN-debug] GET    /admin/analytics          --> main.main.func6 (6 handlers)
+[GIN-debug] GET    /admin/devices            --> sems-backend/internal/devices.GetAllDevicesHandler (6 handlers)
+[GIN-debug] GET    /admin/devices/:id        --> sems-backend/internal/devices.GetDeviceHandler (6 handlers)
+[GIN-debug] PUT    /admin/devices/:id        --> sems-backend/internal/devices.UpdateDeviceHandler (6 handlers)
+[GIN-debug] DELETE /admin/devices/:id        --> sems-backend/internal/devices.DeleteDeviceHandler (6 handlers)
+[GIN-debug] GET    /govt/subsidy/reports     --> main.main.func7 (6 handlers)
+2026/01/09 13:26:00 Server starting on :8080 with regions support
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://github.com/gin-gonic/gin/blob/master/docs/doc.md#dont-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8080
+[GIN] 2026/01/09 - 13:26:12 | 500 |     161.695µs |       127.0.0.1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:26:35 | 200 |      326.06µs |       127.0.0.1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:26:47 | 204 |      34.838µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:26:47 | 204 |      19.228µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:26:47 | 200 |      227.48µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:26:47 | 200 |     160.816µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:26:53 | 204 |        6.41µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:26:53 | 204 |       2.147µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:26:53 | 200 |     916.311µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:26:53 | 200 |     325.412µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:27:06 | 200 |     216.932µs |       127.0.0.1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:28:36 | 204 |       5.932µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:28:36 | 204 |       3.256µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:28:36 | 200 |     465.138µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:28:36 | 200 |     333.454µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:30:22 | 204 |       6.132µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:30:22 | 204 |       2.624µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:30:22 | 200 |     213.944µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:30:22 | 200 |     213.085µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:30:22 | 204 |       7.671µs |             ::1 | OPTIONS  "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:30:22 | 200 |    6.415614ms |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:30:22 | 200 |     257.159µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:30:28 | 204 |       5.658µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:30:28 | 204 |       6.884µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:30:28 | 200 |     319.678µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:30:28 | 200 |     316.407µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:30:43 | 204 |       7.496µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:30:43 | 200 |     453.272µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:30:43 | 204 |       4.576µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:30:43 | 200 |     283.611µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:30:43 | 204 |      24.863µs |             ::1 | OPTIONS  "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:30:43 | 204 |       4.104µs |             ::1 | OPTIONS  "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:30:43 | 200 |     236.021µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:30:43 | 200 |     237.219µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:30:47 | 204 |       6.404µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:30:47 | 200 |     274.721µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:30:47 | 200 |     392.345µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:31:56 | 204 |        6.09µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:31:56 | 200 |     214.434µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:31:57 | 200 |     254.597µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:31:57 | 200 |     310.837µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:31:58 | 200 |     330.745µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:31:59 | 200 |     332.633µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:32:12 | 204 |       5.807µs |             ::1 | OPTIONS  "/superadmin/plants/013303ad-279f-4f08-9d15-f09e48a2b779"
+[GIN] 2026/01/09 - 13:32:12 | 204 |       4.412µs |             ::1 | OPTIONS  "/superadmin/plants/013303ad-279f-4f08-9d15-f09e48a2b779"
+[GIN] 2026/01/09 - 13:32:12 | 200 |     175.667µs |             ::1 | GET      "/superadmin/plants/013303ad-279f-4f08-9d15-f09e48a2b779"
+[GIN] 2026/01/09 - 13:32:12 | 200 |     453.336µs |             ::1 | GET      "/superadmin/plants/013303ad-279f-4f08-9d15-f09e48a2b779"
+[GIN] 2026/01/09 - 13:32:19 | 204 |       6.971µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:32:19 | 204 |       4.978µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:32:19 | 200 |     595.783µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:32:19 | 200 |     204.485µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:32:19 | 204 |       6.126µs |             ::1 | OPTIONS  "/superadmin/plants/013303ad-279f-4f08-9d15-f09e48a2b779"
+[GIN] 2026/01/09 - 13:32:19 | 204 |      10.539µs |             ::1 | OPTIONS  "/superadmin/plants/013303ad-279f-4f08-9d15-f09e48a2b779"
+[GIN] 2026/01/09 - 13:32:19 | 200 |    1.369706ms |             ::1 | GET      "/superadmin/plants/013303ad-279f-4f08-9d15-f09e48a2b779"
+[GIN] 2026/01/09 - 13:32:19 | 200 |     263.465µs |             ::1 | GET      "/superadmin/plants/013303ad-279f-4f08-9d15-f09e48a2b779"
+[GIN] 2026/01/09 - 13:32:21 | 204 |       5.872µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:32:21 | 204 |       3.936µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:32:21 | 200 |     351.782µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:32:21 | 200 |     324.354µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:32:25 | 200 |     329.471µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:33:12 | 204 |       5.884µs |             ::1 | OPTIONS  "/superadmin/plants/013303ad-279f-4f08-9d15-f09e48a2b779"
+[GIN] 2026/01/09 - 13:33:12 | 204 |       5.575µs |             ::1 | OPTIONS  "/superadmin/plants/013303ad-279f-4f08-9d15-f09e48a2b779"
+[GIN] 2026/01/09 - 13:33:12 | 200 |      255.33µs |             ::1 | GET      "/superadmin/plants/013303ad-279f-4f08-9d15-f09e48a2b779"
+[GIN] 2026/01/09 - 13:33:12 | 200 |     203.061µs |             ::1 | GET      "/superadmin/plants/013303ad-279f-4f08-9d15-f09e48a2b779"
+[GIN] 2026/01/09 - 13:33:14 | 204 |       7.284µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:33:14 | 204 |        2.11µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:33:14 | 200 |     848.334µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:33:14 | 200 |     766.379µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:33:34 | 204 |      10.372µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:33:34 | 204 |       8.115µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:33:34 | 200 |     519.138µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:33:34 | 200 |     195.612µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:33:34 | 204 |       7.224µs |             ::1 | OPTIONS  "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:33:34 | 204 |       6.898µs |             ::1 | OPTIONS  "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:33:34 | 200 |     443.808µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:33:34 | 200 |     244.252µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:33:39 | 204 |       6.124µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:33:39 | 204 |       2.448µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:33:39 | 200 |     563.117µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:33:39 | 200 |     291.034µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:33:42 | 204 |       6.651µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:33:42 | 204 |       2.352µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:33:42 | 200 |     244.428µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:33:42 | 200 |     220.361µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:33:42 | 204 |       6.453µs |             ::1 | OPTIONS  "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:33:42 | 200 |     207.391µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:33:42 | 200 |     239.869µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:35:07 | 204 |       5.534µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:35:07 | 204 |       2.844µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:35:07 | 200 |     296.143µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:35:07 | 200 |     457.775µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:35:31 | 204 |       7.511µs |             ::1 | OPTIONS  "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:35:31 | 204 |       3.708µs |             ::1 | OPTIONS  "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:35:31 | 200 |     301.685µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:35:31 | 200 |     313.531µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:35:36 | 204 |       5.851µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:35:36 | 204 |        1.78µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:35:36 | 200 |     216.466µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:35:36 | 200 |     209.391µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:35:36 | 200 |      218.62µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:35:36 | 200 |     351.215µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:35:56 | 204 |      10.265µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:35:56 | 204 |        6.74µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:35:56 | 200 |     318.989µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:35:56 | 200 |     519.652µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:37:17 | 204 |       6.686µs |             ::1 | OPTIONS  "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:37:17 | 204 |      13.742µs |             ::1 | OPTIONS  "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:37:17 | 200 |     237.077µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:37:17 | 200 |     236.231µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:37:23 | 204 |       6.972µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:37:23 | 204 |      14.197µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 13:37:23 | 200 |     635.219µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:37:23 | 200 |     221.633µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 13:37:23 | 204 |       6.725µs |             ::1 | OPTIONS  "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:37:23 | 200 |     249.709µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:37:23 | 200 |     234.983µs |             ::1 | GET      "/superadmin/plants/fe6d1b30-1532-4b58-b6fc-3beec4190773"
+[GIN] 2026/01/09 - 13:39:11 | 204 |       6.376µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:39:11 | 204 |       7.072µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 13:39:11 | 200 |     277.255µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 13:39:11 | 200 |     296.393µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 15:01:57 | 200 |     203.811µs |       127.0.0.1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 15:02:12 | 200 |     155.514µs |       127.0.0.1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 15:03:10 | 201 |   12.684662ms |       127.0.0.1 | POST     "/superadmin/regions"
+[GIN] 2026/01/09 - 15:03:17 | 200 |     212.001µs |       127.0.0.1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 15:03:41 | 200 |      252.08µs |       127.0.0.1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 15:05:25 | 200 |      230.04µs |       127.0.0.1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 15:08:25 | 200 |     230.133µs |       127.0.0.1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 15:09:05 | 200 |     518.774µs |       127.0.0.1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 15:09:21 | 204 |       30.62µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 15:09:21 | 204 |       7.069µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 15:09:21 | 200 |     450.808µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 15:09:21 | 200 |       329.8µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 15:09:23 | 204 |       7.347µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 15:09:23 | 204 |         2.5µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 15:09:23 | 200 |     251.102µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 15:09:23 | 200 |     206.711µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 15:09:27 | 204 |       7.792µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 15:09:27 | 204 |        5.84µs |             ::1 | OPTIONS  "/superadmin/plants"
+[GIN] 2026/01/09 - 15:09:27 | 200 |      331.84µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 15:09:27 | 200 |     353.673µs |             ::1 | GET      "/superadmin/plants"
+[GIN] 2026/01/09 - 15:09:37 | 204 |        7.33µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/09 - 15:09:37 | 200 |     283.528µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 15:09:37 | 200 |     197.377µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/09 - 15:09:56 | 200 |     211.888µs |       127.0.0.1 | GET      "/superadmin/plants"

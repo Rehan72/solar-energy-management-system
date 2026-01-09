@@ -92,6 +92,7 @@ func RunMigrations() error {
 			id TEXT PRIMARY KEY,
 			name TEXT NOT NULL,
 			location TEXT NOT NULL,
+			region_id TEXT,
 			region TEXT NOT NULL,
 			capacity_kw REAL NOT NULL,
 			current_output_kw REAL DEFAULT 0,
@@ -103,6 +104,8 @@ func RunMigrations() error {
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
+		// Add region_id column to existing solar_plants table
+		`ALTER TABLE solar_plants ADD COLUMN IF NOT EXISTS region_id TEXT;`,
 	}
 
 	for i, migration := range migrations {

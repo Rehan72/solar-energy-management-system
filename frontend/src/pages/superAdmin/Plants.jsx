@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Zap, Plus, Search, Filter, RefreshCw, MapPin, Battery, TrendingUp } from 'lucide-react'
+import { Zap, Plus, RefreshCw, Trash2, Eye } from 'lucide-react'
 import StatCard from '../../components/ui/stat-card'
-import { getRequest } from '../../lib/apiService'
+import { getRequest, deleteRequest } from '../../lib/apiService'
+import { notify } from '../../lib/toast'
+import SunLoader from '../../components/SunLoader'
+import DataTable from '../../components/common/DataTable'
 
 export default function Plants() {
   const navigate = useNavigate()
   const [plants, setPlants] = useState([])
   const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterRegion, setFilterRegion] = useState('ALL')
 
   const fetchPlants = async () => {
     try {
@@ -18,6 +19,7 @@ export default function Plants() {
       setPlants(response.data.plants || [])
     } catch (error) {
       console.error('Failed to fetch plants:', error)
+      notify.error('Failed to load plants')
     } finally {
       setLoading(false)
     }
@@ -27,24 +29,117 @@ export default function Plants() {
     fetchPlants()
   }, [])
 
-  const filteredPlants = plants.filter(plant => {
-    const matchesSearch = plant.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         plant.location?.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRegion = filterRegion === 'ALL' || plant.region === filterRegion
-    return matchesSearch && matchesRegion
-  })
-
   const getStatusBadgeColor = (status) => {
-    switch (status) {
-      case 'ACTIVE': return 'bg-solar-success text-white'
-      case 'MAINTENANCE': return 'bg-solar-warning text-solar-dark'
-      case 'INACTIVE': return 'bg-solar-danger text-white'
-      default: return 'bg-solar-muted text-solar-primary'
+    const statusUpper = (status || '').toUpperCase()
+    switch (statusUpper) {
+      case 'ACTIVE': 
+        return 'bg-green-500 text-white px-2 py-1 rounded-full text-xs'
+      case 'MAINTENANCE': 
+        return 'bg-yellow-500 text-dark px-2 py-1 rounded-full text-xs'
+      case 'INACTIVE': 
+        return 'bg-red-500 text-white px-2 py-1 rounded-full text-xs'
+      default: 
+        return 'bg-gray-500 text-white px-2 py-1 rounded-full text-xs'
+    }
+  }
+
+  // Define table columns
+  const columns = useMemo(() => [
+    {
+      header: 'Plant Name',
+      accessorKey: 'name',
+      cellClassName: 'font-semibold text-solar-primary',
+    },
+    {
+      header: 'Location',
+      accessorKey: 'location',
+      cellClassName: 'text-solar-muted',
+    },
+    {
+      header: 'Region',
+      accessorKey: 'region',
+      // cell: (row) => getRegionName(row.region_id) || row.region || 'N/A',
+      cellClassName: 'text-solar-panel',
+    },
+    {
+      header: 'Capacity (kW)',
+      accessorKey: 'capacity_kw',
+      cellClassName: 'text-solar-primary font-semibold',
+    },
+    {
+      header: 'Current Output',
+      accessorKey: 'current_output_kw',
+      cell: (row) => `${row.current_output_kw || 0} kW`,
+      cellClassName: 'text-solar-yellow font-semibold',
+    },
+    {
+      header: 'Efficiency',
+      accessorKey: 'efficiency',
+      cell: (row) => `${row.efficiency || 0}%`,
+      cellClassName: 'text-solar-orange font-semibold',
+    },
+    {
+      header: 'Status',
+      accessorKey: 'status',
+      cell: (row) => (
+        <span className={getStatusBadgeColor(row.status)}>
+          {row.status || 'ACTIVE'}
+        </span>
+      ),
+      cellClassName: 'text-center',
+    },
+    {
+      header: 'Actions',
+      cell: (row) => (
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => navigate(`/plants/${row.id}`)}
+            className="px-3 py-1 bg-solar-primary text-white text-xs font-semibold rounded hover:bg-solar-panel transition"
+            title="View"
+          >
+            <Eye className="w-3 h-3" />
+          </button>
+          <button
+            onClick={() => navigate(`/plants/${row.id}/edit`)}
+            className="px-3 py-1 bg-solar-yellow text-solar-dark text-xs font-semibold rounded hover:bg-solar-orange transition"
+            title="Edit"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => handleDeletePlant(row)}
+            className="px-3 py-1 bg-solar-danger text-white text-xs font-semibold rounded hover:bg-red-600 transition"
+            title="Delete"
+          >
+            <Trash2 className="w-3 h-3" />
+          </button>
+        </div>
+      ),
+      cellClassName: 'text-center',
+    },
+  ], [navigate])
+
+  const handleDeletePlant = async (plant) => {
+    if (window.confirm(`Are you sure you want to delete "${plant.name}"?`)) {
+      try {
+        await deleteRequest(`/superadmin/plants/${plant.id}`)
+        notify.success('Plant deleted successfully')
+        fetchPlants()
+      } catch (error) {
+        notify.error(error.response?.data?.message || 'Failed to delete plant')
+      }
     }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Loading overlay */}
+      {loading && (
+        <div className="absolute inset-0 bg-solar-bg/80 z-50 flex flex-col items-center justify-center">
+          <SunLoader message="Loading plants..." size="large" />
+        </div>
+      )}
+      
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -53,7 +148,7 @@ export default function Plants() {
         </div>
         <div className="flex space-x-3">
           <button
-            onClick={fetchPlants}
+            onClick={() => { fetchPlants() }}
             className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button"
           >
             <RefreshCw className="w-4 h-4" />
@@ -88,113 +183,32 @@ export default function Plants() {
         <StatCard
           title="Total Capacity"
           value={`${plants.reduce((sum, p) => sum + (p.capacity_kw || 0), 0)} kW`}
-          icon={Battery}
+          icon={Zap}
           color="text-solar-yellow"
           gradient="from-solar-yellow/20 to-solar-orange/10"
         />
         <StatCard
           title="Avg Efficiency"
           value={`${plants.length > 0 ? Math.round(plants.reduce((sum, p) => sum + (p.efficiency || 0), 0) / plants.length) : 0}%`}
-          icon={TrendingUp}
+          icon={Zap}
           color="text-solar-orange"
           gradient="from-solar-orange/20 to-solar-orange/5"
         />
       </div>
 
-      {/* Filters and Search */}
-      <div className="bg-solar-card rounded-lg p-4 energy-card">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-solar-muted" />
-            <input
-              type="text"
-              placeholder="Search plants by name or location..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow"
-            />
-          </div>
-          <div className="flex items-center space-x-2">
-            <Filter className="w-4 h-4 text-solar-muted" />
-            <select
-              value={filterRegion}
-              onChange={(e) => setFilterRegion(e.target.value)}
-              className="px-3 py-2 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow"
-            >
-              <option value="ALL">All Regions</option>
-              <option value="Delhi">Delhi</option>
-              <option value="Mumbai">Mumbai</option>
-              <option value="Patna">Patna</option>
-              <option value="Ahmedabad">Ahmedabad</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Plants Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? (
-          <div className="col-span-full p-8 text-center">
-            <div className="animate-spin w-8 h-8 border-2 border-solar-yellow border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-solar-muted">Loading plants...</p>
-          </div>
-        ) : filteredPlants.length === 0 ? (
-          <div className="col-span-full p-8 text-center">
-            <Zap className="w-16 h-16 text-solar-muted mx-auto mb-4" />
-            <p className="text-solar-muted">No plants found</p>
-          </div>
-        ) : (
-          filteredPlants.map((plant) => (
-            <div key={plant.id} className="bg-gradient-to-br from-solar-card to-solar-night/30 rounded-xl p-8 energy-card border border-solar-border/50 shadow-xl">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-solar-success rounded-lg flex items-center justify-center">
-                    <Zap className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-solar-primary">{plant.name || 'Unnamed Plant'}</h3>
-                    <div className="flex items-center text-sm text-solar-muted">
-                      <MapPin className="w-3 h-3 mr-1" />
-                      {plant.location || 'Unknown Location'}
-                    </div>
-                  </div>
-                </div>
-                <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(plant.status)}`}>
-                  {plant.status || 'ACTIVE'}
-                </span>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-solar-muted">Capacity</span>
-                  <span className="text-sm font-semibold text-solar-primary">{plant.capacity_kw || 0} kW</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-solar-muted">Current Output</span>
-                  <span className="text-sm font-semibold text-solar-yellow">{plant.current_output_kw || 0} kW</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-solar-muted">Efficiency</span>
-                  <span className="text-sm font-semibold text-solar-orange">{plant.efficiency || 0}%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-solar-muted">Region</span>
-                  <span className="text-sm font-semibold text-solar-panel">{plant.region || 'N/A'}</span>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-solar-border">
-                <button 
-                  onClick={() => navigate(`/plants/${plant.id}/edit`)}
-                  className="w-full px-4 py-2 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button"
-                >
-                  View Details
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      {/* Plants Table */}
+      <DataTable
+        columns={columns}
+        data={plants}
+        initialPageSize={10}
+        showPagination={true}
+        showPageSize={true}
+        pageSizeOptions={[5, 10, 20, 50]}
+        title="All Solar Plants"
+        description="List of all registered solar power plants"
+        emptyMessage="No plants found"
+        className="w-full"
+      />
     </div>
   )
 }

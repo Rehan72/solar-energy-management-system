@@ -1,29 +1,29 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { MapPin, Plus, Search, RefreshCw, Users, Zap, TrendingUp, Globe } from 'lucide-react'
+import { MapPin, Plus, RefreshCw, Users, Zap, Globe, Edit, Trash2, Eye } from 'lucide-react'
 import StatCard from '../../components/ui/stat-card'
-import { getRequest } from '../../lib/apiService'
+import { getRequest, deleteRequest } from '../../lib/apiService'
+import { notify } from '../../lib/toast'
+import SunLoader from '../../components/SunLoader'
+import DataTable from '../../components/common/DataTable'
 
 export default function Regions() {
   const navigate = useNavigate()
   const [regions, setRegions] = useState([])
   const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [deletingId, setDeletingId] = useState(null)
 
   const fetchRegions = async () => {
     try {
       setLoading(true)
       const response = await getRequest('/superadmin/regions')
-      setRegions(response.data.regions || [])
+      // Backend returns array directly
+      setRegions(Array.isArray(response.data) ? response.data : [])
     } catch (error) {
       console.error('Failed to fetch regions:', error)
-      // Fallback to default regions if API fails
-      setRegions([
-        { id: 1, name: 'Delhi', admins: 2, users: 150, plants: 5, status: 'ACTIVE' },
-        { id: 2, name: 'Mumbai', admins: 3, users: 200, plants: 8, status: 'ACTIVE' },
-        { id: 3, name: 'Patna', admins: 1, users: 80, plants: 3, status: 'ACTIVE' },
-        { id: 4, name: 'Ahmedabad', admins: 2, users: 120, plants: 4, status: 'ACTIVE' }
-      ])
+      notify.error('Failed to fetch regions')
+      // Fallback to empty array
+      setRegions([])
     } finally {
       setLoading(false)
     }
@@ -33,20 +33,141 @@ export default function Regions() {
     fetchRegions()
   }, [])
 
-  const filteredRegions = regions.filter(region =>
-    region.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
-  const getStatusBadgeColor = (status) => {
-    switch (status) {
-      case 'ACTIVE': return 'bg-solar-success text-white'
-      case 'INACTIVE': return 'bg-solar-danger text-white'
-      default: return 'bg-solar-muted text-solar-primary'
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this region?')) return
+    
+    try {
+      setDeletingId(id)
+      await deleteRequest(`/superadmin/regions/${id}`)
+      notify.success('Region deleted successfully')
+      fetchRegions()
+    } catch (error) {
+      notify.error(error.response?.data?.message || 'Failed to delete region')
+    } finally {
+      setDeletingId(null)
     }
   }
 
+  const getStatusBadgeColor = (status) => {
+    switch (status) {
+      case 'ACTIVE': return 'bg-green-500/20 text-green-400 border border-green-500/30'
+      case 'INACTIVE': return 'bg-red-500/20 text-red-400 border border-red-500/30'
+      case 'MAINTENANCE': return 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+      default: return 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
+    }
+  }
+
+  const columns = [
+    {
+      header: 'Region',
+      accessorKey: 'name',
+      cell: (row) => (
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-solar-panel rounded-lg flex items-center justify-center mr-3">
+            <MapPin className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-solar-primary">{row.name}</div>
+            {row.description && (
+              <div className="text-xs text-solar-muted truncate max-w-xs">{row.description}</div>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      header: 'State / Country',
+      accessorKey: 'state',
+      cell: (row) => (
+        <div>
+          <div className="text-sm text-solar-primary">{row.state}</div>
+          <div className="text-xs text-solar-muted">{row.country}</div>
+        </div>
+      ),
+    },
+    {
+      header: 'Timezone',
+      accessorKey: 'timezone',
+      cell: (row) => (
+        <span className="text-sm text-solar-orange">{row.timezone || 'N/A'}</span>
+      ),
+    },
+    {
+      header: 'Users',
+      accessorKey: 'expected_users',
+      cell: (row) => (
+        <div className="flex items-center text-sm text-solar-yellow font-semibold">
+          <Users className="w-4 h-4 mr-1" />
+          {row.expected_users || 0}
+        </div>
+      ),
+    },
+    {
+      header: 'Plants',
+      accessorKey: 'expected_plants',
+      cell: (row) => (
+        <div className="flex items-center text-sm text-solar-success font-semibold">
+          <Zap className="w-4 h-4 mr-1" />
+          {row.expected_plants || 0}
+        </div>
+      ),
+    },
+    {
+      header: 'Capacity (MW)',
+      accessorKey: 'capacity_mw',
+      cell: (row) => (
+        <div className="flex items-center text-sm text-solar-panel font-semibold">
+          {row.capacity_mw || 0}
+        </div>
+      ),
+    },
+    {
+      header: 'Status',
+      accessorKey: 'status',
+      cell: (row) => (
+        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(row.status)}`}>
+          {row.status || 'ACTIVE'}
+        </span>
+      ),
+    },
+    {
+      header: 'Actions',
+      cell: (row) => (
+        <div className="flex items-center space-x-2">
+          <button 
+            onClick={() => navigate(`/regions/${row.id}`)}
+            className="p-2 bg-solar-yellow/20 text-solar-yellow rounded-lg hover:bg-solar-yellow/30 transition"
+            title="View"
+          >
+            <Eye className="w-4 h-4" />
+          </button>
+          <button 
+            onClick={() => navigate(`/regions/${row.id}/edit`)}
+            className="p-2 bg-solar-panel/20 text-solar-panel rounded-lg hover:bg-solar-panel/30 transition"
+            title="Edit"
+          >
+            <Edit className="w-4 h-4" />
+          </button>
+          <button 
+            onClick={() => handleDelete(row.id)}
+            disabled={deletingId === row.id}
+            className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition disabled:opacity-50"
+            title="Delete"
+          >
+            {deletingId === row.id ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-400 border-t-transparent" />
+            ) : (
+              <Trash2 className="w-4 h-4" />
+            )}
+          </button>
+        </div>
+      ),
+    },
+  ]
+
   return (
     <div className="space-y-6">
+      {loading && <SunLoader message="Loading regions..." />}
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -82,113 +203,37 @@ export default function Regions() {
         />
         <StatCard
           title="Total Users"
-          value={regions.reduce((sum, r) => sum + (r.users || 0), 0)}
+          value={regions.reduce((sum, r) => sum + (r.expected_users || 0), 0)}
           icon={Users}
           color="text-solar-yellow"
           gradient="from-solar-yellow/20 to-solar-orange/10"
         />
         <StatCard
           title="Total Plants"
-          value={regions.reduce((sum, r) => sum + (r.plants || 0), 0)}
+          value={regions.reduce((sum, r) => sum + (r.expected_plants || 0), 0)}
           icon={Zap}
           color="text-solar-success"
           gradient="from-solar-success/20 to-solar-success/5"
         />
         <StatCard
-          title="Regional Admins"
-          value={regions.reduce((sum, r) => sum + (r.admins || 0), 0)}
-          icon={Users}
+          title="Capacity (MW)"
+          value={regions.reduce((sum, r) => sum + (r.capacity_mw || 0), 0)}
+          icon={MapPin}
           color="text-solar-orange"
           gradient="from-solar-orange/20 to-solar-orange/5"
         />
       </div>
 
-      {/* Search */}
-      <div className="bg-solar-card rounded-lg p-4 energy-card">
-        <div className="relative max-w-md">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-solar-muted" />
-          <input
-            type="text"
-            placeholder="Search regions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow"
-          />
-        </div>
-      </div>
-
-      {/* Regions Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {loading ? (
-          <div className="col-span-full p-8 text-center">
-            <div className="animate-spin w-8 h-8 border-2 border-solar-yellow border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-solar-muted">Loading regions...</p>
-          </div>
-        ) : filteredRegions.length === 0 ? (
-          <div className="col-span-full p-8 text-center">
-            <MapPin className="w-16 h-16 text-solar-muted mx-auto mb-4" />
-            <p className="text-solar-muted">No regions found</p>
-          </div>
-        ) : (
-          filteredRegions.map((region) => (
-            <div key={region.id} className="bg-gradient-to-br from-solar-card to-solar-night/30 rounded-xl p-8 energy-card border border-solar-border/50 shadow-xl">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-solar-panel rounded-lg flex items-center justify-center">
-                    <MapPin className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-solar-primary">{region.name}</h3>
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(region.status)}`}>
-                      {region.status || 'ACTIVE'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-1">
-                    <Users className="w-4 h-4 text-solar-yellow mr-1" />
-                    <span className="text-sm text-solar-muted">Users</span>
-                  </div>
-                  <p className="text-lg font-bold text-solar-yellow">{region.users || 0}</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-1">
-                    <Zap className="w-4 h-4 text-solar-success mr-1" />
-                    <span className="text-sm text-solar-muted">Plants</span>
-                  </div>
-                  <p className="text-lg font-bold text-solar-success">{region.plants || 0}</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-1">
-                    <div className="w-4 h-4 bg-solar-orange rounded-full mr-1"></div>
-                    <span className="text-sm text-solar-muted">Admins</span>
-                  </div>
-                  <p className="text-lg font-bold text-solar-orange">{region.admins || 0}</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-1">
-                    <TrendingUp className="w-4 h-4 text-solar-panel mr-1" />
-                    <span className="text-sm text-solar-muted">Performance</span>
-                  </div>
-                  <p className="text-lg font-bold text-solar-panel">98%</p>
-                </div>
-              </div>
-
-              <div className="flex space-x-2">
-                <button className="flex-1 px-4 py-2 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button">
-                  View Details
-                </button>
-                <button className="px-4 py-2 bg-solar-panel/20 text-solar-panel font-semibold rounded-lg hover:bg-solar-panel/30 transition sun-button">
-                  Manage
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+      {/* Regions Table */}
+      <DataTable
+        columns={columns}
+        data={regions}
+        title="Regions"
+        description="List of all registered regions"
+        emptyMessage="No regions found"
+        showPagination={true}
+        initialPageSize={10}
+      />
     </div>
   )
 }
