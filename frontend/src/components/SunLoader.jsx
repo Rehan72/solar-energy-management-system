@@ -1,194 +1,100 @@
 import React from 'react';
 
-const SunLoader = ({ message = 'Processing...' }) => {
+/**
+ * SunLoader - A premium, mesmerizing solar-themed loading component.
+ * Features multi-layered glow animations, rotating rays, and a vibrant sun core.
+ */
+const SunLoader = ({ message = 'Harnessing Solar Energy...' }) => {
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center z-50">
-      {/* Sun Animation Container */}
-      <div className="relative w-32 h-32 flex items-center justify-center">
-        {/* Outer Glow Rings - Increasing/Decreasing */}
-        <div className="absolute inset-0 animate-ping-slow">
-          <div className="w-full h-full rounded-full border-4 border-amber-400/20"></div>
-        </div>
-        <div className="absolute inset-2 animate-pulse-slow">
-          <div className="w-full h-full rounded-full border-4 border-amber-400/30"></div>
-        </div>
-        <div className="absolute inset-4 animate-pulse-medium">
-          <div className="w-full h-full rounded-full border-4 border-amber-400/40"></div>
-        </div>
-        
-        {/* Main Sun Circle with Glow */}
-        <div className="relative w-20 h-20">
-          {/* Sun core with pulsing glow */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-orange-500 animate-sun-glow shadow-[0_0_60px_rgba(251,191,36,0.8),0_0_100px_rgba(251,146,60,0.5)]"></div>
-          
-          {/* Inner bright core */}
-          <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white via-yellow-200 to-amber-300 animate-core-pulse"></div>
-          
-          {/* Sun rays */}
-          <div className="absolute inset-0 animate-rotate-slow">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-full bg-gradient-to-t from-amber-400/80 via-yellow-400/40 to-transparent"
-                style={{
-                  transform: `rotate(${i * 45}deg)`,
-                  transformOrigin: 'center center',
-                }}
-              >
-                <div 
-                  className="w-full h-8 bg-gradient-to-t from-amber-300/60 to-transparent"
-                  style={{ marginTop: '-100%' }}
-                ></div>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Light rays extending outward */}
-        <div className="absolute inset-0 animate-ray-pulse">
+    <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center z-[99999] overflow-hidden">
+      {/* Background Ambient Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[120px] animate-pulse"></div>
+
+      {/* Main Sun Construction */}
+      <div className="relative w-48 h-48 flex items-center justify-center scale-110">
+
+        {/* Pulsing Aura Rings */}
+        <div className="absolute inset-0 rounded-full border border-amber-500/20 scale-[1.4] animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
+        <div className="absolute inset-0 rounded-full border border-orange-500/10 scale-[1.8] animate-[ping_4s_linear_infinite]"></div>
+
+        {/* Rotating Outer Rays */}
+        <div className="absolute inset-0 animate-[spin_12s_linear_infinite]">
           {[...Array(12)].map((_, i) => (
             <div
               key={i}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-16 bg-gradient-to-t from-amber-400/60 via-yellow-400/20 to-transparent origin-bottom"
-              style={{
-                transform: `rotate(${i * 30}deg) translateY(-60px)`,
-              }}
-            ></div>
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-full flex flex-col justify-between"
+              style={{ transform: `rotate(${i * 30}deg)` }}
+            >
+              <div className="w-1.5 h-6 bg-gradient-to-b from-amber-400 to-transparent rounded-full shadow-[0_0_12px_rgba(251,191,36,0.5)]"></div>
+              <div className="w-1.5 h-6 bg-gradient-to-t from-orange-500 to-transparent rounded-full opacity-40"></div>
+            </div>
           ))}
         </div>
-      </div>
-      
-      {/* Loading Message */}
-      <div className="mt-8 text-center">
-        <p className="text-amber-400 text-lg font-semibold animate-text-pulse tracking-wide">
-          {message}
-        </p>
-        <div className="flex justify-center mt-3 space-x-1">
-          {[...Array(3)].map((_, i) => (
+
+        {/* Counter-Rotating Inner Rays */}
+        <div className="absolute inset-4 animate-[spin_8s_linear_infinite_reverse]">
+          {[...Array(8)].map((_, i) => (
             <div
               key={i}
-              className="w-2 h-2 bg-amber-400 rounded-full animate-bounce"
-              style={{
-                animationDelay: `${i * 0.15}s`,
-                animationDuration: '0.6s',
-              }}
-            ></div>
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-0.5 h-full flex flex-col justify-between"
+              style={{ transform: `rotate(${i * 45 + 22.5}deg)` }}
+            >
+              <div className="w-1 h-4 bg-gradient-to-b from-yellow-300 to-transparent rounded-full"></div>
+            </div>
           ))}
         </div>
+
+        {/* The Solar Core */}
+        <div className="relative w-24 h-24 group">
+          {/* Intense Outer Glow */}
+          <div className="absolute -inset-4 bg-amber-500 rounded-full blur-2xl opacity-40 animate-pulse"></div>
+
+          {/* Main Sun Gradient Body */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-orange-600 via-yellow-400 to-amber-300 shadow-[0_0_80px_rgba(245,158,11,0.6)] animate-[sun-vibration_0.5s_infinite]"></div>
+
+          {/* Inner Plasma Core */}
+          <div className="absolute inset-3 rounded-full bg-white shadow-[0_0_30px_#fff] flex items-center justify-center">
+            {/* Dynamic Core Texture */}
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-white via-yellow-100 to-amber-200 animate-pulse overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(251,191,36,0.1)_100%)]"></div>
+            </div>
+          </div>
+        </div>
       </div>
-      
-      {/* Style for custom animations */}
+
+      {/* Animated Text Container */}
+      <div className="mt-16 flex flex-col items-center">
+        <div className="relative overflow-hidden px-6 py-2">
+          <p className="text-2xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-200 animate-[shimmer_2s_infinite_linear] bg-[length:200%_auto]">
+            {message.toUpperCase()}
+          </p>
+          {/* Progress underline */}
+          <div className="mt-2 h-0.5 w-full bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-transparent via-amber-500 to-transparent w-1/2 animate-[progress-slide_1.5s_ease-in-out_infinite]"></div>
+          </div>
+        </div>
+
+        <p className="mt-4 text-slate-500 font-medium text-sm italic tracking-wide animate-pulse">
+          Optimizing energy grids...
+        </p>
+      </div>
+
       <style>{`
-        @keyframes sun-glow {
-          0%, 100% {
-            box-shadow: 0 0 40px rgba(251, 191, 36, 0.6), 0 0 80px rgba(251, 146, 60, 0.4);
-            transform: scale(1);
-          }
-          50% {
-            box-shadow: 0 0 80px rgba(251, 191, 36, 0.9), 0 0 120px rgba(251, 146, 60, 0.7), 0 0 160px rgba(245, 158, 11, 0.5);
-            transform: scale(1.05);
-          }
+        @keyframes sun-vibration {
+          0%, 100% { transform: scale(1) translate(0, 0); }
+          25% { transform: scale(1.02) translate(1px, -1px); }
+          50% { transform: scale(1) translate(-1px, 1px); }
+          75% { transform: scale(1.02) translate(1px, 1px); }
         }
-        
-        @keyframes core-pulse {
-          0%, 100% {
-            opacity: 1;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.8;
-            transform: scale(0.95);
-          }
+
+        @keyframes progress-slide {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
         }
-        
-        @keyframes rotate-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        
-        @keyframes ray-pulse {
-          0%, 100% {
-            opacity: 0.3;
-            transform: translateY(-60px) scaleX(1);
-          }
-          50% {
-            opacity: 1;
-            transform: translateY(-60px) scaleX(1.2);
-          }
-        }
-        
-        @keyframes ping-slow {
-          0%, 100% {
-            transform: scale(1);
-            opacity: 0.5;
-          }
-          50% {
-            transform: scale(1.3);
-            opacity: 0.2;
-          }
-        }
-        
-        @keyframes pulse-slow {
-          0%, 100% {
-            transform: scale(1);
-            opacity: 0.7;
-          }
-          50% {
-            transform: scale(1.15);
-            opacity: 0.4;
-          }
-        }
-        
-        @keyframes pulse-medium {
-          0%, 100% {
-            transform: scale(1);
-            opacity: 1;
-          }
-          50% {
-            transform: scale(1.08);
-            opacity: 0.6;
-          }
-        }
-        
-        @keyframes text-pulse {
-          0%, 100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.6;
-          }
-        }
-        
-        .animate-sun-glow {
-          animation: sun-glow 2s ease-in-out infinite;
-        }
-        
-        .animate-core-pulse {
-          animation: core-pulse 1.5s ease-in-out infinite;
-        }
-        
-        .animate-rotate-slow {
-          animation: rotate-slow 8s linear infinite;
-        }
-        
-        .animate-ray-pulse {
-          animation: ray-pulse 2s ease-in-out infinite;
-        }
-        
-        .animate-ping-slow {
-          animation: ping-slow 3s ease-in-out infinite;
-        }
-        
-        .animate-pulse-slow {
-          animation: pulse-slow 2.5s ease-in-out infinite;
-        }
-        
-        .animate-pulse-medium {
-          animation: pulse-medium 2s ease-in-out infinite;
-        }
-        
-        .animate-text-pulse {
-          animation: text-pulse 1.5s ease-in-out infinite;
+
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
         }
       `}</style>
     </div>

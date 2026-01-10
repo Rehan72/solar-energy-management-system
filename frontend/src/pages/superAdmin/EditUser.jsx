@@ -29,6 +29,7 @@ export default function EditUser() {
     latitude: null,
     longitude: '',
     admin_id: '',
+    installer_id: '',
 
     // Solar-specific
     installation_status: 'NOT_INSTALLED',
@@ -78,6 +79,7 @@ export default function EditUser() {
           latitude: user.latitude || null,
           longitude: user.longitude || null,
           admin_id: user.admin_id || '',
+          installer_id: user.installer_id || '',
           installation_status: user.installation_status || 'NOT_INSTALLED',
           property_type: user.property_type || 'RESIDENTIAL',
           avg_monthly_bill: user.avg_monthly_bill || '',
@@ -107,7 +109,9 @@ export default function EditUser() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [admins, setAdmins] = useState([])
+  const [installers, setInstallers] = useState([])
   const [filteredAdmins, setFilteredAdmins] = useState([])
+  const [filteredInstallers, setFilteredInstallers] = useState([])
   const adminsLoadedRef = useRef(false)
 
   const regions = [
@@ -135,6 +139,10 @@ export default function EditUser() {
   // Fetch admins on mount
   useEffect(() => {
     const fetchAdmins = async () => {
+      if (currentUserRole !== 'SUPER_ADMIN') {
+        adminsLoadedRef.current = true
+        return
+      }
       try {
         const response = await getRequest('/superadmin/admins')
         const adminsData = (response.data.admins || []).map(admin => ({
@@ -155,6 +163,25 @@ export default function EditUser() {
       }
     }
     fetchAdmins()
+
+    const fetchInstallers = async () => {
+      try {
+        const response = await getRequest('/admin/installers')
+        const installersData = (response.data.installers || []).map(inst => ({
+          ...inst,
+          name: `${inst.first_name || ''} ${inst.last_name || ''}`.trim()
+        }))
+        setInstallers(installersData)
+        if (formData.region) {
+          setFilteredInstallers(installersData.filter(i => i.region === formData.region))
+        } else {
+          setFilteredInstallers(installersData)
+        }
+      } catch (error) {
+        console.error('Failed to fetch installers:', error)
+      }
+    }
+    fetchInstallers()
   }, [])
 
   // Re-filter admins when admins are first loaded and user has a region
@@ -173,12 +200,19 @@ export default function EditUser() {
     } else if (admins.length > 0) {
       setFilteredAdmins(admins)
     }
-    
-    // Only reset admin_id when region actually changes (not on initial load)
-    if (adminsLoadedRef.current && formData.region === '' && formData.admin_id) {
-      setFormData(prev => ({ ...prev, admin_id: '' }))
+
+    if (formData.region && installers.length > 0) {
+      setFilteredInstallers(installers.filter(i => i.region === formData.region))
+    } else if (installers.length > 0) {
+      setFilteredInstallers(installers)
     }
-  }, [formData.region, admins])
+
+    // Only reset choices when region actually changes (not on initial load)
+    if (adminsLoadedRef.current && formData.region === '') {
+      if (formData.admin_id) setFormData(prev => ({ ...prev, admin_id: '' }))
+      if (formData.installer_id) setFormData(prev => ({ ...prev, installer_id: '' }))
+    }
+  }, [formData.region, admins, installers])
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -245,6 +279,7 @@ export default function EditUser() {
         latitude: formData.latitude,
         longitude: formData.longitude,
         admin_id: formData.admin_id,
+        installer_id: formData.installer_id,
         installation_status: formData.installation_status,
         property_type: formData.property_type,
         avg_monthly_bill: parseFloat(formData.avg_monthly_bill) || 0,
@@ -354,11 +389,10 @@ export default function EditUser() {
       <div className="flex justify-center items-center space-x-4 mb-6">
         {[1, 2, 3].map((s) => (
           <div key={s} className="flex items-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-              step >= s
-                ? "bg-gradient-to-r from-solar-yellow to-solar-orange text-solar-dark"
-                : "bg-gray-300 text-gray-500"
-            }`}>
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= s
+              ? "bg-gradient-to-r from-solar-yellow to-solar-orange text-solar-dark"
+              : "bg-gray-300 text-gray-500"
+              }`}>
               {s}
             </div>
             {s < 3 && <div className={`w-16 h-1 ${step > s ? "bg-solar-yellow" : "bg-gray-300"}`} />}
@@ -758,30 +792,60 @@ export default function EditUser() {
                 </div>
 
                 {/* Assigned Admin */}
+                {currentUserRole === 'SUPER_ADMIN' && (
+                  <div>
+                    <label className="block text-sm font-medium text-solar-primary mb-2">
+                      <Shield className="w-4 h-4 inline mr-2" />
+                      Assigned Admin
+                    </label>
+                    <select
+                      value={formData.admin_id}
+                      onChange={(e) => handleChange('admin_id', e.target.value)}
+                      className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow transition"
+                      disabled={!formData.region}
+                    >
+                      <option value="">Select an admin</option>
+                      {filteredAdmins.length > 0 ? (
+                        filteredAdmins.map(admin => (
+                          <option key={admin.id} value={admin.id}>
+                            {admin.name} ({admin.email})
+                          </option>
+                        ))
+                      ) : (
+                        <option value="" disabled>No admins found in this region</option>
+                      )}
+                    </select>
+                    {!formData.region && (
+                      <p className="text-sm text-solar-muted mt-1">Select a region first to see available admins</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Assigned Installer */}
                 <div>
                   <label className="block text-sm font-medium text-solar-primary mb-2">
                     <Shield className="w-4 h-4 inline mr-2" />
-                    Assigned Admin
+                    Assigned Installer
                   </label>
                   <select
-                    value={formData.admin_id}
-                    onChange={(e) => handleChange('admin_id', e.target.value)}
+                    value={formData.installer_id}
+                    onChange={(e) => handleChange('installer_id', e.target.value)}
                     className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow transition"
                     disabled={!formData.region}
                   >
-                    <option value="">Select an admin</option>
-                    {filteredAdmins.length > 0 ? (
-                      filteredAdmins.map(admin => (
-                        <option key={admin.id} value={admin.id}>
-                          {admin.name} ({admin.email})
+                    <option value="">Select an installer</option>
+                    {filteredInstallers.length > 0 ? (
+                      filteredInstallers.map(inst => (
+                        <option key={inst.id} value={inst.id}>
+                          {inst.name} ({inst.email})
                         </option>
                       ))
                     ) : (
-                      <option value="" disabled>No admins found in this region</option>
+                      <option value="" disabled>No installers found in this region</option>
                     )}
                   </select>
                   {!formData.region && (
-                    <p className="text-sm text-solar-muted mt-1">Select a region first to see available admins</p>
+                    <p className="text-sm text-solar-muted mt-1">Select a region first to see available installers</p>
                   )}
                 </div>
 

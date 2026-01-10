@@ -6,6 +6,8 @@ import (
 	"sems-backend/internal/database"
 	"sems-backend/internal/devices"
 	"sems-backend/internal/energy"
+	"sems-backend/internal/govt"
+	installerPkg "sems-backend/internal/installer"
 	"sems-backend/internal/middleware"
 	"sems-backend/internal/plants"
 	"sems-backend/internal/regions"
@@ -52,7 +54,7 @@ func main() {
 	// Seed endpoint to create initial super admin (for testing)
 	r.POST("/seed/superadmin", func(c *gin.Context) {
 		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("SuperAdmin@123"), bcrypt.DefaultCost)
-		_, err := users.CreateUser("Super", "Admin", "superAdmin@solar.com", string(hashedPassword), "SUPER_ADMIN", "", "", "", "", "", "", "", "", 0, 0, "")
+		_, err := users.CreateUser("Super", "Admin", "superAdmin@solar.com", string(hashedPassword), "SUPER_ADMIN", "", "", "", "", "", "", "", "", 0, 0, "", "")
 		if err != nil {
 			c.JSON(500, gin.H{"error": "Failed to create super admin", "details": err.Error()})
 			return
@@ -90,10 +92,12 @@ func main() {
 	}
 
 	// INSTALLER Routes
-	installer := r.Group("/installer")
-	installer.Use(middleware.AuthMiddleware(), middleware.RequireRole("INSTALLER"))
+	installerGroup := r.Group("/installer")
+	installerGroup.Use(middleware.AuthMiddleware(), middleware.RequireRole("INSTALLER", "SUPER_ADMIN"))
 	{
-		installer.POST("/devices", devices.CreateDeviceHandler)
+		installerGroup.POST("/devices", devices.CreateDeviceHandler)
+		installerGroup.GET("/jobs", installerPkg.GetAvailableJobsHandler)
+		installerGroup.POST("/jobs/:id/complete", installerPkg.CompleteInstallationHandler)
 	}
 
 	// SUPER_ADMIN Routes
@@ -101,18 +105,19 @@ func main() {
 	superAdmin.Use(middleware.AuthMiddleware(), middleware.RequireRole("SUPER_ADMIN"))
 	{
 		superAdmin.GET("/admins", users.GetAdminsHandler)
+		superAdmin.GET("/installers", users.GetInstallersHandler)
 		superAdmin.POST("/admins", users.CreateUserHandler)
 		superAdmin.GET("/admins/:id", users.GetUserHandler)
 		superAdmin.PUT("/admins/:id", users.UpdateUserHandler)
 		superAdmin.DELETE("/admins/:id", users.DeleteUserHandler)
 		superAdmin.GET("/users", users.GetUsersHandler) // all users
 		superAdmin.GET("/global/stats", users.GetGlobalStatsHandler)
-		
+
 		// SuperAdmin Device Management - View ALL devices across all users
 		superAdmin.GET("/devices", devices.GetAllDevicesHandler)
 		superAdmin.GET("/devices/:id", devices.GetDeviceHandler)
 		superAdmin.GET("/devices/:id/power", devices.GetDevicePowerHandler)
-		
+
 		// SuperAdmin Energy Analytics - View ALL energy data
 		superAdmin.GET("/energy/analytics", energy.GetEnergyAnalyticsHandler)
 		superAdmin.GET("/energy/history", energy.GetEnergyHistoryHandler)
@@ -139,11 +144,12 @@ func main() {
 	admin.Use(middleware.AuthMiddleware(), middleware.RequireRole("ADMIN", "SUPER_ADMIN"))
 	{
 		admin.GET("/users", users.GetUsersHandler)
+		admin.GET("/installers", users.GetInstallersHandler)
 		admin.POST("/users", users.CreateUserHandler)
 		admin.GET("/users/:id", users.GetUserHandler)
 		admin.PUT("/users/:id", users.UpdateUserHandler)
 		admin.DELETE("/users/:id", users.DeleteUserHandler)
-		admin.GET("/analytics", func(c *gin.Context) { c.JSON(200, gin.H{"message": "System analytics"}) })
+		admin.GET("/analytics", users.GetAdminStatsHandler)
 
 		// Device management for admins
 		admin.GET("/devices", devices.GetAllDevicesHandler)
@@ -154,13 +160,16 @@ func main() {
 	}
 
 	// GOVERNMENT Routes
-	govt := r.Group("/govt")
-	govt.Use(middleware.AuthMiddleware(), middleware.RequireRole("GOVT"))
+	govtGroup := r.Group("/govt")
+	govtGroup.Use(middleware.AuthMiddleware(), middleware.RequireRole("GOVT", "SUPER_ADMIN"))
 	{
-		govt.GET("/subsidy/reports", func(c *gin.Context) { c.JSON(200, gin.H{"message": "Subsidy reports"}) })
+		govtGroup.GET("/dashboard/stats", govt.GetDashboardStatsHandler)
+		govtGroup.GET("/subsidies/pending", govt.GetPendingSubsidiesHandler)
+		govtGroup.GET("/subsidies/history", govt.GetSubsidyHistoryHandler)
+		govtGroup.PUT("/subsidies/:id/status", govt.UpdateSubsidyStatusHandler)
+		govtGroup.GET("/subsidy/reports", func(c *gin.Context) { c.JSON(200, gin.H{"message": "Regional Reports Placeholder"}) })
 	}
 
 	log.Println("Server starting on :8080 with regions support")
 	r.Run(":8080")
 }
-

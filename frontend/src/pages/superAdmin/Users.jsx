@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Users as UsersIcon, UserPlus, Search, Filter, RefreshCw, Eye, Edit, User } from 'lucide-react'
+import { Users as UsersIcon, UserPlus, Search, Filter, RefreshCw, Eye, Edit, User, Shield } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../../components/ui/stat-card'
 import { getRequest } from '../../lib/apiService'
@@ -31,8 +31,8 @@ export default function Users() {
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          (user.first_name && user.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                          (user.last_name && user.last_name.toLowerCase().includes(searchTerm.toLowerCase()))
+      (user.first_name && user.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.last_name && user.last_name.toLowerCase().includes(searchTerm.toLowerCase()))
     return matchesSearch
   })
 
@@ -67,7 +67,7 @@ export default function Users() {
             <RefreshCw className="w-4 h-4" />
             <span>Refresh</span>
           </button>
-          <button 
+          <button
             onClick={() => navigate('/users/create')}
             className="flex items-center space-x-2 px-4 py-2 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button"
           >
@@ -101,11 +101,18 @@ export default function Users() {
           gradient="from-solar-success/20 to-solar-success/5"
         />
         <StatCard
-          title="Pending Installation"
-          value={users.filter(u => u.role === 'USER' && (u.installation_status === 'NOT_INSTALLED' || u.installation_status === 'INSTALLATION_PLANNED')).length}
+          title="Installers"
+          value={users.filter(u => u.role === 'INSTALLER').length}
           icon={UsersIcon}
-          color="text-solar-warning"
-          gradient="from-solar-warning/20 to-solar-warning/5"
+          color="text-solar-info"
+          gradient="from-blue-500/20 to-blue-500/5"
+        />
+        <StatCard
+          title="Govt Users"
+          value={users.filter(u => u.role === 'GOVT').length}
+          icon={UsersIcon}
+          color="text-solar-success"
+          gradient="from-solar-success/20 to-solar-success/5"
         />
       </div>
 
@@ -140,7 +147,7 @@ export default function Users() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">User</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Role</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Region</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Assignments</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Created</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Actions</th>
                 </tr>
@@ -169,27 +176,43 @@ export default function Users() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        user.is_active ? 'bg-solar-success text-white' : 'bg-solar-danger text-white'
-                      }`}>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.is_active ? 'bg-solar-success text-white' : 'bg-solar-danger text-white'
+                        }`}>
                         {user.is_active ? 'ACTIVE' : 'INACTIVE'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-solar-muted">
                       {user.region || 'N/A'}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex flex-col space-y-1">
+                        {user.admin_id && (
+                          <div className="flex items-center space-x-1">
+                            <Shield className="w-3 h-3 text-solar-orange" />
+                            <span className="text-xs text-solar-primary">Admin: {user.admin_id.substring(0, 8)}</span>
+                          </div>
+                        )}
+                        {user.installer_id && (
+                          <div className="flex items-center space-x-1">
+                            <User className="w-3 h-3 text-solar-info" />
+                            <span className="text-xs text-solar-primary">Inst: {user.installer_id.substring(0, 8)}</span>
+                          </div>
+                        )}
+                        {!user.admin_id && !user.installer_id && <span className="text-xs text-solar-muted italic">None</span>}
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-solar-muted">
                       {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-3">
-                        <button 
+                        <button
                           onClick={() => navigate(`/users/${user.id}`)}
                           className="text-solar-yellow hover:text-solar-orange transition sun-button"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => navigate(`/users/${user.id}/edit`)}
                           className="text-solar-primary hover:text-solar-yellow transition sun-button"
                         >

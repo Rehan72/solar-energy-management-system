@@ -92,7 +92,7 @@ func getDeviceByAPIKey(apiKey string) (*devices.Device, error) {
 	query := `
 		SELECT id, user_id, name, device_type, location, api_key, is_active, created_at, updated_at
 		FROM devices
-		WHERE api_key = $1`
+		WHERE api_key = ?`
 
 	err := database.DB.QueryRow(query, apiKey).Scan(
 		&device.ID, &device.UserID, &device.Name, &device.DeviceType,
@@ -108,16 +108,15 @@ func getDeviceByAPIKey(apiKey string) (*devices.Device, error) {
 }
 
 func insertEnergyData(data *EnergyData) error {
-	// Map simulator fields to database columns:
-	// solar_power -> power, load_power -> energy_consumed
+	// Map simulator fields to database columns
 	query := `
-		INSERT INTO energy_data (id, device_id, timestamp, power, energy_consumed, battery_level, temperature, humidity, grid_status)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 1)`
+		INSERT INTO energy_data (id, device_id, timestamp, solar_power, load_power, grid_power, battery_level, temperature, humidity, grid_status)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`
 
 	_, err := database.DB.Exec(query,
 		data.ID, data.DeviceID, data.Timestamp,
-		data.SolarPower, data.LoadPower, data.BatteryLevel,
-		data.Temperature, data.Humidity,
+		data.SolarPower, data.LoadPower, data.GridPower,
+		data.BatteryLevel, data.Temperature, data.Humidity,
 	)
 
 	return err

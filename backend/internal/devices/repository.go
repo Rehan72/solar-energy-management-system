@@ -44,7 +44,7 @@ func CreateDevice(userID uuid.UUID, name, deviceType, location string) (*Device,
 
 	query := `
 		INSERT INTO devices (id, user_id, name, device_type, location, api_key, is_active)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
 		RETURNING created_at, updated_at`
 
 	err := database.DB.QueryRow(query,
@@ -81,34 +81,21 @@ func GetDevicesByUserID(userID uuid.UUID, deviceType string, activeOnly bool) ([
 	query := `
 		SELECT d.id, d.device_id, d.user_id, d.name, d.device_type, d.location, d.api_key, d.is_active, d.last_seen, d.created_at, d.updated_at,
 			   COALESCE(u.first_name || ' ' || u.last_name, 'Unassigned') as user_name,
-			   COALESCE(power.current_power, 0) as current_power,
-			   COALESCE(power.today_energy, 0) as today_energy,
-			   COALESCE(power.peak_power, 0) as peak_power,
-			   COALESCE(power.avg_power, 0) as avg_power,
-			   COALESCE(power.avg_battery, 0) as avg_battery,
-			   COALESCE(power.total_consumption, 0) as total_consumption,
-			   COALESCE(power.efficiency, 0) as efficiency
+			   COALESCE((SELECT MAX(solar_power) FROM energy_data WHERE device_id = d.id AND timestamp >= datetime('now', '-1 day')), 0) as current_power,
+			   COALESCE((SELECT SUM(solar_power) FROM energy_data WHERE device_id = d.id AND timestamp >= datetime('now', '-1 day')), 0) as today_energy,
+			   COALESCE((SELECT MAX(solar_power) FROM energy_data WHERE device_id = d.id AND timestamp >= datetime('now', '-1 day')), 0) as peak_power,
+			   COALESCE((SELECT AVG(solar_power) FROM energy_data WHERE device_id = d.id AND timestamp >= datetime('now', '-1 day')), 0) as avg_power,
+			   COALESCE((SELECT AVG(battery_level) FROM energy_data WHERE device_id = d.id AND timestamp >= datetime('now', '-1 day')), 0) as avg_battery,
+			   COALESCE((SELECT SUM(load_power) FROM energy_data WHERE device_id = d.id AND timestamp >= datetime('now', '-1 day')), 0) as total_consumption,
+			   0 as efficiency
 		FROM devices d
 		LEFT JOIN users u ON d.user_id = u.id
-		LEFT JOIN LATERAL (
-			SELECT device_id,
-				   MAX(solar_power) as current_power,
-				   SUM(solar_power) as today_energy,
-				   AVG(solar_power) as avg_power,
-				   MAX(solar_power) as peak_power,
-				   AVG(battery_level) as avg_battery,
-				   SUM(load_power) as total_consumption,
-				   0 as efficiency
-			FROM energy_data
-			WHERE device_id = d.id AND timestamp >= NOW() - INTERVAL '24 hours'
-			GROUP BY device_id
-		) power ON true
-		WHERE d.user_id = $1`
+		WHERE d.user_id = ?`
 
 	args := []interface{}{userID}
 
 	if deviceType != "" {
-		query += " AND d.device_type = $2"
+		query += " AND d.device_type = ?"
 		args = append(args, deviceType)
 	}
 
@@ -161,34 +148,21 @@ func GetAllDevices(searchTerm string, statusFilter string) ([]*Device, error) {
 	query := `
 		SELECT d.id, d.device_id, d.user_id, d.name, d.device_type, d.location, d.api_key, d.is_active, d.last_seen, d.created_at, d.updated_at,
 			   COALESCE(u.first_name || ' ' || u.last_name, 'Unassigned') as user_name,
-			   COALESCE(power.current_power, 0) as current_power,
-			   COALESCE(power.today_energy, 0) as today_energy,
-			   COALESCE(power.peak_power, 0) as peak_power,
-			   COALESCE(power.avg_power, 0) as avg_power,
-			   COALESCE(power.avg_battery, 0) as avg_battery,
-			   COALESCE(power.total_consumption, 0) as total_consumption,
-			   COALESCE(power.efficiency, 0) as efficiency
+			   COALESCE((SELECT MAX(solar_power) FROM energy_data WHERE device_id = d.id AND timestamp >= datetime('now', '-1 day')), 0) as current_power,
+			   COALESCE((SELECT SUM(solar_power) FROM energy_data WHERE device_id = d.id AND timestamp >= datetime('now', '-1 day')), 0) as today_energy,
+			   COALESCE((SELECT MAX(solar_power) FROM energy_data WHERE device_id = d.id AND timestamp >= datetime('now', '-1 day')), 0) as peak_power,
+			   COALESCE((SELECT AVG(solar_power) FROM energy_data WHERE device_id = d.id AND timestamp >= datetime('now', '-1 day')), 0) as avg_power,
+			   COALESCE((SELECT AVG(battery_level) FROM energy_data WHERE device_id = d.id AND timestamp >= datetime('now', '-1 day')), 0) as avg_battery,
+			   COALESCE((SELECT SUM(load_power) FROM energy_data WHERE device_id = d.id AND timestamp >= datetime('now', '-1 day')), 0) as total_consumption,
+			   0 as efficiency
 		FROM devices d
 		LEFT JOIN users u ON d.user_id = u.id
-		LEFT JOIN LATERAL (
-			SELECT device_id,
-				   MAX(solar_power) as current_power,
-				   SUM(solar_power) as today_energy,
-				   AVG(solar_power) as avg_power,
-				   MAX(solar_power) as peak_power,
-				   AVG(battery_level) as avg_battery,
-				   SUM(load_power) as total_consumption,
-				   0 as efficiency
-			FROM energy_data
-			WHERE device_id = d.id AND timestamp >= NOW() - INTERVAL '24 hours'
-			GROUP BY device_id
-		) power ON true
 		WHERE 1=1`
 
 	args := []interface{}{}
 
 	if searchTerm != "" {
-		query += " AND (d.name ILIKE $1 OR d.device_id ILIKE $2 OR d.location ILIKE $3)"
+		query += " AND (d.name LIKE ? OR d.device_id LIKE ? OR d.location LIKE ?)"
 		args = append(args, "%"+searchTerm+"%", "%"+searchTerm+"%", "%"+searchTerm+"%")
 	}
 
@@ -244,7 +218,7 @@ func GetDeviceByID(id uuid.UUID) (*Device, error) {
 			   COALESCE(u.first_name || ' ' || u.last_name, 'Unassigned') as user_name
 		FROM devices d
 		LEFT JOIN users u ON d.user_id = u.id
-		WHERE d.id = $1`
+		WHERE d.id = ?`
 
 	var deviceID sql.NullString
 	var userIDStr sql.NullString
@@ -272,8 +246,8 @@ func GetDeviceByID(id uuid.UUID) (*Device, error) {
 func UpdateDevice(device *Device) error {
 	query := `
 		UPDATE devices
-		SET name = $1, location = $2, is_active = $3, updated_at = $4
-		WHERE id = $5`
+		SET name = ?, location = ?, is_active = ?, updated_at = ?
+		WHERE id = ?`
 
 	_, err := database.DB.Exec(query,
 		device.Name, device.Location, device.IsActive,
@@ -283,7 +257,7 @@ func UpdateDevice(device *Device) error {
 }
 
 func DeleteDevice(id uuid.UUID) error {
-	query := `DELETE FROM devices WHERE id = $1`
+	query := `DELETE FROM devices WHERE id = ?`
 	_, err := database.DB.Exec(query, id)
 	return err
 }
@@ -295,7 +269,7 @@ func GetDeviceByAPIKey(apiKey string) (*Device, error) {
 			   COALESCE(u.first_name || ' ' || u.last_name, 'Unassigned') as user_name
 		FROM devices d
 		LEFT JOIN users u ON d.user_id = u.id
-		WHERE d.api_key = $1 AND d.is_active = true`
+		WHERE d.api_key = ? AND d.is_active = true`
 
 	var deviceID sql.NullString
 	var userIDStr sql.NullString

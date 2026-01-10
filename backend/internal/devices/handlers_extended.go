@@ -10,9 +10,9 @@ import (
 )
 
 type UpdateDeviceRequest struct {
-	Name       string `json:"name"`
-	Location   string `json:"location"`
-	IsActive   *bool  `json:"is_active"`
+	Name     string `json:"name"`
+	Location string `json:"location"`
+	IsActive *bool  `json:"is_active"`
 }
 
 func GetDevicesHandler(c *gin.Context) {
@@ -186,12 +186,12 @@ func CreateUserDeviceHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Device created successfully",
 		"device": gin.H{
-			"id":         device.ID,
-			"name":       *device.Name,
+			"id":          device.ID,
+			"name":        *device.Name,
 			"device_type": device.DeviceType,
-			"location":   *device.Location,
-			"api_key":    device.APIKey,
-			"is_active":  device.IsActive,
+			"location":    *device.Location,
+			"api_key":     device.APIKey,
+			"is_active":   device.IsActive,
 		},
 	})
 }
@@ -213,7 +213,7 @@ func GetDevicePowerHandler(c *gin.Context) {
 
 	// Get power data for the last 24 hours
 	startDate := time.Now().AddDate(0, 0, -1)
-	
+
 	query := `
 		SELECT 
 			COALESCE(MAX(solar_power), 0) as current_power,
@@ -223,15 +223,15 @@ func GetDevicePowerHandler(c *gin.Context) {
 			COALESCE(AVG(battery_level), 0) as avg_battery,
 			COALESCE(SUM(load_power), 0) as total_consumption
 		FROM energy_data
-		WHERE device_id = $1 AND timestamp >= $2`
+		WHERE device_id = ? AND timestamp >= ?`
 
 	var powerData struct {
-		CurrentPower      float64 `db:"current_power"`
-		TodayEnergy       float64 `db:"today_energy"`
-		AvgPower          float64 `db:"avg_power"`
-		PeakPower         float64 `db:"peak_power"`
-		AvgBattery        float64 `db:"avg_battery"`
-		TotalConsumption  float64 `db:"total_consumption"`
+		CurrentPower     float64 `db:"current_power"`
+		TodayEnergy      float64 `db:"today_energy"`
+		AvgPower         float64 `db:"avg_power"`
+		PeakPower        float64 `db:"peak_power"`
+		AvgBattery       float64 `db:"avg_battery"`
+		TotalConsumption float64 `db:"total_consumption"`
 	}
 
 	err = database.DB.QueryRow(query, id, startDate).Scan(
@@ -246,15 +246,15 @@ func GetDevicePowerHandler(c *gin.Context) {
 	if err != nil {
 		// Return default values if no data
 		c.JSON(http.StatusOK, gin.H{
-			"device_id":      id,
-			"device_name":    *device.Name,
-			"current_power":  0,
-			"today_energy":   0,
-			"avg_power":      0,
-			"peak_power":     0,
-			"avg_battery":    0,
+			"device_id":         id,
+			"device_name":       *device.Name,
+			"current_power":     0,
+			"today_energy":      0,
+			"avg_power":         0,
+			"peak_power":        0,
+			"avg_battery":       0,
 			"total_consumption": 0,
-			"status":         "No data available",
+			"status":            "No data available",
 		})
 		return
 	}
@@ -266,17 +266,17 @@ func GetDevicePowerHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"device_id":          id,
-		"device_name":        *device.Name,
-		"current_power":      powerData.CurrentPower,
-		"today_energy":       powerData.TodayEnergy,
-		"avg_power":          powerData.AvgPower,
-		"peak_power":         powerData.PeakPower,
-		"avg_battery":        powerData.AvgBattery,
-		"total_consumption":  powerData.TotalConsumption,
-		"efficiency":         efficiency,
-		"status":             "Active",
-		"last_updated":       time.Now().Format("2006-01-02 15:04:05"),
+		"device_id":         id,
+		"device_name":       *device.Name,
+		"current_power":     powerData.CurrentPower,
+		"today_energy":      powerData.TodayEnergy,
+		"avg_power":         powerData.AvgPower,
+		"peak_power":        powerData.PeakPower,
+		"avg_battery":       powerData.AvgBattery,
+		"total_consumption": powerData.TotalConsumption,
+		"efficiency":        efficiency,
+		"status":            "Active",
+		"last_updated":      time.Now().Format("2006-01-02 15:04:05"),
 	})
 }
 

@@ -21,17 +21,17 @@ type RegisterRequest struct {
 	City         string `json:"city" binding:"required"`
 	State        string `json:"state" binding:"required"`
 	Pincode      string `json:"pincode" binding:"required"`
-	
+
 	// Solar-specific fields
-	InstallationStatus string  `json:"installation_status" binding:"required,oneof=NOT_INSTALLED INSTALLATION_PLANNED INSTALLED"`
-	PropertyType       string  `json:"property_type" binding:"omitempty,oneof=RESIDENTIAL COMMERCIAL INDUSTRIAL"`
-	
+	InstallationStatus string `json:"installation_status" binding:"required,oneof=NOT_INSTALLED INSTALLATION_PLANNED INSTALLED"`
+	PropertyType       string `json:"property_type" binding:"omitempty,oneof=RESIDENTIAL COMMERCIAL INDUSTRIAL"`
+
 	// For prospective users (planning stage)
 	AvgMonthlyBill  float64 `json:"avg_monthly_bill"`
 	RoofAreaSqft    float64 `json:"roof_area_sqft"`
 	ConnectionType  string  `json:"connection_type"`
 	SubsidyInterest bool    `json:"subsidy_interest"`
-	
+
 	// For installed users
 	PlantCapacityKW float64 `json:"plant_capacity_kw"`
 	NetMetering     bool    `json:"net_metering"`
@@ -66,21 +66,22 @@ func Register(c *gin.Context) {
 
 	// Create user
 	user, err := users.CreateUser(
-		req.FirstName, 
-		req.LastName, 
-		req.Email, 
-		string(hashedPassword), 
-		"USER", 
-		req.Phone, 
-		"", 
-		req.AddressLine1, 
-		"", 
-		req.City, 
-		req.State, 
-		req.Pincode, 
-		"", 
-		0, 
+		req.FirstName,
+		req.LastName,
+		req.Email,
+		string(hashedPassword),
+		"USER",
+		req.Phone,
+		"",
+		req.AddressLine1,
+		"",
+		req.City,
+		req.State,
+		req.Pincode,
+		"",
 		0,
+		0,
+		"",
 		"",
 	)
 	if err != nil {
@@ -94,7 +95,7 @@ func Register(c *gin.Context) {
 	if req.PropertyType != "" {
 		user.PropertyType = users.PropertyType(req.PropertyType)
 	}
-	
+
 	// Handle based on installation status
 	switch req.InstallationStatus {
 	case "NOT_INSTALLED", "INSTALLATION_PLANNED":
@@ -105,7 +106,7 @@ func Register(c *gin.Context) {
 			user.ConnectionType = users.ConnectionType(req.ConnectionType)
 		}
 		user.SubsidyInterest = req.SubsidyInterest
-		
+
 	case "INSTALLED":
 		// Installed user fields
 		user.PropertyType = users.PropertyType(req.PropertyType)
@@ -127,18 +128,18 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User registered successfully",
 		"user": gin.H{
-			"id":                 user.ID,
-			"first_name":         user.FirstName,
-			"last_name":          user.LastName,
-			"email":              user.Email,
-			"phone":              user.Phone,
-			"city":               user.City,
-			"state":              user.State,
-			"pincode":            user.Pincode,
+			"id":                  user.ID,
+			"first_name":          user.FirstName,
+			"last_name":           user.LastName,
+			"email":               user.Email,
+			"phone":               user.Phone,
+			"city":                user.City,
+			"state":               user.State,
+			"pincode":             user.Pincode,
 			"installation_status": user.InstallationStatus,
-			"property_type":      user.PropertyType,
-			"avg_monthly_bill":   user.AvgMonthlyBill,
-			"plant_capacity_kw":  user.PlantCapacityKW,
+			"property_type":       user.PropertyType,
+			"avg_monthly_bill":    user.AvgMonthlyBill,
+			"plant_capacity_kw":   user.PlantCapacityKW,
 		},
 	})
 }

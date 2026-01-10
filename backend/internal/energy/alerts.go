@@ -18,13 +18,13 @@ const (
 
 // Alert represents a system alert
 type Alert struct {
-	ID        uuid.UUID      `json:"id"`
-	PlantID   *uuid.UUID     `json:"plant_id,omitempty"`
-	DeviceID  *uuid.UUID     `json:"device_id,omitempty"`
-	Severity  AlertSeverity  `json:"severity"`
-	Message   string         `json:"message"`
-	CreatedAt time.Time      `json:"created_at"`
-	Resolved  bool           `json:"resolved"`
+	ID        uuid.UUID     `json:"id"`
+	PlantID   *uuid.UUID    `json:"plant_id,omitempty"`
+	DeviceID  *uuid.UUID    `json:"device_id,omitempty"`
+	Severity  AlertSeverity `json:"severity"`
+	Message   string        `json:"message"`
+	CreatedAt time.Time     `json:"created_at"`
+	Resolved  bool          `json:"resolved"`
 }
 
 // CheckAlert checks incoming sensor data for alerts
@@ -133,7 +133,7 @@ func CreateAlert(severity AlertSeverity, message string, plantID, deviceID *uuid
 func saveAlert(alert *Alert) error {
 	query := `
 		INSERT INTO alerts (id, plant_id, device_id, severity, message, created_at, resolved)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
 	`
 
 	_, err := database.DB.Exec(query,
@@ -204,7 +204,7 @@ func GetAlerts(plantID *uuid.UUID, resolved *bool, limit int) ([]Alert, error) {
 
 // ResolveAlert marks an alert as resolved
 func ResolveAlert(alertID uuid.UUID) error {
-	query := `UPDATE alerts SET resolved = true WHERE id = $1`
+	query := `UPDATE alerts SET resolved = true WHERE id = ?`
 	_, err := database.DB.Exec(query, alertID)
 	return err
 }

@@ -99,21 +99,21 @@ function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <StatCard
                 title="Total Users"
-                value={users.length}
+                value={analytics.stats?.total_users || 0}
                 icon={Users}
                 color="text-solar-success"
                 gradient="from-solar-success/20 to-solar-success/5"
               />
               <StatCard
-                title="System Status"
-                value="Active"
+                title="Energy Generated"
+                value={analytics.stats?.energy_generated || '0 kWh'}
                 icon={Activity}
                 color="text-solar-success"
                 gradient="from-solar-success/20 to-solar-success/5"
               />
               <StatCard
-                title="Analytics"
-                value={analytics.message || 'Data available'}
+                title="Revenue (Est.)"
+                value={analytics.stats?.revenue || '₹0'}
                 icon={BarChart3}
                 color="text-solar-yellow"
                 gradient="from-solar-yellow/20 to-solar-orange/10"

@@ -22,6 +22,9 @@ import Profile from "../pages/user/Profile";
 import Devices from "../pages/user/Devices";
 import EnergyAnalytics from "../pages/user/EnergyAnalytics";
 import SuperAdminDashboard from "../components/dashboards/SuperAdminDashboard";
+import GovtDashboard from "../pages/govt/GovtDashboard";
+import InstallerDashboard from "../pages/installer/InstallerDashboard";
+import SolarSimulator from "../pages/tool/SolarSimulator";
 
 export const routeParams = "management";
 
@@ -34,10 +37,10 @@ export default [
     exact: true
   },
   {
-   element:SuperAdminDashboard,
-   path: `/superadmin/dashboard`,
-   allowedRoles: ["SUPER_ADMIN"],
-   exact: true
+    element: SuperAdminDashboard,
+    path: `/superadmin/dashboard`,
+    allowedRoles: ["SUPER_ADMIN"],
+    exact: true
   },
   {
     element: AdminAnalytics,
@@ -171,7 +174,7 @@ export default [
     allowedRoles: ["SUPER_ADMIN", "ADMIN"],
     exact: true
   },
-  
+
   // User Routes
   {
     element: Profile,
@@ -189,6 +192,28 @@ export default [
     element: EnergyAnalytics,
     path: `/energy-analytics`,
     allowedRoles: ["USER"],
+    exact: true
+  },
+
+  // GOVERNMENT Routes
+  {
+    element: GovtDashboard,
+    path: `/govt/dashboard`,
+    allowedRoles: ["GOVT"],
+    exact: true
+  },
+
+  // INSTALLER Routes
+  {
+    element: InstallerDashboard,
+    path: `/installer/dashboard`,
+    allowedRoles: ["INSTALLER"],
+    exact: true
+  },
+  {
+    element: SolarSimulator,
+    path: `/tool/simulator`,
+    allowedRoles: ["ADMIN", "SUPER_ADMIN"],
     exact: true
   },
 ]

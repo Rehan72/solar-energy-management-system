@@ -79,21 +79,35 @@ function Header({ setSidebarOpen }) {
                 onClick={() => setShowDropdown(!showDropdown)}
                 className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-solar-yellow sun-button p-1"
               >
-                <div className="w-8 h-8 bg-solar-yellow rounded-full flex items-center justify-center">
-                  <span className="text-solar-dark text-sm font-medium">
-                    {user.name?.charAt(0) || 'U'}
-                  </span>
-                </div>
+                {user.profile_image ? (
+                  <img
+                    src={user.profile_image}
+                    alt={`${user.first_name || 'User'}'s profile`}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-solar-yellow rounded-full flex items-center justify-center">
+                    <span className="text-solar-dark text-sm font-medium">
+                      {user.first_name?.charAt(0) || user.last_name?.charAt(0) || 'U'}
+                    </span>
+                  </div>
+                )}
                 <span className="ml-2 text-solar-primary hidden md:block font-medium">
-                  {user.name || 'User'}
+                  {user.first_name && user.last_name
+                    ? `${user.first_name} ${user.last_name}`
+                    : user.first_name || user.last_name || 'User'}
                 </span>
               </button>
 
               {/* Dropdown menu */}
               {showDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-solar-card rounded-lg shadow-lg border border-solar-border py-1 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-[#ffffff] rounded-lg shadow-lg border border-solar-border py-1 z-50">
                   <div className="px-4 py-2 border-b border-solar-border">
-                    <p className="text-sm font-medium text-solar-primary">{user.name || 'User'}</p>
+                    <p className="text-sm font-medium text-solar-primary">
+                      {user.first_name && user.last_name
+                        ? `${user.first_name} ${user.last_name}`
+                        : user.first_name || user.last_name || 'User'}
+                    </p>
                     <p className="text-xs text-solar-muted">{user.email || ''}</p>
                   </div>
                   <button className="w-full flex items-center px-4 py-2 text-sm text-solar-primary hover:bg-solar-panel/10 sun-button">

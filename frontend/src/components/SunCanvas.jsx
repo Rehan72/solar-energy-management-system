@@ -34,8 +34,8 @@ export default function SunCanvas({ offsetY = 0 }) {
           width: '80px',
           height: '80px',
           background: 'radial-gradient(circle, #FFD166 0%, #FFA500 100%)',
-          top: '60px',
-          right: '8%',
+          top: '20px',
+          right: '20px',
           boxShadow: '0 0 60px #FFD166, 0 0 100px #FFA500',
           transform: `translateY(${sunTranslateY}px)`,
         }}
@@ -48,8 +48,8 @@ export default function SunCanvas({ offsetY = 0 }) {
           width: '200px',
           height: '200px',
           background: 'radial-gradient(circle, rgba(255,209,102,0.4) 0%, rgba(255,209,102,0) 70%)',
-          top: '0px',
-          right: '4%',
+          top: '-40px',
+          right: '-40px',
           transform: `translateY(${sunTranslateY}px)`,
         }}
       />
@@ -88,9 +88,9 @@ export default function SunCanvas({ offsetY = 0 }) {
         style={{
           width: '200px',
           height: '200px',
-          top: '0px',
-          right: '5%',
-          transform: `translateY(${sunTranslateY + 60}px)`,
+          top: '10px',
+          right: '10px',
+          transform: `translateY(${sunTranslateY + 40}px)`,
         }}
       >
         {particles.map((p) => (

@@ -74,7 +74,7 @@ func getLatestEnergyData(userID uuid.UUID) (*EnergyData, error) {
 		       e.battery_level, e.grid_power, e.temperature, e.humidity, e.created_at
 		FROM energy_data e
 		INNER JOIN devices d ON e.device_id = d.id
-		WHERE d.user_id = $1
+		WHERE d.user_id = ?
 		ORDER BY e.timestamp DESC
 		LIMIT 1`
 

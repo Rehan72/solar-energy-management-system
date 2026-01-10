@@ -1,27 +1,35 @@
 import { Toaster } from 'react-hot-toast';
 
-// Solar-themed toast configuration matching the design in the image
+/**
+ * SolarToaster - A premium, highly-styled toast container for the Solar Energy Management System.
+ * Optimized with smooth entry/exit animations and consistent solar aesthetics.
+ */
 const SolarToaster = () => {
   return (
     <Toaster
       position="top-right"
-      duration={5000}
-      containerStyle={{
-        top: 60,
-        right: 20,
-        zIndex: 9999,
-      }}
       toastOptions={{
-        className: 'solar-toast',
+        duration: 4000,
+        // We use custom components via toast.custom, but these fallbacks ensure consistency
+        className: 'solar-toast-base',
         style: {
-          background: 'transparent',
-          color: 'transparent',
-          padding: 0,
-          boxShadow: 'none',
-          borderRadius: '16px',
+          background: 'rgba(15, 23, 42, 0.95)',
+          color: '#f8fafc',
+          backdropFilter: 'blur(12px)',
+          borderRadius: '12px',
+          border: '1px solid rgba(245, 158, 11, 0.2)',
+          padding: '0px',
+          boxShadow: '0 10px 40px -10px rgba(0,0,0,0.5)',
         },
       }}
-      gutter={12}
+      containerStyle={{
+        top: 40,
+        right: 20,
+        zIndex: 99999,
+      }}
+      limit={3}
+      gutter={14}
+      reverseOrder={false}
     />
   );
 };

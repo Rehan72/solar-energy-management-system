@@ -21,10 +21,10 @@ export default function AdminAnalytics() {
       const response = await getRequest('/admin/analytics')
       // Use response data or defaults
       setStats({
-        totalUsers: response.data?.total_users || 1250,
-        totalEnergy: response.data?.total_energy || 24456,
-        activeDevices: response.data?.active_devices || 89,
-        revenue: response.data?.revenue || 485000
+        totalUsers: response.data?.stats?.total_users || 1250,
+        totalEnergy: response.data?.stats?.total_energy || 24456,
+        activeDevices: response.data?.stats?.active_devices || 89,
+        revenue: response.data?.stats?.revenue_raw || 485000
       })
     } catch (error) {
       // Use defaults on error
@@ -79,8 +79,8 @@ export default function AdminAnalytics() {
           <p className="text-solar-muted mt-1">Platform performance and user metrics</p>
         </div>
         <div className="flex items-center space-x-4">
-          <select 
-            value={period} 
+          <select
+            value={period}
             onChange={(e) => setPeriod(e.target.value)}
             className="h-10 bg-solar-card text-solar-primary border border-solar-border rounded-lg px-3"
           >
@@ -88,7 +88,7 @@ export default function AdminAnalytics() {
             <option value="month">Last Month</option>
             <option value="quarter">Last Quarter</option>
           </select>
-          <button 
+          <button
             onClick={fetchStats}
             className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button"
           >
@@ -123,7 +123,7 @@ export default function AdminAnalytics() {
         />
         <StatCard
           title="Revenue"
-          value={`₹${(stats.revenue / 1000).toFixed(1)}L`}
+          value={`₹${(stats.revenue / 100000).toFixed(2)}L`}
           icon={DollarSign}
           color="text-solar-success"
           gradient="from-solar-success/20 to-solar-primary/10"
@@ -143,7 +143,7 @@ export default function AdminAnalytics() {
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis dataKey="month" stroke="#9CA3AF" />
               <YAxis stroke="#9CA3AF" />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '8px' }}
                 labelStyle={{ color: '#F3F4F6' }}
               />
@@ -163,7 +163,7 @@ export default function AdminAnalytics() {
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis dataKey="day" stroke="#9CA3AF" />
               <YAxis stroke="#9CA3AF" />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '8px' }}
                 labelStyle={{ color: '#F3F4F6' }}
               />
@@ -185,7 +185,7 @@ export default function AdminAnalytics() {
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis type="number" stroke="#9CA3AF" />
             <YAxis dataKey="region" type="category" stroke="#9CA3AF" width={80} />
-            <Tooltip 
+            <Tooltip
               contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '8px' }}
               labelStyle={{ color: '#F3F4F6' }}
             />

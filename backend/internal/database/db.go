@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 var DB *sql.DB
@@ -17,9 +18,25 @@ func InitDB() error {
 	connStr := "./sems.db"
 
 	var err error
-	DB, err = sql.Open("sqlite3", connStr)
+	DB, err = sql.Open("sqlite", connStr)
 	if err != nil {
 		return fmt.Errorf("failed to open database: %w", err)
+	}
+
+	// Optimize connection pool for SQLite
+	DB.SetMaxOpenConns(1)
+	DB.SetMaxIdleConns(1)
+	DB.SetConnMaxLifetime(time.Hour)
+
+	// Enable WAL mode and Busy Timeout
+	// This helps prevent "database is locked" errors
+	_, err = DB.Exec("PRAGMA journal_mode=WAL;")
+	if err != nil {
+		return fmt.Errorf("failed to set WAL mode: %w", err)
+	}
+	_, err = DB.Exec("PRAGMA busy_timeout=5000;")
+	if err != nil {
+		return fmt.Errorf("failed to set busy timeout: %w", err)
 	}
 
 	// Test the connection
@@ -27,7 +44,7 @@ func InitDB() error {
 		return fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	log.Println("✅ Database connection established successfully")
+	log.Println("✅ Database connection established (WAL mode & Busy Timeout optimized)")
 	return nil
 }
 

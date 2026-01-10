@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, User, X, Columns2, SheetIcon, Users, User2Icon, OrigamiIcon, LogOut, Cpu, Zap } from "lucide-react";
+import { Home, User, X, Columns2, SheetIcon, Users, User2Icon, OrigamiIcon, LogOut, Cpu, Zap, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Calendar } from "lucide-react";
@@ -32,6 +32,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
     { name: "Users", path: "/users", icon: <User2Icon size={18} /> },
     { name: "Reports", path: "/reports", icon: <SheetIcon size={18} /> },
     { name: "Event", path: "/event", icon: <Calendar size={18} /> },
+    { name: "Simulator", path: "/tool/simulator", icon: <Activity size={18} /> },
   ];
 
   // Menu for super admins (full system access)
@@ -45,6 +46,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
     { name: "Users", path: "/users", icon: <User2Icon size={18} /> },
     { name: "Reports", path: "/reports", icon: <SheetIcon size={18} /> },
     { name: "Event", path: "/event", icon: <Calendar size={18} /> },
+    { name: "Simulator", path: "/tool/simulator", icon: <Activity size={18} /> },
     { name: "Profile", path: "/superadmin/profile", icon: <User size={18} /> },
   ];
 
@@ -54,7 +56,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
     if (userRole === "ADMIN") return adminMenu;
     return userMenu;
   };
-  
+
   const menu = getMenu();
 
   const handleLogout = () => {
@@ -68,12 +70,12 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
   };
 
   const textVariants = {
-    open: { 
+    open: {
       opacity: 1,
       width: "auto",
       transition: { delay: 0.1, duration: 0.2 }
     },
-    closed: { 
+    closed: {
       opacity: 0,
       width: 0,
       transition: { duration: 0.15 }
@@ -111,13 +113,13 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
         initial={false}
         animate={isOpen ? "open" : "closed"}
         variants={sidebarVariants}
-        className={`fixed lg:static z-50 top-0 left-0 h-full
+        className={`fixed lg:static z-50 top-0 left-0 h-screen flex flex-col
           bg-solar-card/95 backdrop-blur-md text-solar-primary border-r border-solar-border shadow-xl
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
         {/* Mobile Close Button */}
-        <div className="flex items-center justify-between p-4 lg:hidden">
+        <div className="flex items-center justify-between p-4 lg:hidden shrink-0">
           <motion.h2
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -136,7 +138,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
         </div>
 
         {/* Collapse Toggle Button */}
-        <div className={`flex ${isOpen ? 'justify-end' : 'justify-center'} p-3 border-b border-solar-border`}>
+        <div className={`flex ${isOpen ? 'justify-end' : 'justify-center'} p-3 border-b border-solar-border shrink-0`}>
           <motion.button
             variants={collapseButtonVariants}
             initial={false}
@@ -151,8 +153,8 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
           </motion.button>
         </div>
 
-        {/* Navigation Menu */}
-        <nav className="p-3 space-y-2">
+        {/* Navigation Menu (Scrollable) */}
+        <nav className="p-3 space-y-2 flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
           {menu.map((item) => {
             // Check if current pathname matches or starts with the menu item path for nested routes
             let active = pathname === item.path || pathname.startsWith(item.path + '/');
@@ -160,7 +162,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
             return (
               <motion.div
                 key={item.path}
-                whileHover={{ 
+                whileHover={{
                   scale: 1.02,
                   transition: { duration: 0.2 }
                 }}
@@ -168,19 +170,16 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
               >
                 <Link
                   to={item.path}
-                  className={`flex items-center rounded-lg group relative backdrop-blur-sm overflow-hidden transition-all duration-300 ease-in-out ${
-                    active ? 'sun-button-active' : 'sun-button'
-                  } ${
-                    isOpen ? 'gap-3 px-3 py-3' : 'justify-center p-3'
-                  } ${
-                    active
+                  className={`flex items-center rounded-lg group relative backdrop-blur-sm overflow-hidden transition-all duration-300 ease-in-out ${active ? 'sun-button-active' : 'sun-button'
+                    } ${isOpen ? 'gap-3 px-3 py-3' : 'justify-center p-3'
+                    } ${active
                       ? 'text-solar-yellow'
                       : 'bg-solar-night/80 shadow-md border border-solar-border text-solar-muted hover:bg-solar-panel/20 hover:text-solar-primary hover:shadow-lg'
-                  }`}
+                    }`}
                   title={!isOpen ? item.name : ""}
                 >
                   {/* Icon with animation */}
-                  <motion.span 
+                  <motion.span
                     variants={iconVariants}
                     whileHover="hover"
                     whileTap="tap"
@@ -195,9 +194,8 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                     variants={textVariants}
                     initial={false}
                     animate={isOpen ? "open" : "closed"}
-                    className={`whitespace-nowrap font-medium overflow-hidden ${
-                      active ? 'font-semibold' : ''
-                    }`}
+                    className={`whitespace-nowrap font-medium overflow-hidden ${active ? 'font-semibold' : ''
+                      }`}
                   >
                     {item.name}
                   </motion.span>
@@ -216,15 +214,14 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
           })}
         </nav>
 
-        {/* Logout Button */}
-        <div className="absolute bottom-20 left-0 right-0 p-3 border-t border-solar-border">
+        {/* Logout Button (Fixed at bottom) */}
+        <div className="p-3 border-t border-solar-border shrink-0">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleLogout}
-            className={`flex items-center w-full rounded-lg group relative backdrop-blur-sm overflow-hidden transition-all duration-300 ease-in-out sun-button ${
-              isOpen ? 'gap-3 px-3 py-3' : 'justify-center p-3'
-            } bg-solar-night/80 shadow-md border border-solar-border text-solar-muted hover:bg-red-500/20 hover:text-red-400 hover:shadow-lg`}
+            className={`flex items-center w-full rounded-lg group relative backdrop-blur-sm overflow-hidden transition-all duration-300 ease-in-out sun-button ${isOpen ? 'gap-3 px-3 py-3' : 'justify-center p-3'
+              } bg-solar-night/80 shadow-md border border-solar-border text-solar-muted hover:bg-red-500/20 hover:text-red-400 hover:shadow-lg`}
             title={!isOpen ? "Logout" : ""}
           >
             <motion.span

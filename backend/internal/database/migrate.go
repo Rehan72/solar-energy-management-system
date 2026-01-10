@@ -48,7 +48,8 @@ func RunMigrations() error {
 			scheme_name TEXT,
 			application_id TEXT,
 			installation_date DATETIME,
-			last_data_received DATETIME
+			last_data_received DATETIME,
+			project_cost REAL
 		);`,
 		`CREATE TABLE IF NOT EXISTS devices (
 			id TEXT PRIMARY KEY,
@@ -74,13 +75,13 @@ func RunMigrations() error {
 			timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
 			voltage REAL,
 			current REAL,
-			power REAL,
-			energy_generated REAL,
-			energy_consumed REAL,
+			solar_power REAL,
+			load_power REAL,
+			grid_power REAL,
+			battery_level REAL,
 			temperature REAL,
 			humidity REAL,
 			solar_irradiance REAL,
-			battery_level REAL,
 			grid_status INTEGER DEFAULT 0,
 			weather_condition TEXT,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -117,6 +118,39 @@ func RunMigrations() error {
 			message TEXT NOT NULL,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			resolved BOOLEAN DEFAULT 0
+		);`,
+		// Add installer_id to users
+		`ALTER TABLE users ADD COLUMN installer_id TEXT REFERENCES users(id);`,
+		// Add project_cost to users if not exists
+		`ALTER TABLE users ADD COLUMN project_cost REAL;`,
+		// Create solar_profiles table if not exists
+		`CREATE TABLE IF NOT EXISTS solar_profiles (
+			id TEXT PRIMARY KEY,
+			user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+			installation_status TEXT,
+			property_type TEXT,
+			admin_id TEXT,
+			installer_id TEXT,
+			avg_monthly_bill REAL,
+			roof_area_sqft REAL,
+			connection_type TEXT,
+			subsidy_interest INTEGER,
+			project_cost REAL,
+			plant_capacity_kw REAL,
+			installation_date DATETIME,
+			net_metering INTEGER,
+			inverter_brand TEXT,
+			discom_name TEXT,
+			consumer_number TEXT,
+			device_linked INTEGER,
+			device_id TEXT,
+			last_data_received DATETIME,
+			subsidy_applied INTEGER,
+			subsidy_status TEXT,
+			scheme_name TEXT,
+			application_id TEXT,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
 	}
 

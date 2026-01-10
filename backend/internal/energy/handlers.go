@@ -85,9 +85,9 @@ func GetEnergyHistory(userID uuid.UUID, days int, deviceID string) ([]*EnergyDat
 			SELECT id, device_id, timestamp, solar_power, load_power,
 			       battery_level, grid_power, temperature, humidity, created_at
 			FROM energy_data
-			WHERE device_id IN (SELECT id FROM devices WHERE user_id = $1)
-			AND device_id = $2
-			AND timestamp >= $3
+			WHERE device_id IN (SELECT id FROM devices WHERE user_id = ?)
+			AND device_id = ?
+			AND timestamp >= ?
 			ORDER BY timestamp DESC`
 		args = []interface{}{userID, dID, startDate}
 	} else {
@@ -95,8 +95,8 @@ func GetEnergyHistory(userID uuid.UUID, days int, deviceID string) ([]*EnergyDat
 			SELECT id, device_id, timestamp, solar_power, load_power,
 			       battery_level, grid_power, temperature, humidity, created_at
 			FROM energy_data
-			WHERE device_id IN (SELECT id FROM devices WHERE user_id = $1)
-			AND timestamp >= $2
+			WHERE device_id IN (SELECT id FROM devices WHERE user_id = ?)
+			AND timestamp >= ?
 			ORDER BY timestamp DESC`
 		args = []interface{}{userID, startDate}
 	}
@@ -146,8 +146,8 @@ func GetEnergyAnalytics(userID uuid.UUID) (*EnergyAnalytics, error) {
 			COALESCE(SUM(grid_power), 0) as total_grid,
 			COALESCE(AVG(battery_level), 0) as avg_battery
 		FROM energy_data
-		WHERE device_id IN (SELECT id FROM devices WHERE user_id = $1)
-		AND timestamp >= $2`
+		WHERE device_id IN (SELECT id FROM devices WHERE user_id = ?)
+		AND timestamp >= ?`
 
 	err := database.DB.QueryRow(query, userID, startDate).Scan(
 		&analytics.Generated.Total, &analytics.Generated.Average, &analytics.Generated.Max,
@@ -177,19 +177,19 @@ func GetEnergyAnalytics(userID uuid.UUID) (*EnergyAnalytics, error) {
 
 // EnergyAnalytics represents energy analytics data
 type EnergyAnalytics struct {
-	Generated    EnergyStats   `json:"generated"`
-	Consumed     EnergyStats   `json:"consumed"`
-	GridExport   EnergyStats   `json:"grid_export"`
-	BatteryLevel EnergyStats   `json:"battery_level"`
-	Savings      SavingsStats  `json:"savings"`
+	Generated    EnergyStats  `json:"generated"`
+	Consumed     EnergyStats  `json:"consumed"`
+	GridExport   EnergyStats  `json:"grid_export"`
+	BatteryLevel EnergyStats  `json:"battery_level"`
+	Savings      SavingsStats `json:"savings"`
 }
 
 // EnergyStats represents statistics for energy metrics
 type EnergyStats struct {
-	Total  float64 `json:"total"`
+	Total   float64 `json:"total"`
 	Average float64 `json:"average"`
-	Max    float64 `json:"max"`
-	Min    float64 `json:"min"`
+	Max     float64 `json:"max"`
+	Min     float64 `json:"min"`
 }
 
 // SavingsStats represents savings calculations

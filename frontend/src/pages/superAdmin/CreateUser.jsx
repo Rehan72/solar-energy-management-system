@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Users, ArrowLeft, User, Mail, Lock, CheckCircle, Phone, MapPin, Eye, EyeOff, Shield } from 'lucide-react'
 import LocationPicker from '../../components/LocationPicker'
@@ -9,12 +9,16 @@ import SunLoader from '../../components/SunLoader'
 
 export default function CreateUser() {
   const navigate = useNavigate()
+  const currentUserRole = localStorage.getItem('role')
+  const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
+    // Basic details
     first_name: '',
     last_name: '',
     email: '',
     password: '',
     confirmPassword: '',
+    role: 'USER',
     phone: '',
     profile_image: '',
     address_line1: '',
@@ -25,7 +29,29 @@ export default function CreateUser() {
     region: '',
     latitude: null,
     longitude: null,
-    admin_id: ''
+    admin_id: '',
+    installer_id: '',
+
+    // Solar-specific
+    installation_status: 'NOT_INSTALLED',
+    property_type: 'RESIDENTIAL',
+    avg_monthly_bill: '',
+    roof_area_sqft: '',
+    connection_type: 'SINGLE_PHASE',
+    subsidy_interest: false,
+
+    // Installed user fields
+    plant_capacity_kw: '',
+    installation_date: '',
+    project_cost: '',
+    net_metering: false,
+    inverter_brand: '',
+    discom_name: '',
+    consumer_number: '',
+    subsidy_applied: false,
+    subsidy_status: '',
+    scheme_name: '',
+    application_id: ''
   })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
@@ -33,7 +59,10 @@ export default function CreateUser() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [admins, setAdmins] = useState([])
+  const [installers, setInstallers] = useState([])
   const [filteredAdmins, setFilteredAdmins] = useState([])
+  const [filteredInstallers, setFilteredInstallers] = useState([])
+  const dataLoadedRef = useRef(false)
 
   const regions = [
     'Delhi',
@@ -48,36 +77,6 @@ export default function CreateUser() {
     'Jaipur'
   ]
 
-  // Fetch admins on mount
-  useEffect(() => {
-    const fetchAdmins = async () => {
-      try {
-        const response = await getRequest('/superadmin/admins')
-        const adminsData = (response.data.admins || []).map(admin => ({
-          ...admin,
-          name: `${admin.first_name || ''} ${admin.last_name || ''}`.trim()
-        }))
-        setAdmins(adminsData)
-        setFilteredAdmins(adminsData)
-      } catch (error) {
-        console.error('Failed to fetch admins:', error)
-      }
-    }
-    fetchAdmins()
-  }, [])
-
-  // Filter admins when region changes
-  useEffect(() => {
-    if (formData.region) {
-      const filtered = admins.filter(admin => admin.region === formData.region)
-      setFilteredAdmins(filtered)
-    } else {
-      setFilteredAdmins(admins)
-    }
-    // Reset admin selection when region changes
-    setFormData(prev => ({ ...prev, admin_id: '' }))
-  }, [formData.region, admins])
-
   const indianStates = [
     'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
     'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
@@ -87,6 +86,74 @@ export default function CreateUser() {
     'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi'
   ]
 
+  // Fetch admins and installers on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const promises = [getRequest('/admin/installers')]
+        if (currentUserRole === 'SUPER_ADMIN') {
+          promises.push(getRequest('/superadmin/admins'))
+        }
+
+        const results = await Promise.all(promises)
+        const installersRes = results[0]
+        const adminsRes = currentUserRole === 'SUPER_ADMIN' ? results[1] : { data: { admins: [] } }
+
+        const adminsData = (adminsRes.data.admins || []).map(admin => ({
+          ...admin,
+          name: `${admin.first_name || ''} ${admin.last_name || ''}`.trim()
+        }))
+        const installersData = (installersRes.data.installers || []).map(inst => ({
+          ...inst,
+          name: `${inst.first_name || ''} ${inst.last_name || ''}`.trim()
+        }))
+
+        setAdmins(adminsData)
+        setInstallers(installersData)
+        setFilteredAdmins(adminsData)
+        setFilteredInstallers(installersData)
+        dataLoadedRef.current = true
+      } catch (error) {
+        console.error('Failed to fetch data:', error)
+      }
+    }
+    fetchData()
+  }, [])
+
+  // Filter admins and installers when region or admin changes
+  useEffect(() => {
+    let currentFilteredAdmins = admins
+    let currentFilteredInstallers = installers
+
+    if (formData.region) {
+      currentFilteredAdmins = admins.filter(a => a.region === formData.region)
+      currentFilteredInstallers = installers.filter(i => i.region === formData.region)
+    }
+
+    if (formData.admin_id) {
+      currentFilteredInstallers = currentFilteredInstallers.filter(i => i.admin_id === formData.admin_id)
+    }
+
+    setFilteredAdmins(currentFilteredAdmins)
+    setFilteredInstallers(currentFilteredInstallers)
+  }, [formData.region, formData.admin_id, admins, installers])
+
+  // Reset selections when region or admin changes
+  const prevRegion = useRef(formData.region)
+  const prevAdmin = useRef(formData.admin_id)
+
+  useEffect(() => {
+    if (dataLoadedRef.current) {
+      if (prevRegion.current !== formData.region) {
+        setFormData(prev => ({ ...prev, admin_id: '', installer_id: '' }))
+      } else if (prevAdmin.current !== formData.admin_id) {
+        setFormData(prev => ({ ...prev, installer_id: '' }))
+      }
+    }
+    prevRegion.current = formData.region
+    prevAdmin.current = formData.admin_id
+  }, [formData.region, formData.admin_id])
+
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     if (errors[field]) {
@@ -94,7 +161,7 @@ export default function CreateUser() {
     }
   }
 
-  const validateForm = () => {
+  const validateStep1 = () => {
     const newErrors = {}
     if (!formData.first_name.trim()) newErrors.first_name = 'First name is required'
     if (!formData.last_name.trim()) newErrors.last_name = 'Last name is required'
@@ -102,41 +169,42 @@ export default function CreateUser() {
     if (!formData.password) newErrors.password = 'Password is required'
     if (formData.password && formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters'
     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match'
-    return newErrors
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleNext = (e) => {
+    e.preventDefault()
+    if (step === 1 && validateStep1()) {
+      setStep(2)
+    } else if (step === 2) {
+      setStep(3)
+    }
+  }
+
+  const handleBack = (e) => {
+    e.preventDefault()
+    setStep(prev => prev - 1)
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
-    const validationErrors = validateForm()
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
-      return
-    }
 
     setLoading(true)
     setErrors({})
 
     try {
-      await postRequest('/admin/users', {
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        email: formData.email,
-        password: formData.password,
-        role: 'USER',
-        phone: formData.phone,
-        profile_image: formData.profile_image,
-        address_line1: formData.address_line1,
-        address_line2: formData.address_line2,
-        city: formData.city,
-        state: formData.state,
-        pincode: formData.pincode,
-        region: formData.region,
-        latitude: formData.latitude,
-        longitude: formData.longitude,
-        admin_id: formData.admin_id
-      })
-      
+      const payload = {
+        ...formData,
+        avg_monthly_bill: parseFloat(formData.avg_monthly_bill) || 0,
+        roof_area_sqft: parseFloat(formData.roof_area_sqft) || 0,
+        plant_capacity_kw: parseFloat(formData.plant_capacity_kw) || 0,
+        project_cost: parseFloat(formData.project_cost) || 0,
+      }
+
+      await postRequest('/admin/users', payload)
+
       setSuccess(true)
       notify.success('User created successfully!')
       setTimeout(() => {
@@ -172,26 +240,7 @@ export default function CreateUser() {
             <CheckCircle className="w-8 h-8 text-solar-success" />
           </div>
           <h2 className="text-xl font-semibold text-solar-primary mb-2">User Created Successfully!</h2>
-          <p className="text-solar-muted mb-6">What would you like to do next?</p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="flex items-center justify-center space-x-2 px-6 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button"
-            >
-              <User className="w-5 h-5" />
-              <span>Go to Dashboard</span>
-            </button>
-            <button
-              onClick={() => navigate('/profile')}
-              className="flex items-center justify-center space-x-2 px-6 py-3 bg-solar-card border border-solar-yellow text-solar-primary font-semibold rounded-lg hover:bg-solar-panel/20 transition sun-button"
-            >
-              <Users className="w-5 h-5" />
-              <span>View Profile</span>
-            </button>
-          </div>
-          
-          <p className="text-solar-muted mt-6 text-sm">Redirecting to dashboard automatically...</p>
+          <p className="text-solar-muted">Redirecting to users list...</p>
         </div>
       </div>
     )
@@ -200,6 +249,22 @@ export default function CreateUser() {
   return (
     <div className="space-y-6">
       {loading && <SunLoader message="Creating user..." />}
+
+      {/* Progress Steps */}
+      <div className="flex justify-center items-center space-x-4 mb-6">
+        {[1, 2, 3].map((s) => (
+          <div key={s} className="flex items-center">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= s
+              ? "bg-gradient-to-r from-solar-yellow to-solar-orange text-solar-dark"
+              : "bg-gray-300 text-gray-500"
+              }`}>
+              {s}
+            </div>
+            {s < 3 && <div className={`w-16 h-1 ${step > s ? "bg-solar-yellow" : "bg-gray-300"}`} />}
+          </div>
+        ))}
+      </div>
+
       {/* Header */}
       <div className="flex items-center space-x-4">
         <button
@@ -210,7 +275,7 @@ export default function CreateUser() {
         </button>
         <div>
           <h1 className="text-2xl font-bold sun-glow-text">Create User</h1>
-          <p className="text-solar-muted mt-1">Add a new user to the platform</p>
+          <p className="text-solar-muted mt-1">Add a new user step by step</p>
         </div>
       </div>
 
@@ -223,331 +288,482 @@ export default function CreateUser() {
             </div>
           )}
 
-          {/* Profile Image Upload */}
-          <ProfileImageUpload
-            profileImagePreview={formData.profile_image}
-            onImageUpload={(result, error) => {
-              if (error) {
-                setErrors(prev => ({ ...prev, profile_image: error }))
-              } else {
-                setFormData(prev => ({ ...prev, profile_image: result }))
-                setErrors(prev => ({ ...prev, profile_image: '' }))
-              }
-            }}
-            error={errors.profile_image}
-            variant="drag-drop"
-            optional={true}
-          />
-
-          {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* First Name */}
-            <div>
-              <label className="block text-sm font-medium text-solar-primary mb-2">
-                <User className="w-4 h-4 inline mr-2" />
-                First Name
-              </label>
-              <input
-                type="text"
-                value={formData.first_name}
-                onChange={(e) => handleChange('first_name', e.target.value)}
-                className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.first_name ? 'border-solar-danger' : 'border-solar-yellow'}`}
-                style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                placeholder="Enter first name"
+          {/* Step 1: Basic Information */}
+          {step === 1 && (
+            <div className="space-y-6 animate-fadeIn">
+              <ProfileImageUpload
+                profileImagePreview={formData.profile_image}
+                onImageUpload={(result, error) => {
+                  if (error) {
+                    setErrors(prev => ({ ...prev, profile_image: error }))
+                  } else {
+                    setFormData(prev => ({ ...prev, profile_image: result }))
+                    setErrors(prev => ({ ...prev, profile_image: '' }))
+                  }
+                }}
+                error={errors.profile_image}
+                variant="drag-drop"
+                optional={true}
               />
-              {errors.first_name && <p className="text-sm text-red-800 mt-1">{errors.first_name}</p>}
-            </div>
 
-            {/* Last Name */}
-            <div>
-              <label className="block text-sm font-medium text-solar-primary mb-2">
-                <User className="w-4 h-4 inline mr-2" />
-                Last Name
-              </label>
-              <input
-                type="text"
-                value={formData.last_name}
-                onChange={(e) => handleChange('last_name', e.target.value)}
-                className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.last_name ? 'border-solar-danger' : 'border-solar-yellow'}`}
-                style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                placeholder="Enter last name"
-              />
-              {errors.last_name && <p className="text-sm text-red-800 mt-1">{errors.last_name}</p>}
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2 cursor-pointer">
+                    <User className="w-4 h-4 inline mr-2" />
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.first_name}
+                    onChange={(e) => handleChange('first_name', e.target.value)}
+                    className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.first_name ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                    placeholder="Enter first name"
+                  />
+                  {errors.first_name && <p className="text-sm text-red-800 mt-1">{errors.first_name}</p>}
+                </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-solar-primary mb-2">
-                <Mail className="w-4 h-4 inline mr-2" />
-                Email Address
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleChange('email', e.target.value)}
-                className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.email ? 'border-solar-danger' : 'border-solar-yellow'}`}
-                style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                placeholder="user@example.com"
-              />
-              {errors.email && <p className="text-sm text-red-800 mt-1">{errors.email}</p>}
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    <User className="w-4 h-4 inline mr-2" />
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.last_name}
+                    onChange={(e) => handleChange('last_name', e.target.value)}
+                    className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.last_name ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                    placeholder="Enter last name"
+                  />
+                  {errors.last_name && <p className="text-sm text-red-800 mt-1">{errors.last_name}</p>}
+                </div>
 
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-medium text-solar-primary mb-2">
-                <Phone className="w-4 h-4 inline mr-2" />
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => handleChange('phone', e.target.value)}
-                className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
-                style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                placeholder="+91 9876543210"
-              />
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    <Mail className="w-4 h-4 inline mr-2" />
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleChange('email', e.target.value)}
+                    className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.email ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                    placeholder="user@example.com"
+                  />
+                  {errors.email && <p className="text-sm text-red-800 mt-1">{errors.email}</p>}
+                </div>
 
-            {/* Region */}
-            <div>
-              <label className="block text-sm font-medium text-solar-primary mb-2">
-                <MapPin className="w-4 h-4 inline mr-2" />
-                Assigned Region
-              </label>
-              <select
-                value={formData.region}
-                onChange={(e) => handleChange('region', e.target.value)}
-                className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary focus:outline-none focus:ring-2 ${errors.region ? 'border-solar-danger' : 'border-solar-yellow'}`}
-                style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-              >
-                <option value="">Select a region</option>
-                {regions.map(region => (
-                  <option key={region} value={region}>{region}</option>
-                ))}
-              </select>
-              {errors.region && <p className="text-sm text-red-800 mt-1">{errors.region}</p>}
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    <Phone className="w-4 h-4 inline mr-2" />
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => handleChange('phone', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    placeholder="+91 9876543210"
+                  />
+                </div>
 
-            {/* Select Admin */}
-            <div>
-              <label className="block text-sm font-medium text-solar-primary mb-2">
-                <Shield className="w-4 h-4 inline mr-2" />
-                Assigned Admin
-              </label>
-              <select
-                value={formData.admin_id}
-                onChange={(e) => handleChange('admin_id', e.target.value)}
-                className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
-                style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                disabled={!formData.region}
-              >
-                <option value="">Select an admin</option>
-                {filteredAdmins.length > 0 ? (
-                  filteredAdmins.map(admin => (
-                    <option key={admin.id} value={admin.id}>
-                      {admin.name} ({admin.email})
-                    </option>
-                  ))
-                ) : (
-                  <option value="" disabled>No admins found in this region</option>
+                <div className="relative">
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    <Lock className="w-4 h-4 inline mr-2" />
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={formData.password}
+                      onChange={(e) => handleChange('password', e.target.value)}
+                      className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 pr-10 ${errors.password ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                      placeholder="Min. 6 characters"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-solar-muted hover:text-solar-primary"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="text-sm text-red-800 mt-1">{errors.password}</p>}
+                </div>
+
+                <div className="relative">
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    <Lock className="w-4 h-4 inline mr-2" />
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={formData.confirmPassword}
+                      onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                      className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 pr-10 ${errors.confirmPassword ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                      placeholder="Confirm password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-solar-muted hover:text-solar-primary"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && <p className="text-sm text-red-800 mt-1">{errors.confirmPassword}</p>}
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="px-6 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button"
+                >
+                  Next: Installation Details
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Installation Details */}
+          {step === 2 && (
+            <div className="space-y-6 animate-fadeIn">
+              <h3 className="text-lg font-semibold text-solar-primary">Installation Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    Installation Status
+                  </label>
+                  <select
+                    value={formData.installation_status}
+                    onChange={(e) => handleChange('installation_status', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                  >
+                    <option value="NOT_INSTALLED">Not Installed</option>
+                    <option value="INSTALLATION_PLANNED">Installation Planned</option>
+                    <option value="INSTALLED">Installed</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    Property Type
+                  </label>
+                  <select
+                    value={formData.property_type}
+                    onChange={(e) => handleChange('property_type', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                  >
+                    <option value="RESIDENTIAL">Residential</option>
+                    <option value="COMMERCIAL">Commercial</option>
+                    <option value="INDUSTRIAL">Industrial</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    Average Monthly Bill (₹)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.avg_monthly_bill}
+                    onChange={(e) => handleChange('avg_monthly_bill', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    placeholder="Enter average bill"
+                    min="0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    Roof Area (sq ft)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.roof_area_sqft}
+                    onChange={(e) => handleChange('roof_area_sqft', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    placeholder="Enter roof area"
+                    min="0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    Project Cost / Amount (₹)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.project_cost}
+                    onChange={(e) => handleChange('project_cost', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    placeholder="Enter total amount"
+                    min="0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    Connection Type
+                  </label>
+                  <select
+                    value={formData.connection_type}
+                    onChange={(e) => handleChange('connection_type', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                  >
+                    <option value="SINGLE_PHASE">Single Phase</option>
+                    <option value="THREE_PHASE">Three Phase</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center pt-8">
+                  <input
+                    type="checkbox"
+                    id="subsidy_interest"
+                    checked={formData.subsidy_interest}
+                    onChange={(e) => handleChange('subsidy_interest', e.target.checked)}
+                    className="w-5 h-5 rounded border-solar-border text-solar-yellow focus:ring-solar-yellow"
+                  />
+                  <label htmlFor="subsidy_interest" className="ml-3 text-solar-primary">
+                    Interested in Government Subsidy
+                  </label>
+                </div>
+              </div>
+
+              {formData.installation_status === 'INSTALLED' && (
+                <div className="mt-6 p-4 bg-solar-panel/20 rounded-lg border border-solar-border">
+                  <h4 className="text-md font-semibold text-solar-primary mb-4">Installed Plant Details</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-solar-primary mb-2">
+                        Plant Capacity (kW)
+                      </label>
+                      <input
+                        type="number"
+                        value={formData.plant_capacity_kw}
+                        onChange={(e) => handleChange('plant_capacity_kw', e.target.value)}
+                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                        placeholder="e.g., 5.0"
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-solar-primary mb-2">
+                        Installation Date
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.installation_date}
+                        onChange={(e) => handleChange('installation_date', e.target.value)}
+                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-solar-primary mb-2">
+                        Inverter Brand
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.inverter_brand}
+                        onChange={(e) => handleChange('inverter_brand', e.target.value)}
+                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                        placeholder="e.g., Luminous, Microtek"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-solar-primary mb-2">
+                        DISCOM Name
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.discom_name}
+                        onChange={(e) => handleChange('discom_name', e.target.value)}
+                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                        placeholder="Enter DISCOM name"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-solar-primary mb-2">
+                        Consumer Number
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.consumer_number}
+                        onChange={(e) => handleChange('consumer_number', e.target.value)}
+                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                        placeholder="Enter consumer ID"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-between pt-4">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="px-6 py-3 bg-solar-card hover:bg-solar-panel/20 text-solar-primary font-semibold rounded-lg transition sun-button"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="px-6 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button"
+                >
+                  Next: Location & Assignment
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Location & Assignment */}
+          {step === 3 && (
+            <div className="space-y-6 animate-fadeIn">
+              <h3 className="text-lg font-semibold text-solar-primary">Location & Assignment</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    <MapPin className="w-4 h-4 inline mr-2" />
+                    Region
+                  </label>
+                  <select
+                    value={formData.region}
+                    onChange={(e) => handleChange('region', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                  >
+                    <option value="">Select a region</option>
+                    {regions.map(region => (
+                      <option key={region} value={region}>{region}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {currentUserRole === 'SUPER_ADMIN' && (
+                  <div>
+                    <label className="block text-sm font-medium text-solar-primary mb-2">
+                      <Shield className="w-4 h-4 inline mr-2" />
+                      Assigned Admin
+                    </label>
+                    <select
+                      value={formData.admin_id}
+                      onChange={(e) => handleChange('admin_id', e.target.value)}
+                      className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                      disabled={!formData.region}
+                    >
+                      <option value="">Select an admin</option>
+                      {filteredAdmins.map(admin => (
+                        <option key={admin.id} value={admin.id}>{admin.name}</option>
+                      ))}
+                    </select>
+                  </div>
                 )}
-              </select>
-              {!formData.region && (
-                <p className="text-sm text-solar-muted mt-1">Select a region first to see available admins</p>
-              )}
-            </div>
 
-            {/* Password */}
-            <div className="relative">
-              <label className="block text-sm font-medium text-solar-primary mb-2">
-                <Lock className="w-4 h-4 inline mr-2" />
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
-                  onChange={(e) => handleChange('password', e.target.value)}
-                  className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 pr-10 ${errors.password ? 'border-solar-danger' : 'border-solar-yellow'}`}
-                  style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                  placeholder="Min. 6 characters"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    <Shield className="w-4 h-4 inline mr-2" />
+                    Assigned Installer
+                  </label>
+                  <select
+                    value={formData.installer_id}
+                    onChange={(e) => handleChange('installer_id', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                    disabled={!formData.region}
+                  >
+                    <option value="">Select an installer</option>
+                    {filteredInstallers.map(inst => (
+                      <option key={inst.id} value={inst.id}>{inst.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => handleChange('city', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    placeholder="Enter city"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    State
+                  </label>
+                  <select
+                    value={formData.state}
+                    onChange={(e) => handleChange('state', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                  >
+                    <option value="">Select state</option>
+                    {indianStates.map(state => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    Pincode
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.pincode}
+                    onChange={(e) => handleChange('pincode', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    placeholder="6-digit pincode"
+                    maxLength={6}
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    Address Line 1
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.address_line1}
+                    onChange={(e) => handleChange('address_line1', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    placeholder="Street, House No."
+                  />
+                </div>
+              </div>
+
+              <LocationPicker
+                latitude={formData.latitude}
+                longitude={formData.longitude}
+                onLocationChange={({ latitude, longitude }) => {
+                  setFormData(prev => ({ ...prev, latitude, longitude }))
+                }}
+              />
+
+              <div className="flex justify-between pt-4">
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-solar-muted hover:text-solar-primary"
+                  onClick={handleBack}
+                  className="px-6 py-3 bg-solar-card hover:bg-solar-panel/20 text-solar-primary font-semibold rounded-lg transition sun-button"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  Back
                 </button>
-              </div>
-              {errors.password && <p className="text-sm text-red-800 mt-1">{errors.password}</p>}
-            </div>
-
-            {/* Confirm Password */}
-            <div className="relative">
-              <label className="block text-sm font-medium text-solar-primary mb-2">
-                <Lock className="w-4 h-4 inline mr-2" />
-                Confirm Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                  className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 pr-10 ${errors.confirmPassword ? 'border-solar-danger' : 'border-solar-yellow'}`}
-                  style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                  placeholder="Confirm password"
-                />
                 <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-solar-muted hover:text-solar-primary"
+                  type="submit"
+                  disabled={loading}
+                  className="px-8 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button disabled:opacity-50"
                 >
-                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {loading ? 'Creating...' : 'Create User'}
                 </button>
               </div>
-              {errors.confirmPassword && <p className="text-sm text-red-800 mt-1">{errors.confirmPassword}</p>}
             </div>
-          </div>
-
-          {/* Address Information */}
-          <div className="mt-8">
-            <h3 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-              <MapPin className="w-5 h-5 mr-2 text-solar-yellow" />
-              Address Information
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Address Line 1 */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-solar-primary mb-2">
-                  Address Line 1
-                </label>
-                <input
-                  type="text"
-                  value={formData.address_line1}
-                  onChange={(e) => handleChange('address_line1', e.target.value)}
-                  className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
-                  style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                  placeholder="Street address, house number"
-                />
-              </div>
-
-              {/* Address Line 2 */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-solar-primary mb-2">
-                  Address Line 2 (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={formData.address_line2}
-                  onChange={(e) => handleChange('address_line2', e.target.value)}
-                  className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
-                  style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                  placeholder="Apartment, suite, landmark (optional)"
-                />
-              </div>
-
-              {/* City */}
-              <div>
-                <label className="block text-sm font-medium text-solar-primary mb-2">
-                  City
-                </label>
-                <input
-                  type="text"
-                  value={formData.city}
-                  onChange={(e) => handleChange('city', e.target.value)}
-                  className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
-                  style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                  placeholder="Enter city"
-                />
-              </div>
-
-              {/* State */}
-              <div>
-                <label className="block text-sm font-medium text-solar-primary mb-2">
-                  State
-                </label>
-                <select
-                  value={formData.state}
-                  onChange={(e) => handleChange('state', e.target.value)}
-                  className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
-                  style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                >
-                  <option value="">Select a state</option>
-                  {indianStates.map(state => (
-                    <option key={state} value={state}>{state}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Pincode */}
-              <div>
-                <label className="block text-sm font-medium text-solar-primary mb-2">
-                  Pincode
-                </label>
-                <input
-                  type="text"
-                  value={formData.pincode}
-                  onChange={(e) => handleChange('pincode', e.target.value)}
-                  className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
-                  style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
-                  placeholder="Enter pincode"
-                  maxLength={6}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Location Picker Component */}
-          <LocationPicker
-            latitude={formData.latitude}
-            longitude={formData.longitude}
-            onLocationChange={({ latitude, longitude }) => {
-              setFormData(prev => ({ ...prev, latitude, longitude }))
-            }}
-            placeholder="Search for user location (e.g., Delhi, India)"
-          />
-
-          {/* Role Info */}
-          <div className="bg-solar-success/10 border border-solar-success/30 rounded-lg p-4">
-            <div className="flex items-start space-x-3">
-              <Users className="w-5 h-5 text-solar-success mt-0.5" />
-              <div>
-                <h4 className="text-sm font-semibold text-solar-success">User Permissions</h4>
-                <p className="text-sm text-solar-muted mt-1">
-                  This user will have standard access to view solar plant data and their own dashboard.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={() => navigate('/users')}
-              className="px-6 py-3 bg-solar-card hover:bg-solar-panel/20 text-solar-primary font-semibold rounded-lg transition sun-button"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex items-center space-x-2 px-6 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-solar-dark border-t-transparent rounded-full animate-spin"></div>
-                  <span>Creating...</span>
-                </>
-              ) : (
-                <>
-                  <Users className="w-5 h-5" />
-                  <span>Create User</span>
-                </>
-              )}
-            </button>
-          </div>
+          )}
         </form>
       </div>
     </div>
