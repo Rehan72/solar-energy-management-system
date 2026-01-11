@@ -1,22 +1,34 @@
 import { useState, useEffect } from 'react'
-import { Users as UsersIcon, UserPlus, Search, Filter, RefreshCw, Eye, Edit, User, Shield } from 'lucide-react'
+import { Users as UsersIcon, UserPlus, Search, Filter, RefreshCw, Eye, Edit, User, Shield, Globe } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../../components/ui/stat-card'
 import { getRequest } from '../../lib/apiService'
 import { notify } from '../../lib/toast'
 import SunLoader from '../../components/SunLoader'
+import DataTable from '../../components/common/DataTable'
+import { useMemo } from 'react'
 
 export default function Users() {
   const navigate = useNavigate()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [admins, setAdmins] = useState([])
+  const [installers, setInstallers] = useState([])
+  const [plants, setPlants] = useState([])
 
   const fetchUsers = async () => {
     try {
-      setLoading(true)
-      const response = await getRequest('/superadmin/users')
-      setUsers(response.data.users || [])
+      const [usersRes, installersRes, adminsRes, plantsRes] = await Promise.all([
+        getRequest('/superadmin/users'),
+        getRequest('/admin/installers'),
+        getRequest('/superadmin/admins'),
+        getRequest('/superadmin/plants')
+      ])
+      setUsers(usersRes.data.users || [])
+      setInstallers(installersRes.data.installers || [])
+      setAdmins(adminsRes.data.admins || [])
+      setPlants(plantsRes.data.plants || [])
     } catch (error) {
       console.error('Failed to fetch users:', error)
       notify.error('Failed to load users')
@@ -38,11 +50,109 @@ export default function Users() {
 
   const getRoleBadgeColor = (role) => {
     switch (role) {
-      case 'USER': return 'bg-solar-success text-white'
-      case 'ADMIN': return 'bg-solar-orange text-white'
-      case 'SUPER_ADMIN': return 'bg-solar-danger text-white'
-      default: return 'bg-solar-muted text-solar-primary'
+      case 'USER': return 'bg-solar-success/20 text-solar-success border border-solar-success/30'
+      case 'ADMIN': return 'bg-solar-orange/20 text-solar-orange border border-solar-orange/30'
+      case 'SUPER_ADMIN': return 'bg-solar-danger/20 text-solar-danger border border-solar-danger/30'
+      default: return 'bg-solar-muted/20 text-solar-muted border border-solar-muted/30'
     }
+  }
+
+  const columns = useMemo(() => [
+    {
+      header: 'User Identity',
+      cell: (row) => (
+        <div className="flex items-center space-x-3 py-1">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-solar-yellow to-solar-orange flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-110">
+            <span className="text-white font-black text-xs">
+              {(row.first_name || row.email || '?').charAt(0).toUpperCase()}
+            </span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold text-solar-primary text-sm tracking-tight">
+              {row.first_name && row.last_name ? `${row.first_name} ${row.last_name}` : (row.email || 'N/A')}
+            </span>
+            <span className="text-[10px] text-solar-muted font-medium">{row.email}</span>
+          </div>
+        </div>
+      )
+    },
+    {
+      header: 'System Access',
+      accessorKey: 'role',
+      cell: (row) => (
+        <div className="flex flex-col space-y-1">
+          <span className={`px-2.5 py-1 text-[9px] font-black rounded-lg w-fit transition-all ${getRoleBadgeColor(row.role)}`}>
+            {row.role}
+          </span>
+          <span className={`text-[8px] font-bold ${row.is_active ? 'text-solar-success' : 'text-solar-danger'} flex items-center`}>
+            <div className={`w-1 h-1 rounded-full mr-1 ${row.is_active ? 'bg-solar-success' : 'bg-solar-danger'} animate-pulse`}></div>
+            {row.is_active ? 'SYSTEM ONLINE' : 'SYSTEM OFFLINE'}
+          </span>
+        </div>
+      )
+    },
+    {
+      header: 'Deployment Location',
+      accessorKey: 'region',
+      cell: (row) => (
+        <div className="flex items-center space-x-2">
+          <Globe className="w-3 h-3 text-solar-panel/60" />
+          <span className="text-xs font-bold text-solar-muted uppercase">{row.region || 'Unassigned'}</span>
+        </div>
+      )
+    },
+    {
+      header: 'Structural Assignment',
+      cell: (row) => (
+        <div className="flex flex-col space-y-1.5 py-1">
+          {userHasAssignments(row) ? (
+            <>
+              {row.admin_id && (
+                <div className="flex items-center space-x-1.5 opacity-80 hover:opacity-100 transition-opacity">
+                  <Shield className="w-2.5 h-2.5 text-solar-orange" />
+                  <span className="text-[9px] font-bold text-solar-primary tracking-tighter">
+                    {admins.find(a => a.id === row.admin_id)?.first_name || 'Assigned Admin'}
+                  </span>
+                </div>
+              )}
+              {row.plant_id && (
+                <div className="flex items-center space-x-1.5 opacity-80 hover:opacity-100 transition-opacity">
+                  <Zap className="w-2.5 h-2.5 text-solar-yellow" />
+                  <span className="text-[9px] font-bold text-solar-primary tracking-tighter">
+                    {plants.find(p => p.id === row.plant_id)?.name || 'Linked Plant'}
+                  </span>
+                </div>
+              )}
+            </>
+          ) : (
+            <span className="text-[9px] text-solar-muted italic font-medium opacity-50">Base Instance</span>
+          )}
+        </div>
+      )
+    },
+    {
+      header: 'Actions',
+      cell: (row) => (
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => navigate(`/users/${row.id}`)}
+            className="p-2 bg-solar-card hover:bg-solar-panel/10 rounded-lg text-solar-muted hover:text-solar-panel transition-all duration-200 shadow-sm border border-solar-border/30"
+          >
+            <Eye className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => navigate(`/users/${row.id}/edit`)}
+            className="p-2 bg-solar-card hover:bg-solar-yellow/10 rounded-lg text-solar-muted hover:text-solar-yellow transition-all duration-200 shadow-sm border border-solar-border/30"
+          >
+            <Edit className="w-4 h-4" />
+          </button>
+        </div>
+      )
+    }
+  ], [navigate, admins, installers, plants])
+
+  const userHasAssignments = (user) => {
+    return user.admin_id || user.installer_id || user.plant_id
   }
 
   return (
@@ -117,115 +227,35 @@ export default function Users() {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-solar-card rounded-lg p-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-solar-muted" />
+      <div className="glass-card rounded-2xl p-6 mb-8 group">
+        <div className="flex flex-col md:flex-row gap-6 items-center">
+          <div className="flex-1 w-full relative">
+            <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-solar-muted group-focus-within:text-solar-yellow transition-colors" />
             <input
               type="text"
-              placeholder="Search users by name or email..."
+              placeholder="Query database for users, endpoints, or emails..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow"
+              className="w-full pl-12 pr-6 py-3 bg-solar-bgActive/50 border border-solar-border/30 rounded-xl text-solar-primary placeholder-solar-muted/50 focus:outline-none focus:border-solar-yellow/50 focus:ring-4 focus:ring-solar-yellow/5 transition-all text-sm font-medium"
             />
+          </div>
+          <div className="flex items-center space-x-2 text-[10px] font-black text-solar-muted uppercase tracking-widest bg-solar-night/30 px-4 py-2 rounded-lg border border-solar-border/10">
+            <Filter className="w-3 h-3" />
+            <span>Active Filters: {searchTerm ? 'Enabled' : 'None'}</span>
           </div>
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="bg-solar-card rounded-lg overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center">
-            <div className="animate-spin w-8 h-8 border-2 border-solar-yellow border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-solar-muted">Loading users...</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-solar-night/80">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">User</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Assignments</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Created</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-solar-muted uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-solar-border">
-                {filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-solar-night/40">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-solar-yellow rounded-full flex items-center justify-center mr-3">
-                          <span className="text-solar-dark font-semibold text-sm">
-                            {(user.first_name || user.email).charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-solar-primary">
-                            {user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : (user.email || 'N/A')}
-                          </div>
-                          <div className="text-sm text-solar-muted">{user.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.is_active ? 'bg-solar-success text-white' : 'bg-solar-danger text-white'
-                        }`}>
-                        {user.is_active ? 'ACTIVE' : 'INACTIVE'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-solar-muted">
-                      {user.region || 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex flex-col space-y-1">
-                        {user.admin_id && (
-                          <div className="flex items-center space-x-1">
-                            <Shield className="w-3 h-3 text-solar-orange" />
-                            <span className="text-xs text-solar-primary">Admin: {user.admin_id.substring(0, 8)}</span>
-                          </div>
-                        )}
-                        {user.installer_id && (
-                          <div className="flex items-center space-x-1">
-                            <User className="w-3 h-3 text-solar-info" />
-                            <span className="text-xs text-solar-primary">Inst: {user.installer_id.substring(0, 8)}</span>
-                          </div>
-                        )}
-                        {!user.admin_id && !user.installer_id && <span className="text-xs text-solar-muted italic">None</span>}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-solar-muted">
-                      {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-3">
-                        <button
-                          onClick={() => navigate(`/users/${user.id}`)}
-                          className="text-solar-yellow hover:text-solar-orange transition sun-button"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => navigate(`/users/${user.id}/edit`)}
-                          className="text-solar-primary hover:text-solar-yellow transition sun-button"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      <div className="relative">
+        <DataTable
+          columns={columns}
+          data={filteredUsers}
+          initialPageSize={10}
+          title="Consolidated User Directory"
+          description="High-level overview and management of all system-wide access nodes."
+          emptyMessage="No matching system entities found in the current regional scope."
+          className="w-full"
+        />
       </div>
     </div>
   )

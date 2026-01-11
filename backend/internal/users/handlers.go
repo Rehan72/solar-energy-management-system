@@ -2,6 +2,7 @@ package users
 
 import (
 	"net/http"
+	"sems-backend/internal/plants"
 	"strconv"
 	"time"
 
@@ -27,6 +28,7 @@ type CreateUserRequest struct {
 	Longitude          float64 `json:"longitude"`
 	AdminID            string  `json:"admin_id"`
 	InstallerID        string  `json:"installer_id"`
+	PlantID            string  `json:"plant_id"`
 	InstallationStatus string  `json:"installation_status"`
 	PropertyType       string  `json:"property_type"`
 	AvgMonthlyBill     float64 `json:"avg_monthly_bill"`
@@ -65,6 +67,7 @@ type UpdateUserRequest struct {
 	Longitude          float64 `json:"longitude"`
 	AdminID            string  `json:"admin_id" binding:"-"`
 	InstallerID        string  `json:"installer_id"`
+	PlantID            string  `json:"plant_id"`
 	InstallationStatus string  `json:"installation_status"`
 	PropertyType       string  `json:"property_type"`
 	AvgMonthlyBill     float64 `json:"avg_monthly_bill"`
@@ -87,6 +90,7 @@ type UpdateUserRequest struct {
 type UpdateSolarProfileRequest struct {
 	InstallationStatus string  `json:"installation_status"`
 	InstallerID        string  `json:"installer_id"`
+	PlantID            string  `json:"plant_id"`
 	PropertyType       string  `json:"property_type"`
 	AvgMonthlyBill     float64 `json:"avg_monthly_bill"`
 	RoofAreaSqft       float64 `json:"roof_area_sqft"`
@@ -134,7 +138,7 @@ func CreateUserHandler(c *gin.Context) {
 		req.AdminID = currentUserID
 	}
 
-	user, err := CreateUser(req.FirstName, req.LastName, req.Email, string(hashedPassword), req.Role, req.Phone, req.ProfileImage, req.AddressLine1, req.AddressLine2, req.City, req.State, req.Pincode, req.Region, req.Latitude, req.Longitude, req.AdminID, req.InstallerID)
+	user, err := CreateUser(req.FirstName, req.LastName, req.Email, string(hashedPassword), req.Role, req.Phone, req.ProfileImage, req.AddressLine1, req.AddressLine2, req.City, req.State, req.Pincode, req.Region, req.Latitude, req.Longitude, req.AdminID, req.InstallerID, req.PlantID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 		return
@@ -166,6 +170,14 @@ func CreateUserHandler(c *gin.Context) {
 	user.ConsumerNumber = req.ConsumerNumber
 
 	UpdateUser(user)
+
+	// Create default plants for the region if it has none
+	if req.Region != "" {
+		if err := plants.CreateDefaultPlantsForRegion(req.Region); err != nil {
+			// Log the error but don't fail the user creation
+			// You might want to add proper logging here
+		}
+	}
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User created successfully",
@@ -328,6 +340,9 @@ func UpdateUserHandler(c *gin.Context) {
 	if req.InstallerID != "" {
 		user.InstallerID = req.InstallerID
 	}
+	if req.PlantID != "" {
+		user.PlantID = req.PlantID
+	}
 
 	// Update solar-specific fields
 	if req.InstallationStatus != "" {
@@ -392,6 +407,9 @@ func UpdateSolarProfileHandler(c *gin.Context) {
 	// Update solar-specific fields
 	if req.InstallerID != "" {
 		user.InstallerID = req.InstallerID
+	}
+	if req.PlantID != "" {
+		user.PlantID = req.PlantID
 	}
 	if req.InstallationStatus != "" {
 		user.InstallationStatus = InstallationStatus(req.InstallationStatus)
@@ -474,6 +492,7 @@ func GetSolarProfileHandler(c *gin.Context) {
 		SubsidyStatus:      user.SubsidyStatus,
 		SchemeName:         user.SchemeName,
 		ApplicationID:      user.ApplicationID,
+		PlantID:            user.PlantID,
 	}
 
 	c.JSON(http.StatusOK, gin.H{"solar_profile": solarProfile})

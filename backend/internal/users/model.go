@@ -53,6 +53,7 @@ type User struct {
 	Region       string  `json:"region" db:"region"`
 	AdminID      string  `json:"admin_id" db:"admin_id"`
 	InstallerID  string  `json:"installer_id" db:"installer_id"`
+	PlantID      string  `json:"plant_id" db:"plant_id"`
 	Latitude     float64 `json:"latitude" db:"latitude"`
 	Longitude    float64 `json:"longitude" db:"longitude"`
 
@@ -100,6 +101,7 @@ type SolarProfile struct {
 	PropertyType       PropertyType       `json:"property_type" db:"property_type"`
 	AdminID            string             `json:"admin_id" db:"admin_id"`
 	InstallerID        string             `json:"installer_id" db:"installer_id"`
+	PlantID            string             `json:"plant_id" db:"plant_id"`
 
 	// Planning stage fields
 	AvgMonthlyBill  float64        `json:"avg_monthly_bill" db:"avg_monthly_bill"`

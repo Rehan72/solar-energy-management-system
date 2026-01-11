@@ -10,6 +10,12 @@ import (
 	"github.com/google/uuid"
 )
 
+type AnalyticsPoint struct {
+	Label string  `json:"label"`
+	Solar float64 `json:"solar"`
+	Load  float64 `json:"load"`
+}
+
 // GetEnergyHistoryHandler returns historical energy data
 func GetEnergyHistoryHandler(c *gin.Context) {
 	userIDStr, exists := c.Get("user_id")
@@ -197,4 +203,65 @@ type SavingsStats struct {
 	TotalEnergy      float64 `json:"total_energy_kwh"`
 	EstimatedSavings float64 `json:"estimated_savings_rs"`
 	CO2Reduction     float64 `json:"co2_reduction_kg"`
+}
+
+// GetGlobalEnergyTrendHandler returns aggregated energy trends for super admin
+func GetGlobalEnergyTrendHandler(c *gin.Context) {
+	currentUserRole := c.GetString("role")
+	if currentUserRole != "SUPER_ADMIN" {
+		c.JSON(403, gin.H{"error": "Access denied"})
+		return
+	}
+
+	region := c.Query("region")
+	period := c.DefaultQuery("period", "month")
+
+	interval := "-30 days"
+	groupBy := "%Y-%m-%d"
+	switch period {
+	case "week":
+		interval = "-7 days"
+		groupBy = "%Y-%m-%d"
+	case "quarter":
+		interval = "-90 days"
+		groupBy = "%Y-%m-%d" // Aggregate daily but show more points
+	case "year":
+		interval = "-365 days"
+		groupBy = "%Y-%m"
+	}
+
+	query := `
+		SELECT 
+			strftime('` + groupBy + `', ed.timestamp) as time_bucket,
+			COALESCE(SUM(ed.solar_power), 0) as total_solar,
+			COALESCE(SUM(ed.load_power), 0) as total_load
+		FROM energy_data ed
+		JOIN users u ON ed.device_id = u.device_id
+		WHERE ed.timestamp >= datetime('now', '` + interval + `')`
+
+	params := []interface{}{}
+	if region != "" {
+		query += " AND u.region = ?"
+		params = append(params, region)
+	}
+
+	query += ` GROUP BY time_bucket ORDER BY time_bucket ASC`
+
+	rows, err := database.DB.Query(query, params...)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to fetch energy trend: " + err.Error()})
+		return
+	}
+	defer rows.Close()
+
+	var trend []AnalyticsPoint
+	for rows.Next() {
+		var tp AnalyticsPoint
+		if err := rows.Scan(&tp.Label, &tp.Solar, &tp.Load); err != nil {
+			continue
+		}
+		trend = append(trend, tp)
+	}
+
+	c.JSON(200, gin.H{"trend": trend})
 }

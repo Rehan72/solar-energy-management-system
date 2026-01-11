@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Users, ArrowLeft, User, Mail, Lock, CheckCircle, Phone, MapPin, Eye, EyeOff, Shield } from 'lucide-react'
+import { Users, ArrowLeft, User, Mail, Lock, CheckCircle, Phone, MapPin, Eye, EyeOff, Shield, Zap } from 'lucide-react'
 import LocationPicker from '../../components/LocationPicker'
 import ProfileImageUpload from '../../components/ProfileImageUpload'
 import { postRequest, getRequest } from '../../lib/apiService'
@@ -31,6 +31,7 @@ export default function CreateUser() {
     longitude: null,
     admin_id: '',
     installer_id: '',
+    plant_id: '',
 
     // Solar-specific
     installation_status: 'NOT_INSTALLED',
@@ -62,6 +63,8 @@ export default function CreateUser() {
   const [installers, setInstallers] = useState([])
   const [filteredAdmins, setFilteredAdmins] = useState([])
   const [filteredInstallers, setFilteredInstallers] = useState([])
+  const [plants, setPlants] = useState([])
+  const [filteredPlants, setFilteredPlants] = useState([])
   const dataLoadedRef = useRef(false)
 
   const regions = [
@@ -90,14 +93,18 @@ export default function CreateUser() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const promises = [getRequest('/admin/installers')]
+        const promises = [
+          getRequest('/admin/installers'),
+          getRequest('/superadmin/plants')
+        ]
         if (currentUserRole === 'SUPER_ADMIN') {
           promises.push(getRequest('/superadmin/admins'))
         }
 
         const results = await Promise.all(promises)
         const installersRes = results[0]
-        const adminsRes = currentUserRole === 'SUPER_ADMIN' ? results[1] : { data: { admins: [] } }
+        const plantsRes = results[1]
+        const adminsRes = currentUserRole === 'SUPER_ADMIN' ? results[2] : { data: { admins: [] } }
 
         const adminsData = (adminsRes.data.admins || []).map(admin => ({
           ...admin,
@@ -107,11 +114,14 @@ export default function CreateUser() {
           ...inst,
           name: `${inst.first_name || ''} ${inst.last_name || ''}`.trim()
         }))
+        const plantsData = plantsRes.data.plants || []
 
         setAdmins(adminsData)
         setInstallers(installersData)
+        setPlants(plantsData)
         setFilteredAdmins(adminsData)
         setFilteredInstallers(installersData)
+        setFilteredPlants(plantsData)
         dataLoadedRef.current = true
       } catch (error) {
         console.error('Failed to fetch data:', error)
@@ -120,14 +130,16 @@ export default function CreateUser() {
     fetchData()
   }, [])
 
-  // Filter admins and installers when region or admin changes
+  // Filter admins, installers and plants when region or admin changes
   useEffect(() => {
     let currentFilteredAdmins = admins
     let currentFilteredInstallers = installers
+    let currentFilteredPlants = plants
 
     if (formData.region) {
       currentFilteredAdmins = admins.filter(a => a.region === formData.region)
       currentFilteredInstallers = installers.filter(i => i.region === formData.region)
+      currentFilteredPlants = plants.filter(p => p.region === formData.region)
     }
 
     if (formData.admin_id) {
@@ -136,26 +148,41 @@ export default function CreateUser() {
 
     setFilteredAdmins(currentFilteredAdmins)
     setFilteredInstallers(currentFilteredInstallers)
-  }, [formData.region, formData.admin_id, admins, installers])
+    setFilteredPlants(currentFilteredPlants)
+  }, [formData.region, formData.admin_id, admins, installers, plants])
 
   // Reset selections when region or admin changes
   const prevRegion = useRef(formData.region)
   const prevAdmin = useRef(formData.admin_id)
+  const prevPlant = useRef(formData.plant_id)
 
   useEffect(() => {
     if (dataLoadedRef.current) {
       if (prevRegion.current !== formData.region) {
-        setFormData(prev => ({ ...prev, admin_id: '', installer_id: '' }))
+        setFormData(prev => ({ ...prev, admin_id: '', installer_id: '', plant_id: '' }))
       } else if (prevAdmin.current !== formData.admin_id) {
         setFormData(prev => ({ ...prev, installer_id: '' }))
       }
     }
     prevRegion.current = formData.region
     prevAdmin.current = formData.admin_id
-  }, [formData.region, formData.admin_id])
+    prevPlant.current = formData.plant_id
+  }, [formData.region, formData.admin_id, formData.plant_id])
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    let updates = { [field]: value }
+
+    // Auto-fill location if plant is selected
+    if (field === 'plant_id' && value) {
+      const selectedPlant = plants.find(p => p.id === value)
+      if (selectedPlant && selectedPlant.latitude !== null && selectedPlant.longitude !== null) {
+        updates.latitude = selectedPlant.latitude
+        updates.longitude = selectedPlant.longitude
+        notify.info(`Location updated based on ${selectedPlant.name} plant`)
+      }
+    }
+
+    setFormData(prev => ({ ...prev, ...updates }))
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }))
     }
@@ -643,6 +670,24 @@ export default function CreateUser() {
                   </select>
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-solar-primary mb-2">
+                    <Zap className="w-4 h-4 inline mr-2" />
+                    Solar Plant
+                  </label>
+                  <select
+                    value={formData.plant_id}
+                    onChange={(e) => handleChange('plant_id', e.target.value)}
+                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                    disabled={!formData.region}
+                  >
+                    <option value="">Select a plant</option>
+                    {filteredPlants.map(plant => (
+                      <option key={plant.id} value={plant.id}>{plant.name}</option>
+                    ))}
+                  </select>
+                </div>
+
                 {currentUserRole === 'SUPER_ADMIN' && (
                   <div>
                     <label className="block text-sm font-medium text-solar-primary mb-2">
@@ -672,7 +717,7 @@ export default function CreateUser() {
                     value={formData.installer_id}
                     onChange={(e) => handleChange('installer_id', e.target.value)}
                     className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
-                    disabled={!formData.region}
+                    disabled={!formData.region || (currentUserRole === 'SUPER_ADMIN' && !formData.admin_id)}
                   >
                     <option value="">Select an installer</option>
                     {filteredInstallers.map(inst => (

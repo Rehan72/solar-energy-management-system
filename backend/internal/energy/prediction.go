@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"sems-backend/internal/users"
+	"sems-backend/internal/weather"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,18 +16,40 @@ type AIPredictionRequest struct {
 }
 
 type AIPredictionResponse struct {
-	Success               bool    `json:"success"`
-	TomorrowPredictionKw  float64 `json:"tomorrow_prediction_kw"`
-	Timestamp             string  `json:"timestamp"`
-	ModelVersion          string  `json:"model_version"`
+	Success              bool    `json:"success"`
+	TomorrowPredictionKw float64 `json:"tomorrow_prediction_kw"`
+	Timestamp            string  `json:"timestamp"`
+	ModelVersion         string  `json:"model_version"`
 }
 
 func GetSolarPrediction(c *gin.Context) {
-	// Optional: Get weather data from request
 	var req AIPredictionRequest
 	if err := c.ShouldBindJSON(&req); err != nil && err.Error() != "EOF" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
+	}
+
+	// If cloud cover and temperature not provided, fetch from weather service
+	if req.CloudCover == 0 && req.Temperature == 0 {
+		userID := c.GetString("user_id")
+		user, err := users.GetUserByID(userID)
+		if err == nil && user.Latitude != 0 && user.Longitude != 0 {
+			w, err := weather.GetWeather(user.Latitude, user.Longitude)
+			if err == nil {
+				// Use tomorrow's forecast if available, otherwise current
+				if len(w.Forecast) > 8 { // 8 * 3h = 24h
+					// Use forecast for roughly 24 hours from now
+					req.CloudCover = float64(w.Forecast[8].CloudCover) / 100.0
+					req.Temperature = w.Forecast[8].Temperature
+				} else if len(w.Forecast) > 0 {
+					req.CloudCover = float64(w.Forecast[0].CloudCover) / 100.0
+					req.Temperature = w.Forecast[0].Temperature
+				} else {
+					req.CloudCover = float64(w.Current.CloudCover) / 100.0
+					req.Temperature = w.Current.Temperature
+				}
+			}
+		}
 	}
 
 	// Call AI service

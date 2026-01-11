@@ -49,7 +49,8 @@ func RunMigrations() error {
 			application_id TEXT,
 			installation_date DATETIME,
 			last_data_received DATETIME,
-			project_cost REAL
+			project_cost REAL,
+			plant_id TEXT REFERENCES solar_plants(id)
 		);`,
 		`CREATE TABLE IF NOT EXISTS devices (
 			id TEXT PRIMARY KEY,
@@ -123,6 +124,8 @@ func RunMigrations() error {
 		`ALTER TABLE users ADD COLUMN installer_id TEXT REFERENCES users(id);`,
 		// Add project_cost to users if not exists
 		`ALTER TABLE users ADD COLUMN project_cost REAL;`,
+		// Add plant_id to users if not exists
+		`ALTER TABLE users ADD COLUMN plant_id TEXT REFERENCES solar_plants(id);`,
 		// Create solar_profiles table if not exists
 		`CREATE TABLE IF NOT EXISTS solar_profiles (
 			id TEXT PRIMARY KEY,
@@ -152,6 +155,37 @@ func RunMigrations() error {
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
+		// Create notifications table
+		`CREATE TABLE IF NOT EXISTS notifications (
+			id TEXT PRIMARY KEY,
+			user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+			type TEXT NOT NULL,
+			title TEXT NOT NULL,
+			message TEXT NOT NULL,
+			severity TEXT DEFAULT 'MEDIUM',
+			read INTEGER DEFAULT 0,
+			action_url TEXT,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		);`,
+		// Create notification preferences table
+		`CREATE TABLE IF NOT EXISTS notification_preferences (
+			user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+			email_enabled INTEGER DEFAULT 1,
+			sms_enabled INTEGER DEFAULT 0,
+			push_enabled INTEGER DEFAULT 1,
+			alert_types TEXT DEFAULT '["ALERT","WARNING","CRITICAL"]'
+		);`,
+		// Create index for notifications
+		`CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id, created_at DESC);`,
+		// Cleanup invalid seed data from previous version
+		`DELETE FROM solar_plants WHERE id IN ('p1', 'p2', 'p3', 'p4');`,
+		// Seed initial plants with valid UUIDs
+		`INSERT OR IGNORE INTO solar_plants (id, name, location, region, capacity_kw, current_output_kw, efficiency, latitude, longitude, status, description)
+		VALUES 
+		('550e8400-e29b-41d4-a716-446655440001', 'Delhi North Plant', 'Rohini, Delhi', 'Delhi', 500.0, 320.5, 92.0, 28.7041, 77.1025, 'ACTIVE', 'Primary plant for North Delhi'),
+		('550e8400-e29b-41d4-a716-446655440002', 'Mumbai Coastal Solar', 'Marine Drive, Mumbai', 'Maharashtra', 750.0, 410.2, 88.0, 19.0760, 72.8777, 'ACTIVE', 'Coastal deployment with high humidity tolerance'),
+		('550e8400-e29b-41d4-a716-446655440003', 'Bangalore Tech Park', 'Electronic City, Bangalore', 'Karnataka', 1200.0, 850.0, 95.0, 12.9716, 77.5946, 'ACTIVE', 'Integration with IT hub micro-grid'),
+		('550e8400-e29b-41d4-a716-446655440004', 'Rajasthan Desert Solar', 'Jaisalmer', 'Rajasthan', 5000.0, 4200.0, 96.0, 26.9157, 70.9083, 'ACTIVE', 'Utility scale desert deployment');`,
 	}
 
 	for i, migration := range migrations {

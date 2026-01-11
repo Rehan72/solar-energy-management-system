@@ -109,7 +109,7 @@ function DataTable({
         </div>
       )}
 
-      <div className="bg-solar-card dark:bg-solar-bgActive shadow-md border border-solar-border rounded-xl overflow-hidden">
+      <div className="glass-card shadow-2xl border border-solar-border/30 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
           <Table>
             <TableHeader className="sticky top-0 z-10">

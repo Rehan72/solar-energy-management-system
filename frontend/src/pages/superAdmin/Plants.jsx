@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Zap, Plus, RefreshCw, Trash2, Eye } from 'lucide-react'
+import { Zap, Plus, RefreshCw, Trash2, Eye, Globe, MapPin, Edit, TrendingUp } from 'lucide-react'
 import StatCard from '../../components/ui/stat-card'
 import { getRequest, deleteRequest } from '../../lib/apiService'
 import { notify } from '../../lib/toast'
@@ -11,11 +11,26 @@ export default function Plants() {
   const navigate = useNavigate()
   const [plants, setPlants] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedRegion, setSelectedRegion] = useState('')
+
+  const regions = [
+    'Delhi',
+    'Mumbai',
+    'Patna',
+    'Ahmedabad',
+    'Bangalore',
+    'Chennai',
+    'Kolkata',
+    'Hyderabad',
+    'Pune',
+    'Jaipur'
+  ]
 
   const fetchPlants = async () => {
     try {
       setLoading(true)
-      const response = await getRequest('/superadmin/plants')
+      const url = selectedRegion ? `/superadmin/plants?region=${selectedRegion}` : '/superadmin/plants'
+      const response = await getRequest(url)
       setPlants(response.data.plants || [])
     } catch (error) {
       console.error('Failed to fetch plants:', error)
@@ -27,18 +42,18 @@ export default function Plants() {
 
   useEffect(() => {
     fetchPlants()
-  }, [])
+  }, [selectedRegion])
 
   const getStatusBadgeColor = (status) => {
     const statusUpper = (status || '').toUpperCase()
     switch (statusUpper) {
-      case 'ACTIVE': 
+      case 'ACTIVE':
         return 'bg-green-500 text-white px-2 py-1 rounded-full text-xs'
-      case 'MAINTENANCE': 
+      case 'MAINTENANCE':
         return 'bg-yellow-500 text-dark px-2 py-1 rounded-full text-xs'
-      case 'INACTIVE': 
+      case 'INACTIVE':
         return 'bg-red-500 text-white px-2 py-1 rounded-full text-xs'
-      default: 
+      default:
         return 'bg-gray-500 text-white px-2 py-1 rounded-full text-xs'
     }
   }
@@ -46,77 +61,98 @@ export default function Plants() {
   // Define table columns
   const columns = useMemo(() => [
     {
-      header: 'Plant Name',
-      accessorKey: 'name',
-      cellClassName: 'font-semibold text-solar-primary',
-    },
-    {
-      header: 'Location',
-      accessorKey: 'location',
-      cellClassName: 'text-solar-muted',
-    },
-    {
-      header: 'Region',
-      accessorKey: 'region',
-      // cell: (row) => getRegionName(row.region_id) || row.region || 'N/A',
-      cellClassName: 'text-solar-panel',
-    },
-    {
-      header: 'Capacity (kW)',
-      accessorKey: 'capacity_kw',
-      cellClassName: 'text-solar-primary font-semibold',
-    },
-    {
-      header: 'Current Output',
-      accessorKey: 'current_output_kw',
-      cell: (row) => `${row.current_output_kw || 0} kW`,
-      cellClassName: 'text-solar-yellow font-semibold',
-    },
-    {
-      header: 'Efficiency',
-      accessorKey: 'efficiency',
-      cell: (row) => `${row.efficiency || 0}%`,
-      cellClassName: 'text-solar-orange font-semibold',
-    },
-    {
-      header: 'Status',
-      accessorKey: 'status',
+      header: 'Plant Entity',
       cell: (row) => (
-        <span className={getStatusBadgeColor(row.status)}>
-          {row.status || 'ACTIVE'}
-        </span>
-      ),
-      cellClassName: 'text-center',
+        <div className="flex items-center space-x-3 py-1">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-solar-panel to-blue-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+            <Zap className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold text-solar-primary text-sm tracking-tight">{row.name}</span>
+            <div className="flex items-center space-x-1">
+              <MapPin className="w-2 h-2 text-solar-muted" />
+              <span className="text-[10px] text-solar-muted font-medium">{row.location}</span>
+            </div>
+          </div>
+        </div>
+      )
     },
     {
-      header: 'Actions',
+      header: 'Regional Scoped',
+      cell: (row) => (
+        <div className="flex items-center space-x-2">
+          <Globe className="w-3 h-3 text-solar-panel/60" />
+          <span className="text-xs font-black text-solar-panel uppercase tracking-tighter">{row.region}</span>
+        </div>
+      )
+    },
+    {
+      header: 'Power Capacity',
+      cell: (row) => (
+        <div className="flex flex-col">
+          <span className="text-xs font-black text-solar-primary">{row.capacity_kw} <span className="text-[9px] text-solar-muted">kW</span></span>
+          <div className="w-16 h-1 bg-solar-muted/10 rounded-full mt-1 overflow-hidden">
+            <div className="h-full bg-solar-yellow" style={{ width: `${Math.min((row.current_output_kw / row.capacity_kw) * 100, 100)}%` }}></div>
+          </div>
+        </div>
+      )
+    },
+    {
+      header: 'Live Performance',
+      cell: (row) => (
+        <div className="flex items-center space-x-3">
+          <div className="flex flex-col">
+            <span className="text-sm font-black text-solar-yellow">{row.current_output_kw || 0} kW</span>
+            <span className="text-[8px] font-bold text-solar-success uppercase">Active Output</span>
+          </div>
+          <div className="flex flex-col border-l border-solar-border/30 pl-3">
+            <span className="text-xs font-bold text-solar-orange">{row.efficiency || 0}%</span>
+            <span className="text-[8px] font-bold text-solar-muted uppercase">Efficiency</span>
+          </div>
+        </div>
+      )
+    },
+    {
+      header: 'Operational Status',
+      cell: (row) => (
+        <div className="flex flex-col space-y-1">
+          <span className={`px-2 py-0.5 rounded-md text-[9px] font-black text-center border ${row.status === 'ACTIVE'
+            ? 'bg-solar-success/10 text-solar-success border-solar-success/20'
+            : 'bg-solar-warning/10 text-solar-warning border-solar-warning/20'
+            }`}>
+            {row.status || 'ACTIVE'}
+          </span>
+          <span className="text-[8px] font-bold text-solar-muted text-center tracking-tighter uppercase whitespace-nowrap">
+            {row.status === 'ACTIVE' ? 'Telemetry Received' : 'Maintenance Mode'}
+          </span>
+        </div>
+      )
+    },
+    {
+      header: 'Control Suite',
       cell: (row) => (
         <div className="flex items-center space-x-2">
           <button
             onClick={() => navigate(`/plants/${row.id}`)}
-            className="px-3 py-1 bg-solar-primary text-white text-xs font-semibold rounded hover:bg-solar-panel transition"
-            title="View"
+            className="p-2 bg-solar-card hover:bg-solar-panel/10 rounded-lg text-solar-muted hover:text-solar-panel transition-all shadow-sm border border-solar-border/30"
           >
-            <Eye className="w-3 h-3" />
+            <Eye className="w-4 h-4" />
           </button>
           <button
             onClick={() => navigate(`/plants/${row.id}/edit`)}
-            className="px-3 py-1 bg-solar-yellow text-solar-dark text-xs font-semibold rounded hover:bg-solar-orange transition"
-            title="Edit"
+            className="p-2 bg-solar-card hover:bg-solar-yellow/10 rounded-lg text-solar-muted hover:text-solar-yellow transition-all shadow-sm border border-solar-border/30"
           >
-            Edit
+            <Edit className="w-4 h-4" />
           </button>
           <button
             onClick={() => handleDeletePlant(row)}
-            className="px-3 py-1 bg-solar-danger text-white text-xs font-semibold rounded hover:bg-red-600 transition"
-            title="Delete"
+            className="p-2 bg-solar-card hover:bg-solar-danger/10 rounded-lg text-solar-muted hover:text-solar-danger transition-all shadow-sm border border-solar-border/30"
           >
-            <Trash2 className="w-3 h-3" />
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
-      ),
-      cellClassName: 'text-center',
-    },
+      )
+    }
   ], [navigate])
 
   const handleDeletePlant = async (plant) => {
@@ -139,28 +175,29 @@ export default function Plants() {
           <SunLoader message="Loading plants..." size="large" />
         </div>
       )}
-      
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold sun-glow-text">Solar Plant Management</h1>
-          <p className="text-solar-muted mt-1">Monitor and manage all solar energy plants</p>
-        </div>
-        <div className="flex space-x-3">
-          <button
-            onClick={() => { fetchPlants() }}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button"
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span>Refresh</span>
-          </button>
-          <button 
-            onClick={() => navigate('/plants/create')}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-success text-white font-semibold rounded-lg hover:bg-solar-success/80 transition sun-button"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Plant</span>
-          </button>
+
+      {/* Filters */}
+      <div className="glass-card rounded-2xl p-6 group">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center space-x-4">
+            <Globe className="w-5 h-5 text-solar-panel group-hover:rotate-12 transition-transform" />
+            <select
+              value={selectedRegion}
+              onChange={(e) => setSelectedRegion(e.target.value)}
+              className="px-4 py-2.5 bg-solar-bgActive/50 border border-solar-border/30 rounded-xl text-solar-primary focus:outline-none focus:ring-4 focus:ring-solar-yellow/5 focus:border-solar-yellow/50 transition-all font-bold text-sm"
+            >
+              <option value="">Global Scoped (All Regions)</option>
+              {regions.map(r => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1.5 bg-solar-night/30 px-3 py-1.5 rounded-lg border border-solar-border/10">
+              <div className="w-1.5 h-1.5 rounded-full bg-solar-yellow animate-pulse"></div>
+              <span className="text-[10px] font-black text-solar-muted uppercase">Live Monitoring Engaged</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -196,7 +233,6 @@ export default function Plants() {
         />
       </div>
 
-      {/* Plants Table */}
       <DataTable
         columns={columns}
         data={plants}
@@ -204,8 +240,8 @@ export default function Plants() {
         showPagination={true}
         showPageSize={true}
         pageSizeOptions={[5, 10, 20, 50]}
-        title="All Solar Plants"
-        description="List of all registered solar power plants"
+        title="Fleet Infrastructure Management"
+        description="Global deployment overview of all solar power generation nodes and their operational health."
         emptyMessage="No plants found"
         className="w-full"
       />

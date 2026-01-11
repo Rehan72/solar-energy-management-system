@@ -9,9 +9,12 @@ import (
 	"sems-backend/internal/govt"
 	installerPkg "sems-backend/internal/installer"
 	"sems-backend/internal/middleware"
+	"sems-backend/internal/notifications"
 	"sems-backend/internal/plants"
 	"sems-backend/internal/regions"
+	"sems-backend/internal/reports"
 	"sems-backend/internal/users"
+	"sems-backend/internal/weather"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -54,7 +57,7 @@ func main() {
 	// Seed endpoint to create initial super admin (for testing)
 	r.POST("/seed/superadmin", func(c *gin.Context) {
 		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("SuperAdmin@123"), bcrypt.DefaultCost)
-		_, err := users.CreateUser("Super", "Admin", "superAdmin@solar.com", string(hashedPassword), "SUPER_ADMIN", "", "", "", "", "", "", "", "", 0, 0, "", "")
+		_, err := users.CreateUser("Super", "Admin", "superAdmin@solar.com", string(hashedPassword), "SUPER_ADMIN", "", "", "", "", "", "", "", "", 0, 0, "", "", "")
 		if err != nil {
 			c.JSON(500, gin.H{"error": "Failed to create super admin", "details": err.Error()})
 			return
@@ -68,6 +71,9 @@ func main() {
 
 	// IoT data ingestion (public, authenticated by API key)
 	r.POST("/iot/data", energy.IngestData)
+
+	// Public hierarchy for map
+	r.GET("/public/hierarchy", users.GetPublicHierarchyHandler)
 
 	// USER Routes (USER, ADMIN can access)
 	user := r.Group("/user")
@@ -89,6 +95,18 @@ func main() {
 		user.DELETE("/devices/:id", devices.DeleteDeviceHandler)
 		user.POST("/devices/:id/regenerate-key", devices.RegenerateAPIKeyHandler)
 		user.GET("/devices/:id/power", devices.GetDevicePowerHandler)
+		// Notifications
+		user.GET("/notifications", notifications.GetNotificationsHandler)
+		user.GET("/notifications/unread-count", notifications.GetUnreadCountHandler)
+		user.PUT("/notifications/:id/read", notifications.MarkAsReadHandler)
+		user.PUT("/notifications/read-all", notifications.MarkAllAsReadHandler)
+		user.DELETE("/notifications/:id", notifications.DeleteNotificationHandler)
+		user.GET("/notification-preferences", notifications.GetPreferencesHandler)
+		user.PUT("/notification-preferences", notifications.UpdatePreferencesHandler)
+		// Reports
+		user.GET("/reports/energy/export", reports.ExportEnergyDataHandler)
+		// Weather
+		user.GET("/weather", weather.GetWeatherHandler)
 	}
 
 	// INSTALLER Routes
@@ -112,6 +130,8 @@ func main() {
 		superAdmin.DELETE("/admins/:id", users.DeleteUserHandler)
 		superAdmin.GET("/users", users.GetUsersHandler) // all users
 		superAdmin.GET("/global/stats", users.GetGlobalStatsHandler)
+		superAdmin.GET("/stats/regional", users.GetRegionalStatsHandler)
+		superAdmin.GET("/hierarchy", users.GetSystemHierarchyHandler)
 
 		// SuperAdmin Device Management - View ALL devices across all users
 		superAdmin.GET("/devices", devices.GetAllDevicesHandler)
@@ -122,6 +142,7 @@ func main() {
 		superAdmin.GET("/energy/analytics", energy.GetEnergyAnalyticsHandler)
 		superAdmin.GET("/energy/history", energy.GetEnergyHistoryHandler)
 		superAdmin.GET("/energy/current", energy.CurrentEnergy)
+		superAdmin.GET("/energy/trend", energy.GetGlobalEnergyTrendHandler)
 
 		// Regions routes
 		superAdmin.GET("/regions", regions.GetRegionsHandler)
@@ -137,6 +158,10 @@ func main() {
 		superAdmin.GET("/plants/:id", plants.GetPlantHandler)
 		superAdmin.PUT("/plants/:id", plants.UpdatePlantHandler)
 		superAdmin.DELETE("/plants/:id", plants.DeletePlantHandler)
+
+		// Reports
+		superAdmin.GET("/reports/users/export", reports.ExportUsersHandler)
+		superAdmin.GET("/reports/plants/export", reports.ExportPlantsHandler)
 	}
 
 	// ADMIN Routes

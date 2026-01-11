@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"sems-backend/internal/database"
 	"sems-backend/internal/devices"
+	"sems-backend/internal/plants"
 	"strings"
 	"time"
 
@@ -49,6 +50,14 @@ func IngestData(c *gin.Context) {
 			return
 		}
 
+		// Demo mode power update
+		demoUserID := "00000000-0000-0000-0000-000000000001"
+		var plantID string
+		err := database.DB.QueryRow("SELECT plant_id FROM users WHERE id = ?", demoUserID).Scan(&plantID)
+		if err == nil && plantID != "" {
+			plants.UpdatePlantCurrentPower(plantID)
+		}
+
 		c.JSON(http.StatusOK, gin.H{"message": "Data ingested successfully (demo mode)"})
 		return
 	}
@@ -82,6 +91,13 @@ func IngestData(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save data"})
 		return
+	}
+
+	// Update plant current output
+	var plantID string
+	err = database.DB.QueryRow("SELECT plant_id FROM users WHERE id = ?", device.UserID).Scan(&plantID)
+	if err == nil && plantID != "" {
+		plants.UpdatePlantCurrentPower(plantID)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Data ingested successfully"})

@@ -88,7 +88,16 @@ func CreatePlantHandler(c *gin.Context) {
 }
 
 func GetPlantsHandler(c *gin.Context) {
-	plants, err := GetAllPlants()
+	region := c.Query("region")
+	var plants []Plant
+	var err error
+
+	if region != "" {
+		plants, err = GetPlantsByRegion(region)
+	} else {
+		plants, err = GetAllPlants()
+	}
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch plants", "details": err.Error()})
 		return

@@ -25,7 +25,7 @@ const SolarToast = ({ message, type = 'success', icon: Icon, toastId }) => {
 
   return (
     <div
-      className={`group relative flex items-center gap-4 p-4 min-w-[360px] max-w-[440px] rounded-2xl border border-white/5 backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1`}
+      className={`group relative flex items-center gap-3 p-3 min-w-[320px] max-w-[400px] rounded-xl border border-white/5 backdrop-blur-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1`}
       style={{
         background: 'linear-gradient(160deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)',
         boxShadow: `0 20px 40px -10px rgba(0,0,0,0.6), 0 0 20px -5px ${shadow}`,
@@ -33,18 +33,18 @@ const SolarToast = ({ message, type = 'success', icon: Icon, toastId }) => {
     >
       {/* Dynamic Left Accent Bar */}
       <div
-        className="absolute left-0 top-4 bottom-4 w-1 rounded-r-full"
+        className="absolute left-0 top-3 bottom-3 w-1 rounded-r-full"
         style={{ backgroundColor: accentColor, boxShadow: `0 0 10px ${accentColor}` }}
       ></div>
 
       {/* Hero Icon Section */}
       <div
-        className="flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-500 group-hover:rotate-12"
+        className="flex h-10 w-10 items-center justify-center rounded-lg transition-transform duration-500 group-hover:rotate-12"
         style={{ background: `${accentColor}15` }}
       >
         {Icon && (
           <Icon
-            size={24}
+            size={20}
             color={accentColor}
             className="animate-[pulse_2s_infinite]"
           />
@@ -53,11 +53,11 @@ const SolarToast = ({ message, type = 'success', icon: Icon, toastId }) => {
 
       {/* Textual Content */}
       <div className="flex-1 overflow-hidden">
-        <h4 className="text-[15px] font-bold tracking-tight text-white mb-0.5">
+        <h4 className="text-[14px] font-bold tracking-tight text-white mb-0">
           {message.title}
         </h4>
         {message.description && (
-          <p className="text-[13px] font-medium text-slate-400 leading-relaxed truncate">
+          <p className="text-[12px] font-medium text-slate-400 leading-relaxed truncate mt-0.5">
             {message.description}
           </p>
         )}
@@ -66,9 +66,9 @@ const SolarToast = ({ message, type = 'success', icon: Icon, toastId }) => {
       {/* Interaction: Dismiss Button */}
       <button
         onClick={() => toast.dismiss(toastId)}
-        className="ml-2 flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-all hover:bg-white/10 hover:text-white"
+        className="ml-1 flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-all hover:bg-white/10 hover:text-white"
       >
-        <X size={18} />
+        <X size={16} />
       </button>
 
       {/* Subtle Progress Underline (Visual Decor) */}

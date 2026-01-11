@@ -83,6 +83,7 @@ func Register(c *gin.Context) {
 		0,
 		"",
 		"",
+		"",
 	)
 	if err != nil {
 		log.Printf("CreateUser error: %v", err)

@@ -11,7 +11,7 @@ export default function LandingPage() {
     <div className="relative min-h-screen overflow-hidden text-solar-primary">
       <BackgroundLayer />
       <FloatingParticles />
-       <SunCanvas />
+      <SunCanvas />
       {/* 🌟 CONTENT */}
       <div className="relative z-10">
 
@@ -58,7 +58,7 @@ export default function LandingPage() {
                 p-6
                 energy-card
               ">
-                <SolarMap />
+                <SolarMap isPublic={true} />
               </div>
             </div>
 

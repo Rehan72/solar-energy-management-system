@@ -31,7 +31,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
     { name: "Admins", path: "/admins", icon: <Users size={18} /> },
     { name: "Users", path: "/users", icon: <User2Icon size={18} /> },
     { name: "Reports", path: "/reports", icon: <SheetIcon size={18} /> },
-    { name: "Event", path: "/event", icon: <Calendar size={18} /> },
+    // { name: "Event", path: "/event", icon: <Calendar size={18} /> },
     { name: "Simulator", path: "/tool/simulator", icon: <Activity size={18} /> },
   ];
 
@@ -45,7 +45,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
     { name: "Admins", path: "/admins", icon: <Users size={18} /> },
     { name: "Users", path: "/users", icon: <User2Icon size={18} /> },
     { name: "Reports", path: "/reports", icon: <SheetIcon size={18} /> },
-    { name: "Event", path: "/event", icon: <Calendar size={18} /> },
+    // { name: "Event", path: "/event", icon: <Calendar size={18} /> },
     { name: "Simulator", path: "/tool/simulator", icon: <Activity size={18} /> },
     { name: "Profile", path: "/superadmin/profile", icon: <User size={18} /> },
   ];

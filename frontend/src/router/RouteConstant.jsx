@@ -21,6 +21,7 @@ import AdminDevices from "../pages/admin/Devices";
 import Profile from "../pages/user/Profile";
 import Devices from "../pages/user/Devices";
 import EnergyAnalytics from "../pages/user/EnergyAnalytics";
+import Notifications from "../pages/user/Notifications";
 import SuperAdminDashboard from "../components/dashboards/SuperAdminDashboard";
 import GovtDashboard from "../pages/govt/GovtDashboard";
 import InstallerDashboard from "../pages/installer/InstallerDashboard";
@@ -192,6 +193,12 @@ export default [
     element: EnergyAnalytics,
     path: `/energy-analytics`,
     allowedRoles: ["USER"],
+    exact: true
+  },
+  {
+    element: Notifications,
+    path: `/notifications`,
+    allowedRoles: ["USER", "ADMIN", "SUPER_ADMIN", "GOVT", "INSTALLER"],
     exact: true
   },
 

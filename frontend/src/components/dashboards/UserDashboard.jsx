@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Sun, Battery, Zap, TrendingUp, LogOut, User, RefreshCw } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../ui/stat-card'
 import { getRequest, postRequest } from '../../lib/apiService'
 import LivePowerDashboard from './LivePowerDashboard'
+import WeatherWidget from '../WeatherWidget'
 
 function UserDashboard() {
   const [energyData, setEnergyData] = useState({ solar: 0, load: 0, battery: 0, grid: 0 })
   const [prediction, setPrediction] = useState(null)
+  const [weather, setWeather] = useState(null)
+  const [loadingWeather, setLoadingWeather] = useState(true)
   const [user, setUser] = useState(null)
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
@@ -31,6 +35,19 @@ function UserDashboard() {
     }
   }
 
+  const fetchWeather = async (lat, lon) => {
+    try {
+      setLoadingWeather(true)
+      const url = lat && lon ? `/user/weather?lat=${lat}&lon=${lon}` : '/user/weather'
+      const response = await getRequest(url)
+      setWeather(response.data)
+    } catch (error) {
+      console.error('Failed to fetch weather:', error)
+    } finally {
+      setLoadingWeather(false)
+    }
+  }
+
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
@@ -40,7 +57,30 @@ function UserDashboard() {
   const refreshData = () => {
     fetchEnergyData()
     fetchPrediction()
+    if (user?.latitude && user?.longitude) {
+      fetchWeather(user.latitude, user.longitude)
+    } else {
+      fetchWeather()
+    }
   }
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem('user'))
+    setUser(userData)
+    fetchEnergyData()
+    fetchPrediction()
+    if (userData?.latitude && userData?.longitude) {
+      fetchWeather(userData.latitude, userData.longitude)
+    } else {
+      fetchWeather()
+    }
+
+    const interval = setInterval(() => {
+      fetchEnergyData()
+    }, 10000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   // Sample chart data - in a real app, this would come from the API
   const chartData = [
@@ -52,7 +92,11 @@ function UserDashboard() {
   ]
 
   return (
-    <div className="min-h-screen bg-solar-bg">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="min-h-screen bg-solar-bg"
+    >
       {/* Header */}
       <header className="bg-solar-card/80 backdrop-blur-md shadow-sm border-b border-solar-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -91,6 +135,7 @@ function UserDashboard() {
         {/* Current Energy Status */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
+            index={0}
             title="Solar Generation"
             value={`${energyData.solar} kW`}
             icon={Sun}
@@ -99,6 +144,7 @@ function UserDashboard() {
           />
 
           <StatCard
+            index={1}
             title="Load Consumption"
             value={`${energyData.load} kW`}
             icon={Zap}
@@ -107,6 +153,7 @@ function UserDashboard() {
           />
 
           <StatCard
+            index={2}
             title="Battery Level"
             value={`${energyData.battery}%`}
             icon={Battery}
@@ -115,6 +162,7 @@ function UserDashboard() {
           />
 
           <StatCard
+            index={3}
             title="Grid Power"
             value={`${energyData.grid} kW`}
             icon={TrendingUp}
@@ -123,57 +171,101 @@ function UserDashboard() {
           />
         </div>
 
-        {/* AI Prediction */}
-        {prediction && (
-          <div className="bg-solar-card rounded-lg shadow p-6 mb-8 energy-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-solar-primary flex items-center">
-                  <TrendingUp className="h-5 w-5 text-solar-yellow mr-2" />
-                  AI Solar Prediction
-                </h3>
-                <p className="text-sm text-solar-muted">Tomorrow's expected solar generation</p>
+        {/* AI Prediction & Weather */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {prediction && (
+            <div className="lg:col-span-2 bg-solar-card rounded-lg shadow p-6 energy-card flex flex-col justify-center">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-solar-primary flex items-center">
+                    <TrendingUp className="h-5 w-5 text-solar-yellow mr-2" />
+                    AI Solar Prediction
+                  </h3>
+                  <p className="text-sm text-solar-muted">Tomorrow's expected solar generation</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-4xl font-bold text-solar-yellow">
+                    {prediction.tomorrow_prediction_kw || prediction.prediction_kw} kW
+                  </p>
+                  <p className="text-sm text-solar-muted">AI Model v1.0</p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-3xl font-bold text-solar-yellow">
-                  {prediction.tomorrow_prediction_kw || prediction.prediction_kw} kW
+              <div className="mt-4 pt-4 border-t border-solar-border/30">
+                <p className="text-xs text-solar-muted italic">
+                  * Prediction is adjusted based on {prediction.fallback ? 'historical averages' : 'real-time weather forecasts'}.
                 </p>
-                <p className="text-sm text-solar-muted">AI Model v1.0</p>
               </div>
             </div>
-          </div>
-        )}
+          )}
+          <WeatherWidget weather={weather} loading={loadingWeather} />
+        </div>
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Energy Flow Chart */}
-          <div className="bg-solar-card rounded-lg shadow p-6 energy-card">
-            <h3 className="text-lg font-semibold text-solar-primary mb-4">Energy Generation & Consumption</h3>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-solar-card/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 energy-card border border-solar-border/30"
+          >
+            <h3 className="text-lg font-bold text-solar-primary mb-6 flex items-center">
+              <Zap className="w-5 h-5 text-solar-yellow mr-2" />
+              Energy Distribution
+            </h3>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="solar" stroke="#FFD166" strokeWidth={2} name="Solar (kW)" />
-                <Line type="monotone" dataKey="load" stroke="#F4A261" strokeWidth={2} name="Load (kW)" />
-              </LineChart>
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="colorSolar" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#FFD166" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#FFD166" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="colorLoad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#F4A261" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#F4A261" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+                <Area type="monotone" dataKey="solar" stroke="#FFD166" strokeWidth={3} fillOpacity={1} fill="url(#colorSolar)" name="Solar (kW)" />
+                <Area type="monotone" dataKey="load" stroke="#F4A261" strokeWidth={3} fillOpacity={1} fill="url(#colorLoad)" name="Load (kW)" />
+              </AreaChart>
             </ResponsiveContainer>
-          </div>
+          </motion.div>
 
           {/* Battery Trends Chart */}
-          <div className="bg-solar-card rounded-lg shadow p-6 energy-card">
-            <h3 className="text-lg font-semibold text-solar-primary mb-4">Battery Level Trends</h3>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-solar-card/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 energy-card border border-solar-border/30"
+          >
+            <h3 className="text-lg font-bold text-solar-primary mb-6 flex items-center">
+              <Battery className="w-5 h-5 text-solar-success mr-2" />
+              Battery Storage Cycle
+            </h3>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="time" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="battery" fill="#2ECC71" name="Battery (%)" />
-              </BarChart>
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="colorBattery" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+                <Area type="monotone" dataKey="battery" stroke="#10B981" strokeWidth={3} fillOpacity={1} fill="url(#colorBattery)" name="Battery (%)" />
+              </AreaChart>
             </ResponsiveContainer>
-          </div>
+          </motion.div>
         </div>
 
         {/* Live Power Dashboard */}
@@ -201,7 +293,7 @@ function UserDashboard() {
           </div>
         </div>
       </main>
-    </div>
+    </motion.div>
   )
 }
 

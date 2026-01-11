@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
+import { motion } from 'framer-motion'
 import { Users, Zap, TrendingUp, DollarSign, Activity, BarChart3, RefreshCw, Globe } from 'lucide-react'
 import { getRequest } from '../../lib/apiService'
 import { notify } from '../../lib/toast'
@@ -12,35 +13,43 @@ export default function AdminAnalytics() {
     activeDevices: 0,
     revenue: 0
   })
+  const [regionalData, setRegionalData] = useState([])
   const [loading, setLoading] = useState(true)
   const [period, setPeriod] = useState('month')
 
   const fetchStats = async () => {
     try {
       setLoading(true)
-      const response = await getRequest('/admin/analytics')
-      // Use response data or defaults
+      const response = await getRequest(`/admin/analytics?period=${period}`)
+
       setStats({
-        totalUsers: response.data?.stats?.total_users || 1250,
-        totalEnergy: response.data?.stats?.total_energy || 24456,
-        activeDevices: response.data?.stats?.active_devices || 89,
-        revenue: response.data?.stats?.revenue_raw || 485000
+        totalUsers: response.data?.stats?.total_users || 0,
+        totalEnergy: response.data?.stats?.total_energy || 0,
+        activeDevices: response.data?.stats?.active_devices || 0,
+        revenue: response.data?.stats?.revenue_raw || 0
       })
     } catch (error) {
-      // Use defaults on error
       notify.error('Failed to load analytics data')
-      setStats({
-        totalUsers: 1250,
-        totalEnergy: 24456,
-        activeDevices: 89,
-        revenue: 485000
-      })
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => { fetchStats() }, [])
+  const fetchRegionalStats = async () => {
+    try {
+      const response = await getRequest('/superadmin/stats/regional')
+      if (response.data && response.data.data) {
+        setRegionalData(response.data.data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch regional stats:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchStats()
+    fetchRegionalStats()
+  }, [period])
 
   // Sample chart data
   const userGrowthData = [
@@ -72,7 +81,11 @@ export default function AdminAnalytics() {
   ]
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="space-y-6"
+    >
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold sun-glow-text">Admin Analytics</h1>
@@ -101,6 +114,7 @@ export default function AdminAnalytics() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
+          index={0}
           title="Total Users"
           value={stats.totalUsers.toLocaleString()}
           icon={Users}
@@ -108,6 +122,7 @@ export default function AdminAnalytics() {
           gradient="from-solar-yellow/20 to-solar-orange/10"
         />
         <StatCard
+          index={1}
           title="Energy Generated"
           value={`${stats.totalEnergy.toLocaleString()} kWh`}
           icon={Zap}
@@ -115,6 +130,7 @@ export default function AdminAnalytics() {
           gradient="from-solar-orange/20 to-solar-orange/5"
         />
         <StatCard
+          index={2}
           title="Active Devices"
           value={stats.activeDevices}
           icon={Activity}
@@ -122,6 +138,7 @@ export default function AdminAnalytics() {
           gradient="from-solar-success/20 to-solar-success/5"
         />
         <StatCard
+          index={3}
           title="Revenue"
           value={`₹${(stats.revenue / 100000).toFixed(2)}L`}
           icon={DollarSign}
@@ -133,67 +150,96 @@ export default function AdminAnalytics() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* User Growth */}
-        <div className="bg-solar-card rounded-xl p-6 energy-card">
-          <h3 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-solar-card/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 energy-card border border-solar-border/30"
+        >
+          <h3 className="text-lg font-bold text-solar-primary mb-6 flex items-center">
             <TrendingUp className="w-5 h-5 text-solar-yellow mr-2" />
-            User Growth
+            Platform Growth
           </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={userGrowthData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="month" stroke="#9CA3AF" />
-              <YAxis stroke="#9CA3AF" />
+            <AreaChart data={userGrowthData}>
+              <defs>
+                <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '8px' }}
-                labelStyle={{ color: '#F3F4F6' }}
+                contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
               />
-              <Bar dataKey="users" fill="#FFD166" name="New Users" />
-            </BarChart>
+              <Area type="monotone" dataKey="users" stroke="#F59E0B" strokeWidth={3} fillOpacity={1} fill="url(#colorUsers)" name="Total Users" />
+            </AreaChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
 
         {/* Energy Stats */}
-        <div className="bg-solar-card rounded-xl p-6 energy-card">
-          <h3 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-solar-card/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 energy-card border border-solar-border/30"
+        >
+          <h3 className="text-lg font-bold text-solar-primary mb-6 flex items-center">
             <Zap className="w-5 h-5 text-solar-orange mr-2" />
-            Energy Generation vs Consumption
+            Energy Analytics
           </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={energyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="day" stroke="#9CA3AF" />
-              <YAxis stroke="#9CA3AF" />
+            <AreaChart data={energyData}>
+              <defs>
+                <linearGradient id="colorGenerated" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#FFD166" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#FFD166" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorConsumed" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#EA580C" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#EA580C" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+              <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '8px' }}
-                labelStyle={{ color: '#F3F4F6' }}
+                contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
               />
-              <Line type="monotone" dataKey="generated" stroke="#FFD166" strokeWidth={2} name="Generated (kWh)" />
-              <Line type="monotone" dataKey="consumed" stroke="#F4A261" strokeWidth={2} name="Consumed (kWh)" />
-            </LineChart>
+              <Area type="monotone" dataKey="generated" stroke="#FFD166" strokeWidth={3} fillOpacity={1} fill="url(#colorGenerated)" name="Generated (kWh)" />
+              <Area type="monotone" dataKey="consumed" stroke="#EA580C" strokeWidth={3} fillOpacity={1} fill="url(#colorConsumed)" name="Consumed (kWh)" />
+            </AreaChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
       </div>
 
       {/* Regional Distribution */}
-      <div className="bg-solar-card rounded-xl p-6 energy-card">
-        <h3 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="bg-solar-card/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 energy-card border border-solar-border/30"
+      >
+        <h3 className="text-lg font-bold text-solar-primary mb-6 flex items-center">
           <Globe className="w-5 h-5 text-solar-success mr-2" />
-          Regional Distribution
+          Regional Distribution Metrics
         </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={regionData} layout="vertical">
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis type="number" stroke="#9CA3AF" />
-            <YAxis dataKey="region" type="category" stroke="#9CA3AF" width={80} />
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart data={regionalData} layout="vertical" margin={{ left: 20, right: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
+            <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+            <YAxis dataKey="region" type="category" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 500 }} width={120} />
             <Tooltip
-              contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151', borderRadius: '8px' }}
-              labelStyle={{ color: '#F3F4F6' }}
+              cursor={{ fill: 'rgba(226, 232, 240, 0.4)' }}
+              contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
             />
-            <Bar dataKey="users" fill="#2ECC71" name="Users" />
-            <Bar dataKey="plants" fill="#FFD166" name="Plants" />
+            <Bar dataKey="users" fill="#10B981" radius={[0, 4, 4, 0]} name="Users" barSize={20} />
+            <Bar dataKey="plants" fill="#F59E0B" radius={[0, 4, 4, 0]} name="Plants" barSize={20} />
           </BarChart>
         </ResponsiveContainer>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }
