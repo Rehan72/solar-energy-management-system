@@ -15,7 +15,12 @@ function Dashboard() {
       navigate('/login')
       return
     }
-    setUser(JSON.parse(localStorage.getItem('user')))
+    const userData = JSON.parse(localStorage.getItem('user'))
+    setUser(userData)
+
+    if (userData && userData.role === 'USER' && !userData.property_type) {
+      navigate('/solar-onboarding')
+    }
   }, [token, navigate])
 
   if (!user) {

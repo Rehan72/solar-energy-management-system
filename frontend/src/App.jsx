@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './auth/Login'
 import Register from './auth/Register'
 import Dashboard from './pages/Dashboard'
+import SolarOnboarding from './pages/user/SolarOnboarding'
 import AuthPage from './auth/AuthPage'
 import LandingPage from './pages/LandingPage'
 import Master from './router/Master'
@@ -18,8 +19,9 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/login" element={<AuthPage />} />
+          <Route path="/register" element={<AuthPage />} />
+          <Route path="/solar-onboarding" element={<SolarOnboarding />} />
           <Route path="/*" element={<Master />} />
-          <Route path="/" element={<Navigate to="/login" />} />
         </Routes>
       </Router>
     </ThemeProvider>

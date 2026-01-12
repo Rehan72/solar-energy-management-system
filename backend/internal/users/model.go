@@ -67,6 +67,7 @@ type User struct {
 	ConnectionType  ConnectionType `json:"connection_type" db:"connection_type"`
 	SubsidyInterest bool           `json:"subsidy_interest" db:"subsidy_interest"`
 	ProjectCost     float64        `json:"project_cost" db:"project_cost"`
+	TariffRate      float64        `json:"tariff_rate" db:"tariff_rate"`
 
 	// For installed users
 	PlantCapacityKW  float64   `json:"plant_capacity_kw" db:"plant_capacity_kw"`

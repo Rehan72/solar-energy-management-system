@@ -13,8 +13,10 @@ import (
 	"sems-backend/internal/plants"
 	"sems-backend/internal/regions"
 	"sems-backend/internal/reports"
+	"sems-backend/internal/tickets"
 	"sems-backend/internal/users"
 	"sems-backend/internal/weather"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -33,6 +35,12 @@ func main() {
 			log.Println("Failed to run migrations, continuing in demo mode:", err)
 		}
 	}
+
+	// Initialize Govt/Subsidy package
+	govt.Init()
+
+	// Start Anomaly Detection Worker (every 15 minutes)
+	energy.StartAnomalyDetectionWorker(15 * time.Minute)
 
 	r := gin.Default()
 
@@ -84,6 +92,7 @@ func main() {
 		user.GET("/solar-profile", users.GetSolarProfileHandler)
 		user.PUT("/solar-profile", users.UpdateSolarProfileHandler)
 		user.GET("/energy/current", energy.CurrentEnergy)
+		user.GET("/energy/financials", energy.GetFinancialStatsHandler)
 		user.POST("/energy/predict", energy.GetSolarPrediction)
 		user.GET("/energy/history", energy.GetEnergyHistoryHandler)
 		user.GET("/energy/analytics", energy.GetEnergyAnalyticsHandler)
@@ -107,6 +116,9 @@ func main() {
 		user.GET("/reports/energy/export", reports.ExportEnergyDataHandler)
 		// Weather
 		user.GET("/weather", weather.GetWeatherHandler)
+		// Tickets
+		user.GET("/tickets", tickets.GetUserTicketsHandler)
+		user.POST("/tickets", tickets.CreateTicketHandler)
 	}
 
 	// INSTALLER Routes
@@ -116,6 +128,9 @@ func main() {
 		installerGroup.POST("/devices", devices.CreateDeviceHandler)
 		installerGroup.GET("/jobs", installerPkg.GetAvailableJobsHandler)
 		installerGroup.POST("/jobs/:id/complete", installerPkg.CompleteInstallationHandler)
+		// Tickets
+		installerGroup.GET("/tickets", tickets.GetInstallerTicketsHandler)
+		installerGroup.PUT("/tickets/:id/status", tickets.UpdateTicketStatusHandler)
 	}
 
 	// SUPER_ADMIN Routes

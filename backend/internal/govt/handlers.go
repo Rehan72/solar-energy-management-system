@@ -2,12 +2,18 @@ package govt
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"sems-backend/internal/users"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+// Init initializes the govt package
+func Init() {
+	log.Println("🏛️  Government subsidy module initialized")
+}
 
 type UpdateSubsidyRequest struct {
 	Status string `json:"status" binding:"required,oneof=APPROVED REJECTED"`

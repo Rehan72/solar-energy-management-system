@@ -186,6 +186,17 @@ func RunMigrations() error {
 		('550e8400-e29b-41d4-a716-446655440002', 'Mumbai Coastal Solar', 'Marine Drive, Mumbai', 'Maharashtra', 750.0, 410.2, 88.0, 19.0760, 72.8777, 'ACTIVE', 'Coastal deployment with high humidity tolerance'),
 		('550e8400-e29b-41d4-a716-446655440003', 'Bangalore Tech Park', 'Electronic City, Bangalore', 'Karnataka', 1200.0, 850.0, 95.0, 12.9716, 77.5946, 'ACTIVE', 'Integration with IT hub micro-grid'),
 		('550e8400-e29b-41d4-a716-446655440004', 'Rajasthan Desert Solar', 'Jaisalmer', 'Rajasthan', 5000.0, 4200.0, 96.0, 26.9157, 70.9083, 'ACTIVE', 'Utility scale desert deployment');`,
+		// Create tickets table
+		`CREATE TABLE IF NOT EXISTS tickets (
+			id TEXT PRIMARY KEY,
+			user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+			installer_id TEXT,
+			subject TEXT NOT NULL,
+			description TEXT,
+			status TEXT DEFAULT 'OPEN',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		);`,
 	}
 
 	for i, migration := range migrations {

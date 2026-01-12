@@ -7,11 +7,15 @@ import StatCard from '../ui/stat-card'
 import { getRequest, postRequest } from '../../lib/apiService'
 import LivePowerDashboard from './LivePowerDashboard'
 import WeatherWidget from '../WeatherWidget'
+import FinancialWidget from './FinancialWidget'
+import TicketList from './TicketList'
+import NotificationBell from '../NotificationBell'
 
 function UserDashboard() {
   const [energyData, setEnergyData] = useState({ solar: 0, load: 0, battery: 0, grid: 0 })
   const [prediction, setPrediction] = useState(null)
   const [weather, setWeather] = useState(null)
+  const [financials, setFinancials] = useState(null)
   const [loadingWeather, setLoadingWeather] = useState(true)
   const [user, setUser] = useState(null)
   const navigate = useNavigate()
@@ -23,6 +27,15 @@ function UserDashboard() {
       setEnergyData(response.data)
     } catch (error) {
       console.error('Failed to fetch energy data:', error)
+    }
+  }
+
+  const fetchFinancials = async () => {
+    try {
+      const response = await getRequest('/user/energy/financials');
+      setFinancials(response.data);
+    } catch (error) {
+      console.error('Failed to fetch financials:', error);
     }
   }
 
@@ -57,6 +70,7 @@ function UserDashboard() {
   const refreshData = () => {
     fetchEnergyData()
     fetchPrediction()
+    fetchFinancials()
     if (user?.latitude && user?.longitude) {
       fetchWeather(user.latitude, user.longitude)
     } else {
@@ -69,6 +83,7 @@ function UserDashboard() {
     setUser(userData)
     fetchEnergyData()
     fetchPrediction()
+    fetchFinancials()
     if (userData?.latitude && userData?.longitude) {
       fetchWeather(userData.latitude, userData.longitude)
     } else {
@@ -112,6 +127,7 @@ function UserDashboard() {
               </button>
             </div>
             <div className="flex items-center space-x-4">
+              <NotificationBell />
               <div className="flex items-center space-x-2 text-sm text-solar-muted">
                 <User className="w-4 h-4" />
                 <span>{user?.email || 'User'}</span>
@@ -165,23 +181,26 @@ function UserDashboard() {
             index={3}
             title="Grid Power"
             value={`${energyData.grid} kW`}
-            icon={TrendingUp}
             color={energyData.grid >= 0 ? "text-solar-yellow" : "text-solar-orange"}
             gradient={energyData.grid >= 0 ? "from-solar-yellow/20 to-solar-yellow/5" : "from-solar-orange/20 to-solar-orange/5"}
           />
         </div>
 
-        {/* AI Prediction & Weather */}
+        {/* Financials & AI & Weather */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Financial Widget (Takes up 1 column on LG) */}
+          {financials && <FinancialWidget data={financials} />}
+
+          {/* AI Prediction (Takes up 1 column or adjusts) */}
           {prediction && (
-            <div className="lg:col-span-2 bg-solar-card rounded-lg shadow p-6 energy-card flex flex-col justify-center">
+            <div className="bg-solar-card rounded-lg shadow p-6 energy-card flex flex-col justify-center">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold text-solar-primary flex items-center">
                     <TrendingUp className="h-5 w-5 text-solar-yellow mr-2" />
-                    AI Solar Prediction
+                    AI Prediction
                   </h3>
-                  <p className="text-sm text-solar-muted">Tomorrow's expected solar generation</p>
+                  <p className="text-sm text-solar-muted">Tomorrow's generation</p>
                 </div>
                 <div className="text-right">
                   <p className="text-4xl font-bold text-solar-yellow">
@@ -192,22 +211,28 @@ function UserDashboard() {
               </div>
               <div className="mt-4 pt-4 border-t border-solar-border/30">
                 <p className="text-xs text-solar-muted italic">
-                  * Prediction is adjusted based on {prediction.fallback ? 'historical averages' : 'real-time weather forecasts'}.
+                  * Based on {prediction.fallback ? 'historical avg' : 'weather forecast'}.
                 </p>
               </div>
             </div>
           )}
+
           <WeatherWidget weather={weather} loading={loadingWeather} />
         </div>
 
-        {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Energy Flow Chart */}
+        {/* Middle Section: Tickets and Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Tickets Section (Taking 1/3 width on large screens) */}
+          <div className="lg:col-span-1">
+            <TicketList role={user?.role} />
+          </div>
+
+          {/* Charts taking 2/3 width */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-solar-card/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 energy-card border border-solar-border/30"
+            className="lg:col-span-2 bg-solar-card/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 energy-card border border-solar-border/30"
           >
             <h3 className="text-lg font-bold text-solar-primary mb-6 flex items-center">
               <Zap className="w-5 h-5 text-solar-yellow mr-2" />
@@ -236,46 +261,16 @@ function UserDashboard() {
               </AreaChart>
             </ResponsiveContainer>
           </motion.div>
-
-          {/* Battery Trends Chart */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-solar-card/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 energy-card border border-solar-border/30"
-          >
-            <h3 className="text-lg font-bold text-solar-primary mb-6 flex items-center">
-              <Battery className="w-5 h-5 text-solar-success mr-2" />
-              Battery Storage Cycle
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="colorBattery" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                />
-                <Area type="monotone" dataKey="battery" stroke="#10B981" strokeWidth={3} fillOpacity={1} fill="url(#colorBattery)" name="Battery (%)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </motion.div>
         </div>
 
         {/* Live Power Dashboard */}
-        <div className="mt-8">
+        < div className="mt-8" >
           <h3 className="text-lg font-semibold text-solar-primary mb-4">Live Power Monitoring</h3>
           <LivePowerDashboard />
-        </div>
+        </div >
 
         {/* System Status */}
-        <div className="mt-8 bg-solar-card rounded-lg shadow p-6 energy-card">
+        < div className="mt-8 bg-solar-card rounded-lg shadow p-6 energy-card" >
           <h3 className="text-lg font-semibold text-solar-primary mb-4">System Status</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center space-x-3">
@@ -291,9 +286,9 @@ function UserDashboard() {
               <span className="text-sm text-solar-muted">ESP32 Devices: 1 Connected</span>
             </div>
           </div>
-        </div>
-      </main>
-    </motion.div>
+        </div >
+      </main >
+    </motion.div >
   )
 }
 

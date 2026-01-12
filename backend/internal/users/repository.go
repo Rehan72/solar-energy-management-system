@@ -20,7 +20,7 @@ func nullStringToString(ns sql.NullString) string {
 func GetUsersByAdmin(adminID string) ([]*User, error) {
 	users := []*User{}
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
 		FROM users
 		WHERE admin_id = ?`
 	rows, err := database.DB.Query(query, adminID)
@@ -31,7 +31,7 @@ func GetUsersByAdmin(adminID string) ([]*User, error) {
 	for rows.Next() {
 		user := &User{}
 		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
-		var aID, installerID sql.NullString
+		var aID, installerID, pID sql.NullString
 		var latitude, longitude, avgMonthlyBill, roofAreaSqft, plantCapacityKW sql.NullFloat64
 		var installationDate, lastDataReceived sql.NullTime
 		var subsidyInterest, netMetering, deviceLinked, subsidyApplied, isActive sql.NullBool
@@ -39,7 +39,7 @@ func GetUsersByAdmin(adminID string) ([]*User, error) {
 		err := rows.Scan(
 			&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.PasswordHash,
 			&user.Role, &phone, &profileImage, &addressLine1, &addressLine2,
-			&city, &state, &pincode, &region, &latitude, &longitude, &aID, &installerID,
+			&city, &state, &pincode, &region, &latitude, &longitude, &aID, &installerID, &pID,
 			&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 			&plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 			&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
@@ -60,6 +60,7 @@ func GetUsersByAdmin(adminID string) ([]*User, error) {
 		user.Longitude = nullFloat64ToFloat64(longitude)
 		user.AdminID = nullStringToString(aID)
 		user.InstallerID = nullStringToString(installerID)
+		user.PlantID = nullStringToString(pID)
 		user.InstallationStatus = InstallationStatus(nullStringToString(installationStatus))
 		user.PropertyType = PropertyType(nullStringToString(propertyType))
 		user.AvgMonthlyBill = nullFloat64ToFloat64(avgMonthlyBill)
@@ -181,19 +182,19 @@ func CreateUser(firstName, lastName, email, passwordHash, role, phone, profileIm
 func GetUserByEmail(email string) (*User, error) {
 	user := &User{}
 	var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
-	var adminID, installerID sql.NullString
+	var adminID, installerID, pID sql.NullString
 	var latitude, longitude, avgMonthlyBill, roofAreaSqft, plantCapacityKW, projectCost sql.NullFloat64
 	var installationDate, lastDataReceived sql.NullTime
 	var subsidyInterest, netMetering, deviceLinked, subsidyApplied, isActive sql.NullBool
 
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
 		FROM users
 		WHERE email = ?`
 	err := database.DB.QueryRow(query, email).Scan(
 		&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.PasswordHash,
 		&user.Role, &phone, &profileImage, &addressLine1, &addressLine2,
-		&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID,
+		&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID, &pID,
 		&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 		&projectCost, &plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 		&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
@@ -216,6 +217,7 @@ func GetUserByEmail(email string) (*User, error) {
 	user.Longitude = nullFloat64ToFloat64(longitude)
 	user.AdminID = nullStringToString(adminID)
 	user.InstallerID = nullStringToString(installerID)
+	user.PlantID = nullStringToString(pID)
 	user.InstallationStatus = InstallationStatus(nullStringToString(installationStatus))
 	user.PropertyType = PropertyType(nullStringToString(propertyType))
 	user.AvgMonthlyBill = nullFloat64ToFloat64(avgMonthlyBill)
@@ -245,7 +247,7 @@ func GetUserByEmail(email string) (*User, error) {
 func GetUsersByRole(role string) ([]*User, error) {
 	users := []*User{}
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
 		FROM users
 		WHERE role = ?`
 	rows, err := database.DB.Query(query, role)
@@ -256,7 +258,7 @@ func GetUsersByRole(role string) ([]*User, error) {
 	for rows.Next() {
 		user := &User{}
 		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
-		var adminID, installerID sql.NullString
+		var adminID, installerID, pID sql.NullString
 		var latitude, longitude, avgMonthlyBill, roofAreaSqft, projectCost, plantCapacityKW sql.NullFloat64
 		var installationDate, lastDataReceived sql.NullTime
 		var subsidyInterest, netMetering, deviceLinked, subsidyApplied, isActive sql.NullBool
@@ -264,7 +266,7 @@ func GetUsersByRole(role string) ([]*User, error) {
 		err := rows.Scan(
 			&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.PasswordHash,
 			&user.Role, &phone, &profileImage, &addressLine1, &addressLine2,
-			&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID,
+			&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID, &pID,
 			&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 			&projectCost, &plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 			&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
@@ -286,6 +288,7 @@ func GetUsersByRole(role string) ([]*User, error) {
 		user.Longitude = nullFloat64ToFloat64(longitude)
 		user.AdminID = nullStringToString(adminID)
 		user.InstallerID = nullStringToString(installerID)
+		user.PlantID = nullStringToString(pID)
 		user.InstallationStatus = InstallationStatus(nullStringToString(installationStatus))
 		user.PropertyType = PropertyType(nullStringToString(propertyType))
 		user.AvgMonthlyBill = nullFloat64ToFloat64(avgMonthlyBill)
@@ -316,7 +319,7 @@ func GetUsersByRole(role string) ([]*User, error) {
 func GetAllUsers() ([]*User, error) {
 	users := []*User{}
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
 		FROM users
 		WHERE role = 'USER'` // Only return users with role "USER", exclude ADMIN and SUPER_ADMIN
 	rows, err := database.DB.Query(query)
@@ -327,7 +330,7 @@ func GetAllUsers() ([]*User, error) {
 	for rows.Next() {
 		user := &User{}
 		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
-		var adminID, installerID sql.NullString
+		var adminID, installerID, pID sql.NullString
 		var latitude, longitude, avgMonthlyBill, roofAreaSqft, projectCost, plantCapacityKW sql.NullFloat64
 		var installationDate, lastDataReceived sql.NullTime
 		var subsidyInterest, netMetering, deviceLinked, subsidyApplied, isActive sql.NullBool
@@ -335,7 +338,7 @@ func GetAllUsers() ([]*User, error) {
 		err := rows.Scan(
 			&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.PasswordHash,
 			&user.Role, &phone, &profileImage, &addressLine1, &addressLine2,
-			&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID,
+			&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID, &pID,
 			&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 			&projectCost, &plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 			&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
@@ -357,6 +360,7 @@ func GetAllUsers() ([]*User, error) {
 		user.Longitude = nullFloat64ToFloat64(longitude)
 		user.AdminID = nullStringToString(adminID)
 		user.InstallerID = nullStringToString(installerID)
+		user.PlantID = nullStringToString(pID)
 		user.InstallationStatus = InstallationStatus(nullStringToString(installationStatus))
 		user.PropertyType = PropertyType(nullStringToString(propertyType))
 		user.AvgMonthlyBill = nullFloat64ToFloat64(avgMonthlyBill)
@@ -388,7 +392,7 @@ func GetAllUsers() ([]*User, error) {
 func GetAllUsersIncludingAdmins() ([]*User, error) {
 	users := []*User{}
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
 		FROM users`
 	rows, err := database.DB.Query(query)
 	if err != nil {
@@ -398,7 +402,7 @@ func GetAllUsersIncludingAdmins() ([]*User, error) {
 	for rows.Next() {
 		user := &User{}
 		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
-		var adminID, installerID sql.NullString
+		var adminID, installerID, pID sql.NullString
 		var latitude, longitude, avgMonthlyBill, roofAreaSqft, projectCost, plantCapacityKW sql.NullFloat64
 		var installationDate, lastDataReceived sql.NullTime
 		var subsidyInterest, netMetering, deviceLinked, subsidyApplied, isActive sql.NullBool
@@ -406,7 +410,7 @@ func GetAllUsersIncludingAdmins() ([]*User, error) {
 		err := rows.Scan(
 			&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.PasswordHash,
 			&user.Role, &phone, &profileImage, &addressLine1, &addressLine2,
-			&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID,
+			&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID, &pID,
 			&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 			&projectCost, &plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 			&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
@@ -428,6 +432,7 @@ func GetAllUsersIncludingAdmins() ([]*User, error) {
 		user.Longitude = nullFloat64ToFloat64(longitude)
 		user.AdminID = nullStringToString(adminID)
 		user.InstallerID = nullStringToString(installerID)
+		user.PlantID = nullStringToString(pID)
 		user.InstallationStatus = InstallationStatus(nullStringToString(installationStatus))
 		user.PropertyType = PropertyType(nullStringToString(propertyType))
 		user.AvgMonthlyBill = nullFloat64ToFloat64(avgMonthlyBill)
@@ -458,19 +463,19 @@ func GetAllUsersIncludingAdmins() ([]*User, error) {
 func GetUserByID(id string) (*User, error) {
 	user := &User{}
 	var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
-	var adminID, installerID sql.NullString
+	var adminID, installerID, pID sql.NullString
 	var latitude, longitude, avgMonthlyBill, roofAreaSqft, plantCapacityKW, projectCost sql.NullFloat64
 	var installationDate, lastDataReceived sql.NullTime
 	var subsidyInterest, netMetering, deviceLinked, subsidyApplied, isActive sql.NullBool
 
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
 		FROM users
 		WHERE id = ?`
 	err := database.DB.QueryRow(query, id).Scan(
 		&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.PasswordHash,
 		&user.Role, &phone, &profileImage, &addressLine1, &addressLine2,
-		&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID,
+		&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID, &pID,
 		&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 		&projectCost, &plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 		&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
@@ -492,6 +497,7 @@ func GetUserByID(id string) (*User, error) {
 	user.Longitude = nullFloat64ToFloat64(longitude)
 	user.AdminID = nullStringToString(adminID)
 	user.InstallerID = nullStringToString(installerID)
+	user.PlantID = nullStringToString(pID)
 	user.InstallationStatus = InstallationStatus(nullStringToString(installationStatus))
 	user.PropertyType = PropertyType(nullStringToString(propertyType))
 	user.AvgMonthlyBill = nullFloat64ToFloat64(avgMonthlyBill)
@@ -546,7 +552,7 @@ func DeleteUser(id string) error {
 func GetUsersByInstallationStatus(status InstallationStatus) ([]*User, error) {
 	users := []*User{}
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
 		FROM users
 		WHERE installation_status = ?`
 	rows, err := database.DB.Query(query, status)
@@ -557,7 +563,7 @@ func GetUsersByInstallationStatus(status InstallationStatus) ([]*User, error) {
 	for rows.Next() {
 		user := &User{}
 		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
-		var adminID, installerID sql.NullString
+		var adminID, installerID, pID sql.NullString
 		var latitude, longitude, avgMonthlyBill, roofAreaSqft, projectCost, plantCapacityKW sql.NullFloat64
 		var installationDate, lastDataReceived sql.NullTime
 		var subsidyInterest, netMetering, deviceLinked, subsidyApplied, isActive sql.NullBool
@@ -565,7 +571,7 @@ func GetUsersByInstallationStatus(status InstallationStatus) ([]*User, error) {
 		err := rows.Scan(
 			&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.PasswordHash,
 			&user.Role, &phone, &profileImage, &addressLine1, &addressLine2,
-			&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID,
+			&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID, &pID,
 			&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 			&plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 			&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
@@ -586,6 +592,7 @@ func GetUsersByInstallationStatus(status InstallationStatus) ([]*User, error) {
 		user.Longitude = nullFloat64ToFloat64(longitude)
 		user.AdminID = nullStringToString(adminID)
 		user.InstallerID = nullStringToString(installerID)
+		user.PlantID = nullStringToString(pID)
 		user.InstallationStatus = InstallationStatus(nullStringToString(installationStatus))
 		user.PropertyType = PropertyType(nullStringToString(propertyType))
 		user.AvgMonthlyBill = nullFloat64ToFloat64(avgMonthlyBill)
@@ -617,7 +624,7 @@ func GetUsersByInstallationStatus(status InstallationStatus) ([]*User, error) {
 func GetUsersBySubsidyStatus(status SubsidyStatus) ([]*User, error) {
 	users := []*User{}
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
 		FROM users
 		WHERE subsidy_status = ?`
 	rows, err := database.DB.Query(query, status)
@@ -628,7 +635,7 @@ func GetUsersBySubsidyStatus(status SubsidyStatus) ([]*User, error) {
 	for rows.Next() {
 		user := &User{}
 		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
-		var adminID, installerID sql.NullString
+		var adminID, installerID, pID sql.NullString
 		var latitude, longitude, avgMonthlyBill, roofAreaSqft, plantCapacityKW sql.NullFloat64
 		var installationDate, lastDataReceived sql.NullTime
 		var subsidyInterest, netMetering, deviceLinked, subsidyApplied, isActive sql.NullBool
@@ -636,7 +643,7 @@ func GetUsersBySubsidyStatus(status SubsidyStatus) ([]*User, error) {
 		err := rows.Scan(
 			&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.PasswordHash,
 			&user.Role, &phone, &profileImage, &addressLine1, &addressLine2,
-			&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID,
+			&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID, &pID,
 			&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 			&plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 			&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
@@ -657,6 +664,7 @@ func GetUsersBySubsidyStatus(status SubsidyStatus) ([]*User, error) {
 		user.Longitude = nullFloat64ToFloat64(longitude)
 		user.AdminID = nullStringToString(adminID)
 		user.InstallerID = nullStringToString(installerID)
+		user.PlantID = nullStringToString(pID)
 		user.InstallationStatus = InstallationStatus(nullStringToString(installationStatus))
 		user.PropertyType = PropertyType(nullStringToString(propertyType))
 		user.AvgMonthlyBill = nullFloat64ToFloat64(avgMonthlyBill)
