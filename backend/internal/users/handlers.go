@@ -208,7 +208,16 @@ func GetUsersHandler(c *gin.Context) {
 		}
 	} else if currentUserRole == "ADMIN" {
 		currentUserID := c.GetString("user_id")
-		users, err = GetUsersByAdmin(currentUserID)
+		// Fetch current admin details to determine scope
+		adminUser, err := GetUserByID(currentUserID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch admin details"})
+			return
+		}
+
+		// Fetch users based on Admin's scope (Region/Plant)
+		users, err = GetUsersByScope(adminUser)
+
 		// Filter by role if not ALL
 		if err == nil && roleFilter != "ALL" {
 			filtered := []*User{}

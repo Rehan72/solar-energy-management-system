@@ -142,7 +142,7 @@ export default function CreateInstaller() {
 
     try {
       // Validate required fields
-      if (!formData.first_name || !formData.last_name || !formData.email || !formData.plant_id || !formData.admin_id) {
+      if (!formData.first_name || !formData.last_name || !formData.email || !formData.plant_id) {
         notify.error('Please fill all required fields')
         setSaving(false)
         return
@@ -310,12 +310,11 @@ export default function CreateInstaller() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-solar-primary mb-2">Reporting Admin *</label>
+              <label className="block text-sm font-medium text-solar-primary mb-2">Reporting Admin (Optional)</label>
               <select
                 name="admin_id"
                 value={formData.admin_id}
                 onChange={handleChange}
-                required
                 disabled={!formData.region}
                 className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition disabled:opacity-50"
               >

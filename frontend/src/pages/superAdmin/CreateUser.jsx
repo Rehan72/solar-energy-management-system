@@ -67,19 +67,8 @@ export default function CreateUser() {
   const [filteredPlants, setFilteredPlants] = useState([])
   const dataLoadedRef = useRef(false)
 
-  const regions = [
-    'Delhi',
-    'Mumbai',
-    'Patna',
-    'Ahmedabad',
-    'Bangalore',
-    'Chennai',
-    'Kolkata',
-    'Hyderabad',
-    'Pune',
-    'Jaipur'
-  ]
-
+  const [regions, setRegions] = useState([])
+  
   const indianStates = [
     'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
     'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
@@ -88,23 +77,27 @@ export default function CreateUser() {
     'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
     'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi'
   ]
-
-  // Fetch admins and installers on mount
+  
+  // Fetch admins, installers, regions and plants on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         const promises = [
+          getRequest('/superadmin/regions'),
+           getRequest('/superadmin/plants'),
           getRequest('/admin/installers'),
-          getRequest('/superadmin/plants')
+         
+          
         ]
         if (currentUserRole === 'SUPER_ADMIN') {
           promises.push(getRequest('/superadmin/admins'))
         }
 
         const results = await Promise.all(promises)
-        const installersRes = results[0]
+        const regionsRes = results[0]
         const plantsRes = results[1]
-        const adminsRes = currentUserRole === 'SUPER_ADMIN' ? results[2] : { data: { admins: [] } }
+        const installersRes = results[2]
+        const adminsRes = currentUserRole === 'SUPER_ADMIN' ? results[3] : { data: { admins: [] } }
 
         const adminsData = (adminsRes.data.admins || []).map(admin => ({
           ...admin,
@@ -115,10 +108,12 @@ export default function CreateUser() {
           name: `${inst.first_name || ''} ${inst.last_name || ''}`.trim()
         }))
         const plantsData = plantsRes.data.plants || []
+        const regionsData = regionsRes.data || []
 
         setAdmins(adminsData)
         setInstallers(installersData)
         setPlants(plantsData)
+        setRegions(regionsData)
         setFilteredAdmins(adminsData)
         setFilteredInstallers(installersData)
         setFilteredPlants(plantsData)
@@ -137,9 +132,21 @@ export default function CreateUser() {
     let currentFilteredPlants = plants
 
     if (formData.region) {
-      currentFilteredAdmins = admins.filter(a => a.region === formData.region)
-      currentFilteredInstallers = installers.filter(i => i.region === formData.region)
+      const selectedRegionObj = regions.find(r => r.name === formData.region)
+      currentFilteredAdmins = admins.filter(a => 
+        a.region === formData.region || 
+        (selectedRegionObj && a.region === selectedRegionObj.state)
+      )
+      currentFilteredInstallers = installers.filter(i => 
+        i.region === formData.region || 
+        (selectedRegionObj && i.region === selectedRegionObj.state)
+      )
       currentFilteredPlants = plants.filter(p => p.region === formData.region)
+    }
+
+    if (formData.plant_id) {
+      currentFilteredAdmins = currentFilteredAdmins.filter(a => a.plant_id === formData.plant_id || !a.plant_id)
+      currentFilteredInstallers = currentFilteredInstallers.filter(i => i.plant_id === formData.plant_id || !i.plant_id)
     }
 
     if (formData.admin_id) {
@@ -149,7 +156,7 @@ export default function CreateUser() {
     setFilteredAdmins(currentFilteredAdmins)
     setFilteredInstallers(currentFilteredInstallers)
     setFilteredPlants(currentFilteredPlants)
-  }, [formData.region, formData.admin_id, admins, installers, plants])
+  }, [formData.region, formData.plant_id, formData.admin_id, admins, installers, plants])
 
   // Reset selections when region or admin changes
   const prevRegion = useRef(formData.region)
@@ -159,15 +166,17 @@ export default function CreateUser() {
   useEffect(() => {
     if (dataLoadedRef.current) {
       if (prevRegion.current !== formData.region) {
-        setFormData(prev => ({ ...prev, admin_id: '', installer_id: '', plant_id: '' }))
+        setFormData(prev => ({ ...prev, plant_id: '', admin_id: '', installer_id: '' }))
+      } else if (prevPlant.current !== formData.plant_id) {
+        setFormData(prev => ({ ...prev, admin_id: '', installer_id: '' }))
       } else if (prevAdmin.current !== formData.admin_id) {
         setFormData(prev => ({ ...prev, installer_id: '' }))
       }
     }
     prevRegion.current = formData.region
-    prevAdmin.current = formData.admin_id
     prevPlant.current = formData.plant_id
-  }, [formData.region, formData.admin_id, formData.plant_id])
+    prevAdmin.current = formData.admin_id
+  }, [formData.region, formData.plant_id, formData.admin_id])
 
   const handleChange = (field, value) => {
     let updates = { [field]: value }
@@ -699,8 +708,8 @@ export default function CreateUser() {
                     className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
                   >
                     <option value="">Select a region</option>
-                    {regions.map(region => (
-                      <option key={region} value={region}>{region}</option>
+                    {regions?.map(r => (
+                      <option key={r.id} value={r.name}>{r.name}</option>
                     ))}
                   </select>
                 </div>
@@ -717,7 +726,7 @@ export default function CreateUser() {
                     disabled={!formData.region}
                   >
                     <option value="">Select a plant</option>
-                    {filteredPlants.map(plant => (
+                    {filteredPlants?.map(plant => (
                       <option key={plant.id} value={plant.id}>{plant.name}</option>
                     ))}
                   </select>
@@ -728,7 +737,7 @@ export default function CreateUser() {
                   <div>
                     <label className="block text-sm font-medium text-solar-primary mb-2">
                       <Shield className="w-4 h-4 inline mr-2" />
-                      Assigned Admin
+                      Assigned Admin (Optional)
                     </label>
                     <select
                       value={formData.admin_id}
@@ -737,7 +746,7 @@ export default function CreateUser() {
                       disabled={!formData.region}
                     >
                       <option value="">Select an admin</option>
-                      {filteredAdmins.map(admin => (
+                      {filteredAdmins?.map(admin => (
                         <option key={admin.id} value={admin.id}>{admin.name}</option>
                       ))}
                     </select>
@@ -753,10 +762,10 @@ export default function CreateUser() {
                     value={formData.installer_id}
                     onChange={(e) => handleChange('installer_id', e.target.value)}
                     className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
-                    disabled={!formData.region || (currentUserRole === 'SUPER_ADMIN' && !formData.admin_id)}
+                    disabled={!formData.region}
                   >
                     <option value="">Select an installer</option>
-                    {filteredInstallers.map(inst => (
+                    {filteredInstallers?.map(inst => (
                       <option key={inst.id} value={inst.id}>{inst.name}</option>
                     ))}
                   </select>
@@ -785,7 +794,7 @@ export default function CreateUser() {
                     className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
                   >
                     <option value="">Select state</option>
-                    {indianStates.map(state => (
+                    {indianStates?.map(state => (
                       <option key={state} value={state}>{state}</option>
                     ))}
                   </select>
