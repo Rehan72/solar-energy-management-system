@@ -221,6 +221,22 @@ export default function CreateUser() {
     setLoading(true)
     setErrors({})
 
+    // Validation for Admin creation
+    if (formData.role === 'ADMIN') {
+        if (!formData.region) {
+            setErrors({ submit: "Region is required for Admins" });
+            notify.error("Region is required for Admins");
+            setLoading(false);
+            return;
+        }
+        if (!formData.plant_id) {
+            setErrors({ submit: "Plant is required for Admins" });
+             notify.error("Plant is required for Admins");
+            setLoading(false);
+            return;
+        }
+    }
+
     try {
       const payload = {
         ...formData,
@@ -348,6 +364,25 @@ export default function CreateUser() {
                   />
                   {errors.first_name && <p className="text-sm text-red-800 mt-1">{errors.first_name}</p>}
                 </div>
+
+                {currentUserRole === 'SUPER_ADMIN' && (
+                  <div>
+                    <label className="block text-sm font-medium text-solar-primary mb-2">
+                       <Shield className="w-4 h-4 inline mr-2" />
+                       User Role
+                    </label>
+                    <select
+                      value={formData.role}
+                      onChange={(e) => handleChange('role', e.target.value)}
+                      className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                    >
+                      <option value="USER">User</option>
+                      <option value="ADMIN">Admin</option>
+                      <option value="INSTALLER">Installer</option>
+                      <option value="GOVT">Govt Official</option>
+                    </select>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-solar-primary mb-2">
@@ -688,7 +723,8 @@ export default function CreateUser() {
                   </select>
                 </div>
 
-                {currentUserRole === 'SUPER_ADMIN' && (
+                {/* Hide Admin selection if creating an Admin or Super Admin, or if role is INSTALLER (might need admin logic) */}
+                {currentUserRole === 'SUPER_ADMIN' && formData.role !== 'ADMIN' && (
                   <div>
                     <label className="block text-sm font-medium text-solar-primary mb-2">
                       <Shield className="w-4 h-4 inline mr-2" />

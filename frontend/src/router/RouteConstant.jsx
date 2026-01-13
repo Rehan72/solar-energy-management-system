@@ -11,6 +11,8 @@ import EditPlant from "../pages/superAdmin/EditPlant";
 import PlantDetail from "../pages/superAdmin/PlantDetail";
 import Users from "../pages/superAdmin/Users";
 import CreateUser from "../pages/superAdmin/CreateUser";
+import CreateInstaller from "../pages/superAdmin/CreateInstaller";
+import Installers from "../pages/superAdmin/Installers";
 import UserDetail from "../pages/superAdmin/UserDetail";
 import EditUser from "../pages/superAdmin/EditUser";
 import AdminDetail from "../pages/superAdmin/AdminDetail";
@@ -131,6 +133,18 @@ export default [
     element: CreateUser,
     path: `/users/create`,
     allowedRoles: ["ADMIN", "SUPER_ADMIN"],
+    exact: true
+  },
+  {
+    element: Installers,
+    path: `/installers`,
+    allowedRoles: ["SUPER_ADMIN"],
+    exact: true
+  },
+  {
+    element: CreateInstaller,
+    path: `/installers/create`,
+    allowedRoles: ["SUPER_ADMIN"],
     exact: true
   },
   {

@@ -1,6 +1,7 @@
 package energy
 
 import (
+	"fmt"
 	"net/http"
 	"sems-backend/internal/database"
 	"strconv"
@@ -249,6 +250,7 @@ func GetGlobalEnergyTrendHandler(c *gin.Context) {
 
 	rows, err := database.DB.Query(query, params...)
 	if err != nil {
+		fmt.Printf("Error fetching energy trend: %v\n", err)
 		c.JSON(500, gin.H{"error": "Failed to fetch energy trend: " + err.Error()})
 		return
 	}

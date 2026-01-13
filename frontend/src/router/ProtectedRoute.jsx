@@ -59,6 +59,19 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     }
   }
 
+  // Force Onboarding Flow for incomplete profiles
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  // If user is logged in, role is USER, and no plant_id (incomplete profile)
+  // And we are NOT already on the onboarding page
+  if (isAuth && userRole === 'USER' && !user.plant_id && location.pathname !== '/onboarding') {
+      return <Navigate to="/onboarding" replace />;
+  }
+  
+  // If user HAS completed onboarding but tries to go back to /onboarding, redirect to dashboard
+  if (isAuth && userRole === 'USER' && user.plant_id && location.pathname === '/onboarding') {
+      return <Navigate to="/dashboard" replace />;
+  }
+
   return children;
 };
 

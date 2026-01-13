@@ -1,6 +1,7 @@
 package regions
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 func GetRegionsHandler(c *gin.Context) {
 	regions, err := GetAllRegions()
 	if err != nil {
+		fmt.Printf("Error fetching regions: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch regions", "details": err.Error()})
 		return
 	}
@@ -113,7 +115,7 @@ func GetAllRegions() ([]Region, error) {
 		return []Region{}, nil
 	}
 
-	rows, err := database.DB.Query(`SELECT id, name, state, country, timezone, description, status, latitude, longitude, expected_users, expected_plants, capacity_mw, created_at, updated_at FROM regions`)
+	rows, err := database.DB.Query(`SELECT id, name, state, country, timezone, description, status, COALESCE(latitude, 0), COALESCE(longitude, 0), expected_users, expected_plants, capacity_mw, created_at, updated_at FROM regions`)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, User, X, Columns2, SheetIcon, Users, User2Icon, OrigamiIcon, LogOut, Cpu, Zap, Activity } from "lucide-react";
+import { Home, User, X, Columns2, SheetIcon, Users, User2Icon, OrigamiIcon, LogOut, Cpu, Zap, Activity, Inspect } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Calendar } from "lucide-react";
@@ -44,6 +44,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
     { name: "Energy Analytics", path: "/superadmin/all-energy", icon: <Zap size={18} /> },
     { name: "Admins", path: "/admins", icon: <Users size={18} /> },
     { name: "Users", path: "/users", icon: <User2Icon size={18} /> },
+    {name:"Installer",path:"/installers",icon:<Inspect size={18}/>},
     { name: "Reports", path: "/reports", icon: <SheetIcon size={18} /> },
     // { name: "Event", path: "/event", icon: <Calendar size={18} /> },
     { name: "Simulator", path: "/tool/simulator", icon: <Activity size={18} /> },

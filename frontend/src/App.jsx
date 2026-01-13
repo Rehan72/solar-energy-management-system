@@ -3,6 +3,7 @@ import Login from './auth/Login'
 import Register from './auth/Register'
 import Dashboard from './pages/Dashboard'
 import SolarOnboarding from './pages/user/SolarOnboarding'
+import Onboarding from './pages/Onboarding' // New Import
 import AuthPage from './auth/AuthPage'
 import LandingPage from './pages/LandingPage'
 import Master from './router/Master'
@@ -21,6 +22,7 @@ function App() {
           <Route path="/login" element={<AuthPage />} />
           <Route path="/register" element={<AuthPage />} />
           <Route path="/solar-onboarding" element={<SolarOnboarding />} />
+          <Route path="/onboarding" element={<Onboarding />} /> {/* New Route */}
           <Route path="/*" element={<Master />} />
         </Routes>
       </Router>

@@ -89,6 +89,7 @@ func main() {
 	{
 		user.GET("/profile", users.GetCurrentUserHandler)
 		user.PUT("/profile", users.UpdateUserHandler)
+		user.POST("/onboarding", users.CompleteOnboarding) // New Onboarding Endpoint
 		user.GET("/solar-profile", users.GetSolarProfileHandler)
 		user.PUT("/solar-profile", users.UpdateSolarProfileHandler)
 		user.GET("/energy/current", energy.CurrentEnergy)

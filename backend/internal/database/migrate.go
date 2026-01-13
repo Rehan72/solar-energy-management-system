@@ -197,6 +197,12 @@ func RunMigrations() error {
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
+		// Fix Schema Mismatch: Rename power to solar_power if exists
+		`ALTER TABLE energy_data RENAME COLUMN power TO solar_power;`,
+		// Add missing columns if table was created with old schema
+		`ALTER TABLE energy_data ADD COLUMN load_power REAL DEFAULT 0;`,
+		`ALTER TABLE energy_data ADD COLUMN grid_power REAL DEFAULT 0;`,
+		`ALTER TABLE energy_data ADD COLUMN weather_condition TEXT;`,
 	}
 
 	for i, migration := range migrations {

@@ -302,7 +302,11 @@ export default function EditUser() {
         updateData.password = formData.password
       }
 
-      await putRequest(`/superadmin/admins/${id}`, updateData)
+      const endpoint = currentUserRole === 'SUPER_ADMIN' 
+        ? `/superadmin/admins/${id}` 
+        : `/admin/users/${id}`
+
+      await putRequest(endpoint, updateData)
 
       setSuccess(true)
       notify.success('User updated successfully!')

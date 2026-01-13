@@ -23,6 +23,8 @@ CREATE TABLE users (
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
     admin_id UUID REFERENCES users(id),
+    plant_id UUID REFERENCES solar_plants(id),
+    installer_id UUID REFERENCES users(id),
 
     -- Solar-specific fields
     installation_status VARCHAR(50) DEFAULT 'NOT_INSTALLED' CHECK (installation_status IN ('NOT_INSTALLED', 'INSTALLATION_PLANNED', 'INSTALLED')),

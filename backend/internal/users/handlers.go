@@ -15,7 +15,7 @@ type CreateUserRequest struct {
 	LastName           string  `json:"last_name" binding:"required"`
 	Email              string  `json:"email" binding:"required,email"`
 	Password           string  `json:"password" binding:"required,min=6"`
-	Role               string  `json:"role" binding:"required,oneof=USER ADMIN SUPER_ADMIN"`
+	Role               string  `json:"role" binding:"required,oneof=USER ADMIN SUPER_ADMIN INSTALLER GOVT"`
 	Phone              string  `json:"phone"`
 	ProfileImage       string  `json:"profile_image"`
 	AddressLine1       string  `json:"address_line1"`

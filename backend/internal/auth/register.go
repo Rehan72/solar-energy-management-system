@@ -1,29 +1,27 @@
 package auth
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"sems-backend/internal/database"
-	"sems-backend/internal/notifications"
 	"sems-backend/internal/users"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type RegisterRequest struct {
 	// Basic user details (required)
-	FirstName    string `json:"first_name" binding:"required"`
-	LastName     string `json:"last_name" binding:"required"`
-	Email        string `json:"email" binding:"required,email"`
-	Password     string `json:"password" binding:"required,min=6"`
-	Phone        string `json:"phone" binding:"required"`
-	AddressLine1 string `json:"address_line1" binding:"required"`
-	City         string `json:"city" binding:"required"`
-	State        string `json:"state" binding:"required"`
-	Pincode      string `json:"pincode" binding:"required"`
+	FirstName string `json:"first_name" binding:"required"`
+	LastName  string `json:"last_name" binding:"required"`
+	Email     string `json:"email" binding:"required,email"`
+	Password  string `json:"password" binding:"required,min=6"`
+	Phone     string `json:"phone" binding:"required"`
+	// Address details (optional at registration)
+	AddressLine1 string `json:"address_line1"`
+	City         string `json:"city"`
+	State        string `json:"state"`
+	Pincode      string `json:"pincode"`
 }
 
 func Register(c *gin.Context) {
@@ -64,12 +62,12 @@ func Register(c *gin.Context) {
 		req.City,
 		req.State,
 		req.Pincode,
-		"",
+		"", // Region
 		0,
 		0,
-		"",
-		"",
-		"",
+		"", // AdminID
+		"", // InstallerID
+		"", // PlantID
 	)
 	if err != nil {
 		log.Printf("CreateUser error: %v", err)
@@ -77,23 +75,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// Notify Admins
-	admins, err := users.GetUsersByRole("ADMIN")
-	if err == nil {
-		for _, admin := range admins {
-			adminID, err := uuid.Parse(admin.ID)
-			if err == nil {
-				notifications.CreateNotification(
-					adminID,
-					notifications.NotificationTypeAlert,
-					"New User Registration",
-					fmt.Sprintf("New user %s %s has registered.", user.FirstName, user.LastName),
-					notifications.SeverityInfo,
-					"/admin/users", // Link to user management
-				)
-			}
-		}
-	}
+	// Notification will be sent after Onboarding Complete
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User registered successfully",
@@ -103,9 +85,6 @@ func Register(c *gin.Context) {
 			"last_name":  user.LastName,
 			"email":      user.Email,
 			"phone":      user.Phone,
-			"city":       user.City,
-			"state":      user.State,
-			"pincode":    user.Pincode,
 		},
 	})
 }
