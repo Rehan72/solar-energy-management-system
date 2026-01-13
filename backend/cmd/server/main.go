@@ -20,8 +20,30 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"golang.org/x/crypto/bcrypt"
+
+	_ "sems-backend/docs"
 )
+
+// @title           Solar Energy Management System API
+// @version         1.0
+// @description     API documentation for the Solar Energy Management System.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name    API Support
+// @contact.url     http://www.swagger.io/support
+// @contact.email   support@swagger.io
+
+// @license.name    Apache 2.0
+// @license.url     http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host            localhost:8080
+// @BasePath        /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 
 func main() {
 	// Initialize database (skip if not available for demo)
@@ -61,6 +83,9 @@ func main() {
 	r.GET("/test", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "root test works"})
 	})
+
+	// Swagger
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Seed endpoint to create initial super admin (for testing)
 	r.POST("/seed/superadmin", func(c *gin.Context) {
