@@ -199,6 +199,29 @@ export default function Plants() {
             </div>
           </div>
         </div>
+        
+      </div>
+       <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold sun-glow-text">Solar Plant Management</h1>
+          <p className="text-solar-muted mt-1">Monitor and manage all solar energy plants</p>
+        </div>
+        <div className="flex space-x-3">
+          <button
+            onClick={() => { fetchPlants() }}
+            className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>Refresh</span>
+          </button>
+          <button 
+            onClick={() => navigate('/plants/create')}
+            className="flex items-center space-x-2 px-4 py-2 bg-solar-success text-white font-semibold rounded-lg hover:bg-solar-success/80 transition sun-button"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Plant</span>
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
