@@ -206,6 +206,7 @@ func RunMigrations() error {
 		// Seed super admin if not exists
 		`INSERT OR IGNORE INTO users (id, email, password_hash, first_name, last_name, role)
 		VALUES ('00000000-0000-4000-a000-000000000001', 'superAdmin@solar.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Super', 'Admin', 'SUPER_ADMIN');`,
+<<<<<<< HEAD
 		// Create inventory table
 		`CREATE TABLE IF NOT EXISTS inventory_items (
 			id TEXT PRIMARY KEY,
@@ -223,6 +224,8 @@ func RunMigrations() error {
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
+=======
+>>>>>>> 8f0a5b0 (theme change)
 	}
 
 	for i, migration := range migrations {

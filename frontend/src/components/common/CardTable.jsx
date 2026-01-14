@@ -229,8 +229,8 @@ const CardTable = ({
                 {/* Left Section - Checkbox and Basic Info */}
                 <div className="flex items-start gap-4 flex-1 min-w-0">
                   <div className="flex items-start gap-3 shrink-0">
-                    <div
-                      data-prevent-expand
+                    <div 
+                      data-prevent-expand 
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Checkbox
@@ -307,7 +307,7 @@ const CardTable = ({
                 </div>
 
                 {/* Right Section - Actions and Expand Indicator */}
-                <div
+                <div 
                   className="flex items-center gap-2 shrink-0 ml-4"
                 >
                   {/* Expand Indicator - Clickable */}

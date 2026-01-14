@@ -34,8 +34,8 @@ function NotificationsPage() {
             ));
             notify.success('Marked as read');
         } catch (err) {
-            console.error(err);
-            notify.error("Signal corruption: Unable to update signal status.");
+      console.error(err);
+      notify.error("Signal corruption: Unable to update signal status.");
         }
     };
     const markAllAsRead = async () => {
@@ -54,8 +54,8 @@ function NotificationsPage() {
             setNotifications(notifications.filter(n => n.id !== id));
             notify.success('Notification deleted');
         } catch (err) {
-            console.error(err);
-            notify.error("Command rejected: Unable to purge transmission record.");
+      console.error(err);
+      notify.error("Command rejected: Unable to purge transmission record.");
         }
     };
 
@@ -102,9 +102,9 @@ function NotificationsPage() {
                 <div className="mb-10">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-6">
-                            <div className="w-16 h-16 solar-glass rounded-2xl flex items-center justify-center border border-solar-border/30">
-                                <Bell size={32} className="text-solar-yellow" />
-                            </div>
+                           <div className="w-16 h-16 solar-glass rounded-2xl flex items-center justify-center border border-solar-border/30">
+                             <Bell size={32} className="text-solar-yellow" />
+                           </div>
                             <div>
                                 <h1 className="text-3xl font-black text-solar-primary tracking-tight uppercase">Registry Comms</h1>
                                 <p className="text-solar-muted mt-1 font-medium italic">
@@ -119,8 +119,8 @@ function NotificationsPage() {
                                     className="sun-button px-6 py-2.5"
                                 >
                                     <div className="flex items-center gap-2 font-black uppercase tracking-tight text-xs">
-                                        <CheckCheck size={18} />
-                                        Sync All Read
+                                      <CheckCheck size={18} />
+                                      Sync All Read
                                     </div>
                                 </button>
                             )}
@@ -178,7 +178,7 @@ function NotificationsPage() {
                 ) : filteredNotifications.length === 0 ? (
                     <div className="text-center p-20 solar-glass rounded-3xl border border-solar-border/10 group">
                         <div className="w-20 h-20 bg-solar-panel/10 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-solar-border/30 group-hover:scale-110 transition-transform duration-500">
-                            <Bell size={48} className="text-solar-muted opacity-30 group-hover:opacity-60 transition-opacity" />
+                          <Bell size={48} className="text-solar-muted opacity-30 group-hover:opacity-60 transition-opacity" />
                         </div>
                         <h3 className="text-2xl font-black text-solar-primary mb-2 uppercase tracking-tight">Static Silence</h3>
                         <p className="text-solar-muted font-medium italic">
@@ -190,7 +190,7 @@ function NotificationsPage() {
                         {filteredNotifications.map((notification) => (
                             <div
                                 key={notification.id}
-                                className={`solar-glass rounded-2xl p-6 border-l-4 shadow-xl transition-all duration-300 hover:!bg-solar-yellow hover:!text-solar-dark hover:!shadow-solar-glow-yellow hover:!font-bold group ${getSeverityColor(notification.severity)
+                                className={`solar-glass rounded-2xl p-6 border-l-4 shadow-xl transition-all hover:translate-x-1 duration-300 ${getSeverityColor(notification.severity)
                                     } ${!notification.read ? 'border-solar-yellow shadow-solar-yellow/5' : 'border-transparent opacity-80'}`}
                             >
                                 <div className="flex items-start gap-6">
@@ -213,18 +213,19 @@ function NotificationsPage() {
                                                 </p>
                                             </div>
                                             <div className="shrink-0">
-                                                <span className={`text-[10px] font-black px-4 py-1 rounded-lg border uppercase tracking-[0.2em] ${notification.severity === 'CRITICAL' ? 'bg-solar-danger/20 text-solar-danger border-solar-danger/30' :
-                                                    notification.severity === 'HIGH' ? 'bg-solar-orange/20 text-solar-orange border-solar-orange/30' :
-                                                        notification.severity === 'MEDIUM' ? 'bg-solar-yellow/20 text-solar-yellow border-solar-yellow/30' :
-                                                            'bg-solar-success/20 text-solar-success border-solar-success/30'
-                                                    }`}>
+                                                <span className={`text-[10px] font-black px-4 py-1 rounded-lg border uppercase tracking-[0.2em] ${
+                                                  notification.severity === 'CRITICAL' ? 'bg-solar-danger/20 text-solar-danger border-solar-danger/30' : 
+                                                  notification.severity === 'HIGH' ? 'bg-solar-orange/20 text-solar-orange border-solar-orange/30' : 
+                                                  notification.severity === 'MEDIUM' ? 'bg-solar-yellow/20 text-solar-yellow border-solar-yellow/30' : 
+                                                  'bg-solar-success/20 text-solar-success border-solar-success/30'
+                                                }`}>
                                                     {notification.severity}
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/5">
                                             <div className="flex items-center text-[10px] font-black text-solar-muted uppercase tracking-widest italic opacity-60">
-                                                {formatTime(notification.created_at)}
+                                              {formatTime(notification.created_at)}
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 {!notification.read && (

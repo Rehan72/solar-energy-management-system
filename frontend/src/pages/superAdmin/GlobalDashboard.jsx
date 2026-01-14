@@ -332,21 +332,21 @@ export default function GlobalDashboard() {
         <h2 className="text-3xl font-black text-solar-primary mb-12 text-center tracking-tighter uppercase relative z-10">Regional Fleet Summary</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
           <div className="text-center group">
-            <div className="w-24 h-24 bg-linear-to-br from-solar-success/20 to-solar-success/5 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl transition-all duration-500 border border-solar-success/20">
+            <div className="w-24 h-24 bg-linear-to-br from-solar-success/20 to-solar-success/5 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-all duration-500 border border-solar-success/20">
               <Activity className="w-12 h-12 text-solar-success" />
             </div>
             <h3 className="text-xl font-black text-solar-primary mb-3 uppercase tracking-tight">Grid Resilience</h3>
             <p className="text-sm font-medium text-solar-muted leading-relaxed italic">All system nodes operating at 99.9% uptime with autonomous self-healing protocols.</p>
           </div>
           <div className="text-center group">
-            <div className="w-24 h-24 bg-linear-to-br from-solar-yellow/20 to-solar-orange/5 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl transition-all duration-500 border border-solar-yellow/20">
+            <div className="w-24 h-24 bg-linear-to-br from-solar-yellow/20 to-solar-orange/5 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-all duration-500 border border-solar-yellow/20">
               <TrendingUp className="w-12 h-12 text-solar-yellow" />
             </div>
             <h3 className="text-xl font-black text-solar-primary mb-3 uppercase tracking-tight">Spectral Yield</h3>
             <p className="text-sm font-medium text-solar-muted leading-relaxed italic">Harvesting energy at 94.2% efficiency threshold across the global decentralized fleet.</p>
           </div>
           <div className="text-center group">
-            <div className="w-24 h-24 bg-linear-to-br from-solar-panel/20 to-solar-panel/5 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl transition-all duration-500 border border-solar-panel/20">
+            <div className="w-24 h-24 bg-linear-to-br from-solar-panel/20 to-solar-panel/5 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-all duration-500 border border-solar-panel/20">
               <Globe className="w-12 h-12 text-solar-panel" />
             </div>
             <h3 className="text-xl font-black text-solar-primary mb-3 uppercase tracking-tight">Eco-Sync Data</h3>

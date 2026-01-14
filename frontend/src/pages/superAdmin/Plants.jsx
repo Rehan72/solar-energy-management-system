@@ -52,7 +52,7 @@ export default function Plants() {
       header: 'Plant Entity',
       cell: (row) => (
         <div className="flex items-center space-x-3 py-1">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-solar-panel to-blue-600 flex items-center justify-center shadow-lg transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-solar-panel to-blue-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
             <Zap className="w-5 h-5 text-white" />
           </div>
           <div className="flex flex-col">
