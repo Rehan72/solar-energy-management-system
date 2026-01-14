@@ -77,31 +77,35 @@ export default function Installers() {
     <div className="space-y-6 relative animate-fadeIn">
       {/* Loading overlay */}
       {loading && (
-        <div className="absolute inset-0 bg-solar-bg/80 z-50 flex flex-col items-center justify-center">
-          <SunLoader message="Loading installers..." size="large" />
+        <div className="absolute inset-0 bg-solar-bg/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-2xl transition-all duration-500">
+          <SunLoader message="Synchronizing field personnel data..." size="large" />
         </div>
       )}
 
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold sun-glow-text">Installer Management</h1>
-          <p className="text-solar-muted mt-1">Manage field installers and their assignments</p>
+          <h1 className="text-3xl font-black text-solar-primary tracking-tight uppercase">Personnel Registry</h1>
+          <p className="text-solar-muted mt-1 font-medium italic">Managing decentralized field intelligence and regional deployments.</p>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex space-x-4">
           <button
             onClick={fetchInstallers}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button"
+            className="sun-button px-6 py-2.5"
           >
-            <RefreshCw className="w-4 h-4" />
-            <span>Refresh</span>
+            <div className="flex items-center space-x-2">
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <span>Resync</span>
+            </div>
           </button>
           <button 
             onClick={() => navigate('/installers/create')}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-orange text-white font-semibold rounded-lg hover:bg-solar-orange/80 transition sun-button"
+            className="sun-button px-6 py-2.5 border-solar-orange/30 hover:border-solar-orange/50 shadow-solar-orange/10"
           >
-            <UserPlus className="w-4 h-4" />
-            <span>Add Installer</span>
+            <div className="flex items-center space-x-2">
+              <UserPlus className="w-4 h-4" />
+              <span>Deploy New Node</span>
+            </div>
           </button>
         </div>
       </div>
@@ -139,27 +143,27 @@ export default function Installers() {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-solar-card rounded-lg p-4 ">
-        <div className="flex flex-col md:flex-row gap-4">
+      <div className="solar-glass rounded-2xl p-6 group">
+        <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">
             <SearchBar
-              placeholder="Search installers by name or email..."
+              placeholder="Query personnel by designation or digital signature..."
               value={searchTerm}
               onChange={({ value }) => setSearchTerm(value)}
             />
           </div>
-          <div className="flex items-center space-x-2">
-            <Filter className="w-4 h-4 text-solar-muted" />
+          <div className="flex items-center space-x-4">
+            <Filter className="w-4 h-4 text-solar-muted group-hover:rotate-180 transition-transform duration-700" />
             <select
               value={filterRegion}
               onChange={(e) => setFilterRegion(e.target.value)}
-              className="px-3 py-2 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow"
+              className="solar-input min-w-[180px]"
             >
-              <option value="ALL">All Regions</option>
-              <option value="Delhi">Delhi</option>
-              <option value="Mumbai">Mumbai</option>
-              <option value="Patna">Patna</option>
-              <option value="Ahmedabad">Ahmedabad</option>
+              <option value="ALL">All Sectors</option>
+              <option value="Delhi">Sector: Delhi</option>
+              <option value="Mumbai">Sector: Mumbai</option>
+              <option value="Patna">Sector: Patna</option>
+              <option value="Ahmedabad">Sector: Ahmedabad</option>
             </select>
           </div>
         </div>

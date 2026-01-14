@@ -115,7 +115,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
         animate={isOpen ? "open" : "closed"}
         variants={sidebarVariants}
         className={`fixed lg:static z-50 top-0 left-0 h-screen flex flex-col
-          bg-solar-card/95 backdrop-blur-md text-solar-primary border-r border-solar-border shadow-xl
+          solar-glass text-solar-primary border-r border-solar-border
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}
       >
@@ -171,11 +171,10 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
               >
                 <Link
                   to={item.path}
-                  className={`flex items-center rounded-lg group relative backdrop-blur-sm overflow-hidden transition-all duration-300 ease-in-out ${active ? 'sun-button-active' : 'sun-button'
-                    } ${isOpen ? 'gap-3 px-3 py-3' : 'justify-center p-3'
-                    } ${active
-                      ? 'text-solar-yellow'
-                      : 'bg-solar-night/80 shadow-md border border-solar-border text-solar-muted hover:bg-solar-panel/20 hover:text-solar-primary hover:shadow-lg'
+                  className={`flex items-center rounded-xl group relative overflow-hidden transition-all duration-300 ease-in-out ${active
+                      ? 'bg-solar-yellow text-solar-dark shadow-solar-glow-yellow scale-[1.02] font-bold'
+                      : 'hover:bg-solar-yellow/10 hover:text-solar-yellow text-solar-muted'
+                    } ${isOpen ? 'gap-3 px-3 py-4' : 'justify-center p-3'
                     }`}
                   title={!isOpen ? item.name : ""}
                 >
@@ -222,7 +221,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
             whileTap={{ scale: 0.98 }}
             onClick={handleLogout}
             className={`flex items-center w-full rounded-lg group relative backdrop-blur-sm overflow-hidden transition-all duration-300 ease-in-out sun-button ${isOpen ? 'gap-3 px-3 py-3' : 'justify-center p-3'
-              } bg-solar-night/80 shadow-md border border-solar-border text-solar-muted hover:bg-red-500/20 hover:text-red-400 hover:shadow-lg`}
+              } bg-solar-night/80 shadow-md border border-solar-border text-solar-muted hover:bg-solar-danger/20 hover:text-solar-danger hover:shadow-lg`}
             title={!isOpen ? "Logout" : ""}
           >
             <motion.span

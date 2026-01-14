@@ -229,7 +229,7 @@ const CardTable = ({
               <div className="flex items-start justify-between">
                 {/* Left Section - Checkbox and Basic Info */}
                 <div className="flex items-start gap-4 flex-1 min-w-0">
-                  <div className="flex items-start gap-3 flex-shrink-0">
+                  <div className="flex items-start gap-3 shrink-0">
                     <div 
                       data-prevent-expand 
                       onClick={(e) => e.stopPropagation()}
@@ -281,25 +281,25 @@ const CardTable = ({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                       <div className="flex items-center gap-2 min-w-0">
-                        <Mail className="h-4 w-4 text-solar-orange flex-shrink-0" />
+                        <Mail className="h-4 w-4 text-solar-orange shrink-0" />
                         <span className="text-solar-muted truncate" title={user.email}>
                           {user.email}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 min-w-0">
-                        <Phone className="h-4 w-4 text-solar-orange flex-shrink-0" />
+                        <Phone className="h-4 w-4 text-solar-orange shrink-0" />
                         <span className="text-solar-muted truncate" title={user.phone}>
                           {user.phone}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 min-w-0">
-                        <MapPin className="h-4 w-4 text-solar-orange flex-shrink-0" />
+                        <MapPin className="h-4 w-4 text-solar-orange shrink-0" />
                         <span className="text-solar-muted truncate" title={user.address}>
                           {user.address}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 min-w-0">
-                        <Calendar className="h-4 w-4 text-solar-orange flex-shrink-0" />
+                        <Calendar className="h-4 w-4 text-solar-orange shrink-0" />
                         <span className="text-solar-muted truncate">
                           Joined {user.joinDate}
                         </span>
@@ -310,7 +310,7 @@ const CardTable = ({
 
                 {/* Right Section - Actions and Expand Indicator */}
                 <div 
-                  className="flex items-center gap-2 flex-shrink-0 ml-4"
+                  className="flex items-center gap-2 shrink-0 ml-4"
                 >
                   {/* Expand Indicator - Clickable */}
                   <button

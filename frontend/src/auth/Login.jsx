@@ -53,16 +53,7 @@ function Login() {
         type="button"
         onClick={handleLogin}
         disabled={loading}
-        className="
-          w-full h-11 text-base tracking-wide
-          bg-gradient-to-r from-solar-yellow to-solar-orange
-          text-solar-textPrimaryLight
-          border-0 rounded-lg
-          shadow-[0_0_20px_rgba(245,158,11,0.3)]
-          hover:shadow-[0_0_30px_rgba(245,158,11,0.5)]
-          hover:scale-[1.02]
-          transition-all duration-300
-        "
+        className="w-full h-11 sun-button"
       >
         {loading && (
           <span className="h-4 w-4 border-2 border-solar-dark border-t-transparent rounded-full animate-spin mr-2" />
@@ -93,29 +84,37 @@ export default Login;
 /* ================================
    🔌 SOLAR INPUT FIELD
 ================================ */
+import { Eye, EyeOff } from "lucide-react";
+
 function Field({ label, value, onChange, type, placeholder }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === "password";
+  const inputType = isPassword ? (showPassword ? "text" : "password") : type;
+
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-solar-primary dark:text-solar-yellow">
         {label}
       </label>
-      <Input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="
-          h-11
-          bg-solar-dark/80 dark:bg-solar-night/80
-          text-solar-primary dark:text-solar-textPrimaryDark
-          border border-solar-border dark:border-solar-border
-          focus:ring-2 focus:ring-solar-yellow focus:border-solar-yellow
-          placeholder:text-solar-muted/50
-          rounded-lg
-          transition-all duration-300
-        "
-        required
-      />
+      <div className="relative">
+        <Input
+          type={inputType}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="solar-input h-11 pr-10"
+          required
+        />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-solar-muted hover:text-solar-yellow transition-colors"
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

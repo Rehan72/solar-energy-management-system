@@ -136,7 +136,7 @@ export default function CreatePlant() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
-        <div className="bg-solar-card rounded-xl p-6">
+        <div className="solar-glass rounded-2xl p-8">
           <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
             <Zap className="w-5 h-5 text-solar-yellow mr-2" />
             Basic Information
@@ -150,7 +150,7 @@ export default function CreatePlant() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="e.g., Delhi Solar Farm Phase 1"
-                className={errors.name ? 'border-red-500' : ''}
+                className={`solar-input ${errors.name ? 'border-solar-danger' : ''}`}
               />
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
@@ -167,7 +167,7 @@ export default function CreatePlant() {
                   name="region_id"
                   value={formData.region_id}
                   onChange={handleChange}
-                  className={`w-full h-10 bg-solar-night/50 text-solar-primary border rounded-lg px-3 focus:outline-none focus:border-solar-yellow ${errors.region_id ? 'border-red-500' : 'border-solar-border'}`}
+                  className={`solar-input ${errors.region_id ? 'border-solar-danger' : ''}`}
                 >
                   <option value="">Select Region</option>
                   {regions.map(region => (
@@ -187,7 +187,7 @@ export default function CreatePlant() {
                 value={formData.location}
                 onChange={handleChange}
                 placeholder="e.g., Sector 15, Rohini, Delhi - 110085"
-                className={errors.location ? 'border-red-500' : ''}
+                className={`solar-input ${errors.location ? 'border-solar-danger' : ''}`}
               />
               {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
             </div>
@@ -200,14 +200,14 @@ export default function CreatePlant() {
                 onChange={handleChange}
                 placeholder="Optional description about the solar plant..."
                 rows={3}
-                className="w-full bg-solar-night/50 text-solar-primary border border-solar-border rounded-lg px-3 py-2 focus:outline-none focus:border-solar-yellow resize-none"
+                className="solar-input resize-none"
               />
             </div>
           </div>
         </div>
 
         {/* Capacity & Performance */}
-        <div className="bg-solar-card rounded-xl p-6 ">
+        <div className="solar-glass rounded-2xl p-8 ">
           <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
             <Battery className="w-5 h-5 text-solar-success mr-2" />
             Capacity & Performance
@@ -224,7 +224,7 @@ export default function CreatePlant() {
                 value={formData.capacity_kw}
                 onChange={handleChange}
                 placeholder="e.g., 1000"
-                className={errors.capacity_kw ? 'border-red-500' : ''}
+                className={`solar-input ${errors.capacity_kw ? 'border-solar-danger' : ''}`}
               />
               {errors.capacity_kw && <p className="text-red-500 text-sm mt-1">{errors.capacity_kw}</p>}
             </div>
@@ -239,6 +239,7 @@ export default function CreatePlant() {
                 value={formData.current_output_kw}
                 onChange={handleChange}
                 placeholder="e.g., 0"
+                className="solar-input"
               />
             </div>
             <div>
@@ -253,7 +254,7 @@ export default function CreatePlant() {
                 value={formData.efficiency}
                 onChange={handleChange}
                 placeholder="e.g., 85"
-                className={errors.efficiency ? 'border-red-500' : ''}
+                className={`solar-input ${errors.efficiency ? 'border-solar-danger' : ''}`}
               />
               {errors.efficiency && <p className="text-red-500 text-sm mt-1">{errors.efficiency}</p>}
             </div>
@@ -261,7 +262,7 @@ export default function CreatePlant() {
         </div>
 
         {/* Location Picker */}
-        <div className="bg-solar-card rounded-xl p-6">
+        <div className="solar-glass rounded-2xl p-8">
           <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
             <MapPin className="w-5 h-5 text-solar-orange mr-2" />
             Plant Location
@@ -275,7 +276,7 @@ export default function CreatePlant() {
         </div>
 
         {/* Status */}
-        <div className="bg-solar-card rounded-xl p-6">
+        <div className="solar-glass rounded-2xl p-8">
           <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
             <TrendingUp className="w-5 h-5 text-solar-primary mr-2" />
             Plant Status
@@ -322,14 +323,14 @@ export default function CreatePlant() {
           <Button
             type="button"
             onClick={() => navigate('/plants')}
-            className="bg-gray-500 text-white hover:bg-gray-600"
+            className="px-6 py-3 border border-solar-border text-solar-muted rounded-xl hover:bg-solar-yellow/10 transition-all duration-300"
           >
             Cancel
           </Button>
           <Button
             type="submit"
             disabled={loading}
-            className="bg-solar-yellow text-solar-dark hover:bg-solar-orange flex items-center space-x-2"
+            className="sun-button"
           >
             {loading ? (
               <>

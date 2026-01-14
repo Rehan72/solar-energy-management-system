@@ -1,0 +1,274 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/EnergyLayer.jsx
+  89:24  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  87 |             className="sparkle"
+  88 |             style={{
+> 89 |               left: `${Math.random() * 100}%`,
+     |                        ^^^^^^^^^^^^^ Cannot call impure function
+  90 |               top: `${Math.random() * 100}%`,
+  91 |               animationDelay: `${Math.random() * 5}s`,
+  92 |               animationDuration: `${2 + Math.random() * 3}s`  react-hooks/purity
+  90:23  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  88 |             style={{
+  89 |               left: `${Math.random() * 100}%`,
+> 90 |               top: `${Math.random() * 100}%`,
+     |                       ^^^^^^^^^^^^^ Cannot call impure function
+  91 |               animationDelay: `${Math.random() * 5}s`,
+  92 |               animationDuration: `${2 + Math.random() * 3}s`
+  93 |             }}                    react-hooks/purity
+  91:34  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  89 |               left: `${Math.random() * 100}%`,
+  90 |               top: `${Math.random() * 100}%`,
+> 91 |               animationDelay: `${Math.random() * 5}s`,
+     |                                  ^^^^^^^^^^^^^ Cannot call impure function
+  92 |               animationDuration: `${2 + Math.random() * 3}s`
+  93 |             }}
+  94 |           />                 react-hooks/purity
+  92:41  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  90 |               top: `${Math.random() * 100}%`,
+  91 |               animationDelay: `${Math.random() * 5}s`,
+> 92 |               animationDuration: `${2 + Math.random() * 3}s`
+     |                                         ^^^^^^^^^^^^^ Cannot call impure function
+  93 |             }}
+  94 |           />
+  95 |         ))}                                             react-hooks/purity
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/FloatingParticles.jsx
+  22:5  warning  Compilation Skipped: Inline `class` declarations are not supported
+
+Move class declarations outside of components/hooks.
+
+  20 |
+  21 |     // Particle class
+> 22 |     class Particle {
+     |     ^^^^^^^^^^^^^^^^
+> 23 |       constructor() {
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 24 |         this.reset();
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 59 |       }
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 60 |     }
+     | ^^^^^^ Inline `class` declarations are not supported
+  61 |
+  62 |     // Initialize particles
+  63 |     const initParticles = () => {
+
+  react-hooks/unsupported-syntax
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/LocationMap.jsx
+  54:7  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  52 |         longitude: initialLocation.longitude
+  53 |       }
+> 54 |       setCoordinates(newCoords)
+     |       ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  55 |       
+  56 |       if (mapInstanceRef.current) {
+  57 |         updateMarker(initialLocation.latitude, initialLocation.longitude)  react-hooks/set-state-in-effect
+  61:6  warning  React Hook useEffect has a missing dependency: 'updateMarker'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-hooks/exhaustive-deps
+  69:6  warning  React Hook useEffect has a missing dependency: 'updateMarker'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-hooks/exhaustive-deps
+  95:6  warning  React Hook useEffect has missing dependencies: 'coordinates.latitude', 'coordinates.longitude', 'updateCoordinates', and 'updateMarker'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react-hooks/exhaustive-deps
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/LocationPicker.jsx
+  208:6  warning  React Hook useEffect has a missing dependency: 'updateDropdownPosition'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  216:6  warning  React Hook useEffect has a missing dependency: 'updateDropdownPosition'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/Navbar.jsx
+  4:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/NotificationBell.jsx
+  46:18  error  'error' is defined but never used  no-unused-vars
+  67:18  error  'error' is defined but never used  no-unused-vars
+  78:18  error  'error' is defined but never used  no-unused-vars
+  88:18  error  'error' is defined but never used  no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/SolarMap.jsx
+   8:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                      no-unused-vars
+  33:10  error    'selectedPlant' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                      no-unused-vars
+  64:6   warning  React Hook useEffect has a missing dependency: 'fetchHierarchy'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/SunCanvas.jsx
+  26:9  error  'raysRotate' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/ThemeToggle.jsx
+  13:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  11 |                    (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  12 |     
+> 13 |     setDarkMode(isDark);
+     |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  14 |     if (isDark) {
+  15 |       document.documentElement.classList.add('dark');
+  16 |     }  react-hooks/set-state-in-effect
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/common/UserForm.jsx
+  48:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  46 |   useEffect(() => {
+  47 |     if (user) {
+> 48 |       setFormData({
+     |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  49 |         first_name: user.first_name || '',
+  50 |         last_name: user.last_name || '',
+  51 |         email: user.email || '',  react-hooks/set-state-in-effect
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/dashboards/AdminDashboard.jsx
+  39:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  37 |       return
+  38 |     }
+> 39 |     setUser(JSON.parse(localStorage.getItem('user')))
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  40 |     fetchUsers()
+  41 |     fetchAnalytics()
+  42 |   }, [token, navigate])  react-hooks/set-state-in-effect
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/dashboards/FinancialWidget.jsx
+  1:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/dashboards/LivePowerDashboard.jsx
+    8:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                  no-unused-vars
+  104:9   error  'getAlertColor' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/dashboards/SuperAdminDashboard.jsx
+  48:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  46 |     const storedUser = localStorage.getItem('user')
+  47 |     if (storedUser) {
+> 48 |       setUser(JSON.parse(storedUser))
+     |       ^^^^^^^ Avoid calling setState() directly within an effect
+  49 |     }
+  50 |     fetchStats()
+  51 |   }, [token, navigate])  react-hooks/set-state-in-effect
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/dashboards/TicketList.jsx
+   2:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                    no-unused-vars
+  27:8   warning  React Hook useEffect has a missing dependency: 'fetchTickets'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/dashboards/UserDashboard.jsx
+   3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u          no-unused-vars
+  22:9   error  'token' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/ui/badge.jsx
+  34:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/ui/button.jsx
+  72:18  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/components/ui/stat-card.jsx
+  2:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/contexts/ThemeContext.jsx
+  5:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/lib/toast.jsx
+   8:7   error  Fast refresh only works when a file only exports components. Move your component(s) to a separate file  react-refresh/only-export-components
+  24:24  error  'labelColor' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u              no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/Dashboard.jsx
+  19:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  17 |     }
+  18 |     const userData = JSON.parse(localStorage.getItem('user'))
+> 19 |     setUser(userData)
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  20 |
+  21 |     if (userData && userData.role === 'USER' && !userData.property_type) {
+  22 |       navigate('/solar-onboarding')  react-hooks/set-state-in-effect
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/superAdmin/AdminAnalytics.jsx
+   3:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                  no-unused-vars
+  31:14  error    'error' is defined but never used                                                                              no-unused-vars
+  52:6   warning  React Hook useEffect has a missing dependency: 'fetchStats'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  75:9   error    'regionData' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                     no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/superAdmin/AdminEdit.jsx
+  5:10  error  'notify' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/superAdmin/GlobalDashboard.jsx
+   3:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                    no-unused-vars
+  83:6   warning  React Hook useEffect has a missing dependency: 'fetchRegions'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/superAdmin/Plants.jsx
+  144:6  warning  React Hook useMemo has a missing dependency: 'handleDeletePlant'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/superAdmin/Users.jsx
+  17:10  error  'installers' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/tool/SolarSimulator.jsx
+  172:38  warning  The ref value 'timers.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'timers.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+  326:27  error    'IconComponent' is defined but never used                                                                                                                                                                                                                    no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/user/EnergyAnalytics.jsx
+  28:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  26 |
+  27 |   useEffect(() => {
+> 28 |     fetchData()
+     |     ^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |   }, [fetchData])
+  30 |
+  31 |   // Sample data when API is not available  react-hooks/set-state-in-effect
+
+✖ 50 problems (38 errors, 12 warnings)
+

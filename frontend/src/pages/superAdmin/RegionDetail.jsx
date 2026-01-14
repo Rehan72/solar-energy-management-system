@@ -40,19 +40,14 @@ export default function RegionDetail() {
     }
   }, [id, navigate])
 
-  const getStatusBadgeColor = (status) => {
-    switch (status) {
-      case 'ACTIVE': return 'bg-green-500/20 text-green-400 border border-green-500/30'
-      case 'INACTIVE': return 'bg-red-500/20 text-red-400 border border-red-500/30'
-      case 'MAINTENANCE': return 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-      default: return 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-    }
-  }
+
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-solar-yellow border-t-transparent"></div>
+      <div className="space-y-6 relative min-h-[400px]">
+        <div className="absolute inset-0 bg-solar-bg/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-2xl transition-all duration-500">
+          <SunLoader message="Synchronizing regional grid data..." size="large" fullscreen={false} />
+        </div>
       </div>
     )
   }
@@ -68,22 +63,26 @@ export default function RegionDetail() {
         <div className="flex items-center space-x-4">
           <button 
             onClick={() => navigate('/regions')}
-            className="p-2 rounded-lg hover:bg-solar-panel/20 transition"
+            className="p-2 solar-glass rounded-lg hover:bg-solar-panel/20 transition-all"
           >
-            <ArrowLeft className="w-5 h-5 text-solar-muted" />
+            <ArrowLeft className="w-5 h-5 text-solar-primary" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold sun-glow-text">{region.name}</h1>
-            <p className="text-solar-muted mt-1">Region Details</p>
+            <h1 className="text-3xl font-black text-solar-primary tracking-tight uppercase">
+              {region.name} <span className="text-solar-orange ml-2 text-sm font-black tracking-widest">[REG-NODE-{region.id?.toString().slice(-4)}]</span>
+            </h1>
+            <p className="text-solar-muted mt-1 font-medium italic">Regional Infrastructure Oversight</p>
           </div>
         </div>
-        <Button
+        <button
           onClick={() => navigate(`/regions/${id}/edit`)}
-          className="bg-solar-yellow text-solar-dark hover:bg-solar-orange flex items-center space-x-2"
+          className="sun-button px-6 py-2.5"
         >
-          <Edit className="w-4 h-4" />
-          <span>Edit Region</span>
-        </Button>
+          <div className="flex items-center space-x-2">
+            <Edit className="w-4 h-4" />
+            <span>Update Regional Parameters</span>
+          </div>
+        </button>
       </div>
 
       {/* Stats Cards */}
@@ -121,82 +120,85 @@ export default function RegionDetail() {
       {/* Region Details */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Basic Information */}
-        <div className="bg-solar-card rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <Globe className="w-5 h-5 text-solar-yellow mr-2" />
-            Basic Information
+        <div className="solar-glass rounded-2xl p-6 group">
+          <h2 className="text-lg font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+            <Globe className="w-5 h-5 text-solar-yellow mr-3 group-hover:rotate-12 transition-transform" />
+            Geographical Intelligence
           </h2>
           <div className="space-y-4">
-            <div className="flex justify-between items-center border-b border-solar-border pb-2">
-              <span className="text-solar-muted">Region Name</span>
-              <span className="text-solar-primary font-semibold">{region.name}</span>
+            <div className="flex justify-between items-center border-b border-solar-border/30 pb-3">
+              <span className="text-xs font-bold text-solar-muted uppercase">Sector Designation</span>
+              <span className="text-sm font-black text-solar-primary">{region.name}</span>
             </div>
-            <div className="flex justify-between items-center border-b border-solar-border pb-2">
-              <span className="text-solar-muted">State/Province</span>
-              <span className="text-solar-primary">{region.state}</span>
+            <div className="flex justify-between items-center border-b border-solar-border/30 pb-3">
+              <span className="text-xs font-bold text-solar-muted uppercase">State Jurisdiction</span>
+              <span className="text-sm font-black text-solar-primary">{region.state}</span>
             </div>
-            <div className="flex justify-between items-center border-b border-solar-border pb-2">
-              <span className="text-solar-muted">Country</span>
-              <span className="text-solar-primary">{region.country}</span>
+            <div className="flex justify-between items-center border-b border-solar-border/30 pb-3">
+              <span className="text-xs font-bold text-solar-muted uppercase">Sovereign Territory</span>
+              <span className="text-sm font-black text-solar-primary">{region.country}</span>
             </div>
-            <div className="flex justify-between items-center border-b border-solar-border pb-2">
-              <span className="text-solar-muted">Timezone</span>
-              <span className="text-solar-orange">{region.timezone}</span>
+            <div className="flex justify-between items-center border-b border-solar-border/30 pb-3">
+              <span className="text-xs font-bold text-solar-muted uppercase">Temporal Alignment</span>
+              <span className="text-sm font-black text-solar-orange">{region.timezone}</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-solar-muted">Status</span>
-              <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(region.status)}`}>
-                {region.status || 'ACTIVE'}
-              </span>
+            <div className="flex justify-between items-center pt-1">
+              <span className="text-xs font-bold text-solar-muted uppercase">Operational State</span>
+              <div className={`flex items-center space-x-2 px-3 py-1 rounded-lg border ${region.status === 'ACTIVE' 
+                ? 'bg-solar-success/10 text-solar-success border-solar-success/20' 
+                : 'bg-solar-warning/10 text-solar-warning border-solar-warning/20'}`}>
+                <div className={`w-1.5 h-1.5 rounded-full ${region.status === 'ACTIVE' ? 'bg-solar-success' : 'bg-solar-warning'}`}></div>
+                <span className="text-[10px] font-black uppercase tracking-widest">{region.status || 'ACTIVE'}</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Location & Description */}
-        <div className="bg-solar-card rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <MapPin className="w-5 h-5 text-solar-orange mr-2" />
-            Location & Description
+        <div className="solar-glass rounded-2xl p-6 group">
+          <h2 className="text-lg font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+            <MapPin className="w-5 h-5 text-solar-orange mr-3 group-hover:scale-110 transition-transform" />
+            Deployment Metadata
           </h2>
           <div className="space-y-4">
             {region.description && (
-              <div className="border-b border-solar-border pb-2">
-                <span className="text-solar-muted block mb-1">Description</span>
-                <p className="text-solar-primary">{region.description}</p>
+              <div className="border-b border-solar-border/30 pb-3">
+                <span className="text-xs font-bold text-solar-muted uppercase block mb-2">Architectural Brief</span>
+                <p className="text-sm font-medium text-solar-muted italic leading-relaxed">{region.description}</p>
               </div>
             )}
-            <div className="flex justify-between items-center border-b border-solar-border pb-2">
-              <span className="text-solar-muted">Latitude</span>
-              <span className="text-solar-primary">{region.latitude || 'N/A'}</span>
+            <div className="flex justify-between items-center border-b border-solar-border/30 pb-3">
+              <span className="text-xs font-bold text-solar-muted uppercase">Latitudinal Point</span>
+              <span className="text-sm font-black text-solar-primary">{region.latitude || 'N/A'}</span>
             </div>
-            <div className="flex justify-between items-center border-b border-solar-border pb-2">
-              <span className="text-solar-muted">Longitude</span>
-              <span className="text-solar-primary">{region.longitude || 'N/A'}</span>
+            <div className="flex justify-between items-center border-b border-solar-border/30 pb-3">
+              <span className="text-xs font-bold text-solar-muted uppercase">Longitudinal Point</span>
+              <span className="text-sm font-black text-solar-primary">{region.longitude || 'N/A'}</span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-solar-muted">Region ID</span>
-              <span className="text-solar-muted text-xs">{region.id}</span>
+            <div className="flex justify-between items-center pt-1">
+              <span className="text-xs font-bold text-solar-muted uppercase">System Registry ID</span>
+              <span className="text-[10px] font-black text-solar-muted font-mono">{region.id}</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Timestamps */}
-      <div className="bg-solar-card rounded-xl p-6">
-        <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-          <Calendar className="w-5 h-5 text-solar-success mr-2" />
-          Timeline
+      <div className="solar-glass rounded-2xl p-6 group">
+        <h2 className="text-lg font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+          <Calendar className="w-5 h-5 text-solar-success mr-3 group-hover:scale-110 transition-transform" />
+          Infrastructure Timeline
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex justify-between items-center">
-            <span className="text-solar-muted">Created At</span>
-            <span className="text-solar-primary">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="flex justify-between items-center p-4 bg-solar-night/30 rounded-xl border border-solar-border/10">
+            <span className="text-xs font-bold text-solar-muted uppercase">Registry Event</span>
+            <span className="text-sm font-black text-solar-primary">
               {region.created_at ? new Date(region.created_at).toLocaleString() : 'N/A'}
             </span>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-solar-muted">Last Updated</span>
-            <span className="text-solar-primary">
+          <div className="flex justify-between items-center p-4 bg-solar-night/30 rounded-xl border border-solar-border/10">
+            <span className="text-xs font-bold text-solar-muted uppercase">Last Synchronization</span>
+            <span className="text-sm font-black text-solar-yellow">
               {region.updated_at ? new Date(region.updated_at).toLocaleString() : 'N/A'}
             </span>
           </div>
@@ -204,15 +206,14 @@ export default function RegionDetail() {
       </div>
 
       {/* Back Button */}
-      <div className="flex justify-start">
-        <Button
-          type="button"
+      <div className="flex justify-start pt-4">
+        <button
           onClick={() => navigate('/regions')}
-          className="bg-solar-card text-solar-primary hover:bg-solar-panel/20"
+          className="flex items-center space-x-2 px-6 py-2.5 solar-glass rounded-xl text-solar-primary font-black uppercase tracking-widest text-[10px] hover:bg-solar-panel/10 transition-all border border-solar-border/30"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Regions
-        </Button>
+          Return to Regional Fleet
+        </button>
       </div>
     </div>
   )

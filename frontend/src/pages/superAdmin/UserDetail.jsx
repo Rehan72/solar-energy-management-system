@@ -59,22 +59,9 @@ export default function UserDetail() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => navigate('/users')}
-            className="p-2 bg-solar-card rounded-lg hover:bg-solar-panel/20 transition"
-          >
-            <ArrowLeft className="w-5 h-5 text-solar-primary" />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold sun-glow-text">User Details</h1>
-            <p className="text-solar-muted mt-1">View user information</p>
-          </div>
-        </div>
-        <div className="bg-solar-card rounded-lg p-8 energy-card text-center">
-          <div className="animate-spin w-8 h-8 border-2 border-solar-yellow border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-solar-muted">Loading user details...</p>
+      <div className="space-y-6 relative min-h-[400px]">
+        <div className="absolute inset-0 bg-solar-bg/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-2xl transition-all duration-500">
+          <SunLoader message="Acquiring personnel profile..." size="large" />
         </div>
       </div>
     )
@@ -86,80 +73,97 @@ export default function UserDetail() {
         <div className="flex items-center space-x-4">
           <button
             onClick={() => navigate('/users')}
-            className="p-2 bg-solar-card rounded-lg hover:bg-solar-panel/20 transition"
+            className="p-2 solar-glass rounded-lg hover:bg-solar-panel/20 transition-all border border-solar-border/30"
           >
             <ArrowLeft className="w-5 h-5 text-solar-primary" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold sun-glow-text">User Details</h1>
-            <p className="text-solar-muted mt-1">View user information</p>
+            <h1 className="text-3xl font-black text-solar-primary tracking-tight uppercase">Profile Lost</h1>
+            <p className="text-solar-muted mt-1 font-medium italic">Signal termination or invalid reference.</p>
           </div>
         </div>
-        <div className="bg-solar-card rounded-lg p-8 energy-card text-center">
-          <p className="text-solar-danger">{error || 'User not found'}</p>
+        <div className="solar-glass rounded-2xl p-12 text-center border-solar-danger/20">
+          <p className="text-solar-danger font-black uppercase tracking-tight">{error || 'Node identification failed'}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
             onClick={() => navigate('/users')}
-            className="p-2 bg-solar-card rounded-lg hover:bg-solar-panel/20 transition"
+            className="p-2 solar-glass rounded-lg hover:bg-solar-panel/20 transition-all border border-solar-border/30"
           >
             <ArrowLeft className="w-5 h-5 text-solar-primary" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold sun-glow-text">User Details</h1>
-            <p className="text-solar-muted mt-1">View user information</p>
+            <h1 className="text-3xl font-black text-solar-primary tracking-tight uppercase">Personnel Profile</h1>
+            <p className="text-solar-muted mt-1 font-medium italic">Complete overview of decentralized personnel node.</p>
           </div>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex space-x-4">
           <button
             onClick={() => navigate(`/users/${id}/edit`)}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button"
+            className="sun-button px-6 py-2.5"
           >
-            <Edit className="w-4 h-4" />
-            <span>Edit</span>
+            <div className="flex items-center space-x-2">
+              <Edit className="w-4 h-4" />
+              <span>Modify Protocol</span>
+            </div>
           </button>
           <button
             onClick={handleDelete}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-danger text-white font-semibold rounded-lg hover:bg-solar-danger/80 transition sun-button"
+            className="sun-button px-6 py-2.5 border-solar-danger/30 hover:border-solar-danger/50 shadow-solar-danger/10"
           >
-            <Trash2 className="w-4 h-4" />
-            <span>Delete</span>
+            <div className="flex items-center space-x-2">
+              <Trash2 className="w-4 h-4" />
+              <span>Terminate Access</span>
+            </div>
           </button>
         </div>
       </div>
 
       {/* User Profile Card */}
-      <div className="bg-solar-card rounded-lg p-6 energy-card">
-        <div className="flex items-start space-x-6">
+      <div className="solar-glass rounded-3xl p-8 group relative overflow-hidden border-solar-panel/10">
+        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+          <Users className="w-48 h-48 text-solar-yellow" />
+        </div>
+        <div className="flex items-center space-x-8 relative z-10">
           {/* Avatar */}
-          <div className="w-24 h-24 bg-solar-yellow rounded-full flex items-center justify-center flex-shrink-0">
-            <span className="text-solar-dark text-3xl font-bold">
-              {user.first_name?.charAt(0)?.toUpperCase() || user.email.charAt(0).toUpperCase()}
-            </span>
+          <div className="relative group/avatar">
+            <div className="w-28 h-28 bg-linear-to-br from-solar-panel to-solar-yellow rounded-2xl flex items-center justify-center shrink-0 shadow-2xl group-hover/avatar:scale-105 transition-transform duration-500 border border-solar-yellow/20">
+              <span className="text-solar-bg text-4xl font-black">
+                {user.first_name?.charAt(0)?.toUpperCase() || user.email.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-solar-success rounded-lg border-4 border-solar-bg flex items-center justify-center shadow-lg">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+            </div>
           </div>
 
           {/* User Info */}
           <div className="flex-1">
-            <div className="flex items-center space-x-3 mb-2">
-              <h2 className="text-2xl font-bold text-solar-primary">
+            <div className="flex items-center space-x-4 mb-3">
+              <h2 className="text-3xl font-black text-solar-primary tracking-tighter uppercase italic">
                 {user.first_name} {user.last_name}
               </h2>
-              <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className={`px-4 py-1 text-[10px] font-black rounded-lg uppercase tracking-widest border border-white/10 ${getRoleBadgeColor(user.role)}`}>
                 {user.role}
               </span>
-              <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusBadgeColor(user.status)}`}>
+              <span className={`px-4 py-1 text-[10px] font-black rounded-lg uppercase tracking-widest border border-white/10 ${getStatusBadgeColor(user.status)}`}>
                 {user.status || 'ACTIVE'}
               </span>
             </div>
-            <p className="text-solar-muted">{user.email}</p>
+            <div className="mt-4 flex items-center text-solar-muted">
+              <Mail className="w-4 h-4 mr-2 text-solar-yellow" />
+              <span className="font-medium italic">{user.email}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -167,91 +171,91 @@ export default function UserDetail() {
       {/* Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Personal Information */}
-        <div className="bg-solar-card rounded-lg p-6 energy-card">
-          <h3 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <User className="w-5 h-5 mr-2 text-solar-yellow" />
-            Personal Information
+        <div className="solar-glass rounded-2xl p-6 border-solar-panel/10">
+          <h3 className="text-xs font-black text-solar-primary mb-6 flex items-center tracking-tight uppercase italic decoration-solar-yellow decoration-2 underline-offset-4 underline">
+            <User className="w-4 h-4 mr-3 text-solar-yellow" />
+            Personnel Identity
           </h3>
           <div className="space-y-4">
-            <div className="flex justify-between items-center py-2 border-b border-solar-border">
-              <span className="text-solar-muted">First Name</span>
-              <span className="text-solar-primary font-medium">{user.first_name || 'N/A'}</span>
+            <div className="flex justify-between items-center py-3 border-b border-solar-border/30">
+              <span className="text-[10px] font-black text-solar-muted uppercase tracking-widest">First Name</span>
+              <span className="text-sm font-black text-solar-primary uppercase">{user.first_name || 'N/A'}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-solar-border">
-              <span className="text-solar-muted">Last Name</span>
-              <span className="text-solar-primary font-medium">{user.last_name || 'N/A'}</span>
+            <div className="flex justify-between items-center py-3 border-b border-solar-border/30">
+              <span className="text-[10px] font-black text-solar-muted uppercase tracking-widest">Last Name</span>
+              <span className="text-sm font-black text-solar-primary uppercase">{user.last_name || 'N/A'}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-solar-border">
-              <span className="text-solar-muted">Email</span>
-              <span className="text-solar-primary font-medium">{user.email}</span>
+            <div className="flex justify-between items-center py-3 border-b border-solar-border/30">
+              <span className="text-[10px] font-black text-solar-muted uppercase tracking-widest">Email Hash</span>
+              <span className="text-sm font-black text-solar-primary lowercase">{user.email}</span>
             </div>
           </div>
         </div>
 
         {/* Account Information */}
-        <div className="bg-solar-card rounded-lg p-6 energy-card">
-          <h3 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <Shield className="w-5 h-5 mr-2 text-solar-yellow" />
-            Account Information
+        <div className="solar-glass rounded-2xl p-6 border-solar-panel/10">
+          <h3 className="text-xs font-black text-solar-primary mb-6 flex items-center tracking-tight uppercase italic decoration-solar-yellow decoration-2 underline-offset-4 underline">
+            <Shield className="w-4 h-4 mr-3 text-solar-yellow" />
+            Security protocols
           </h3>
           <div className="space-y-4">
-            <div className="flex justify-between items-center py-2 border-b border-solar-border">
-              <span className="text-solar-muted">Role</span>
-              <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
+            <div className="flex justify-between items-center py-3 border-b border-solar-border/30">
+              <span className="text-[10px] font-black text-solar-muted uppercase tracking-widest">Role Rank</span>
+              <span className={`px-4 py-1 text-[10px] font-black rounded-lg uppercase tracking-widest border border-white/10 ${getRoleBadgeColor(user.role)}`}>
                 {user.role}
               </span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-solar-border">
-              <span className="text-solar-muted">Status</span>
-              <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusBadgeColor(user.status)}`}>
+            <div className="flex justify-between items-center py-3 border-b border-solar-border/30">
+              <span className="text-[10px] font-black text-solar-muted uppercase tracking-widest">Current Status</span>
+              <span className={`px-4 py-1 text-[10px] font-black rounded-lg uppercase tracking-widest border border-white/10 ${getStatusBadgeColor(user.status)}`}>
                 {user.status || 'ACTIVE'}
               </span>
             </div>
             {user.admin_id && (
-              <div className="flex justify-between items-center py-2 border-b border-solar-border">
-                <span className="text-solar-muted">Admin ID</span>
-                <span className="text-solar-primary font-medium text-sm">{user.admin_id}</span>
+              <div className="flex justify-between items-center py-3 border-b border-solar-border/30">
+                <span className="text-[10px] font-black text-solar-muted uppercase tracking-widest">Admin Nexus</span>
+                <span className="text-xs font-black text-solar-primary uppercase tracking-tighter">{user.admin_id}</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Timestamps */}
-        <div className="bg-solar-card rounded-lg p-6 energy-card">
-          <h3 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <Calendar className="w-5 h-5 mr-2 text-solar-yellow" />
-            Timestamps
+        <div className="solar-glass rounded-2xl p-6 border-solar-panel/10">
+          <h3 className="text-xs font-black text-solar-primary mb-6 flex items-center tracking-tight uppercase italic decoration-solar-yellow decoration-2 underline-offset-4 underline">
+            <Calendar className="w-4 h-4 mr-3 text-solar-yellow" />
+            Registry Chronology
           </h3>
           <div className="space-y-4">
-            <div className="flex justify-between items-center py-2 border-b border-solar-border">
-              <span className="text-solar-muted">Created At</span>
-              <span className="text-solar-primary font-medium">
-                {user.created_at ? new Date(user.created_at).toLocaleString() : 'N/A'}
+            <div className="flex justify-between items-center py-3 border-b border-solar-border/30">
+              <span className="text-[10px] font-black text-solar-muted uppercase tracking-widest">Initialization</span>
+              <span className="text-sm font-black text-solar-primary uppercase">
+                {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
               </span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-solar-border">
-              <span className="text-solar-muted">Updated At</span>
-              <span className="text-solar-primary font-medium">
-                {user.updated_at ? new Date(user.updated_at).toLocaleString() : 'N/A'}
+            <div className="flex justify-between items-center py-3 border-b border-solar-border/30">
+              <span className="text-[10px] font-black text-solar-muted uppercase tracking-widest">Last Calibration</span>
+              <span className="text-sm font-black text-solar-primary uppercase">
+                {user.updated_at ? new Date(user.updated_at).toLocaleDateString() : 'N/A'}
               </span>
             </div>
           </div>
         </div>
 
         {/* Additional Info */}
-        <div className="bg-solar-card rounded-lg p-6 energy-card">
-          <h3 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <MapPin className="w-5 h-5 mr-2 text-solar-yellow" />
-            Additional Info
+        <div className="solar-glass rounded-2xl p-6 border-solar-panel/10">
+          <h3 className="text-xs font-black text-solar-primary mb-6 flex items-center tracking-tight uppercase italic decoration-solar-yellow decoration-2 underline-offset-4 underline">
+            <MapPin className="w-4 h-4 mr-3 text-solar-yellow" />
+            Geospatial metadata
           </h3>
           <div className="space-y-4">
-            <div className="flex justify-between items-center py-2 border-b border-solar-border">
-              <span className="text-solar-muted">User ID</span>
-              <span className="text-solar-primary font-medium text-sm">{user.id}</span>
+            <div className="flex justify-between items-center py-3 border-b border-solar-border/30">
+              <span className="text-[10px] font-black text-solar-muted uppercase tracking-widest">Node ID</span>
+              <span className="text-xs font-black text-solar-primary uppercase tracking-tighter">{user.id}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-solar-border">
-              <span className="text-solar-muted">Region</span>
-              <span className="text-solar-primary font-medium">{user.region || 'Not assigned'}</span>
+            <div className="flex justify-between items-center py-3 border-b border-solar-border/30">
+              <span className="text-[10px] font-black text-solar-muted uppercase tracking-widest">Jurisdiction</span>
+              <span className="text-sm font-black text-solar-primary uppercase">{user.region || 'Unassigned'}</span>
             </div>
           </div>
         </div>

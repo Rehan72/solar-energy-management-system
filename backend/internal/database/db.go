@@ -24,9 +24,9 @@ func InitDB() error {
 	}
 
 	// Optimize connection pool for SQLite
-	// Increased to 10 to prevent deadlocks during nested queries (e.g., Scan calling lookup)
-	DB.SetMaxOpenConns(10)
-	DB.SetMaxIdleConns(10)
+	// Set to 1 for modernc.org/sqlite to prevent locking/corruption under high concurrency
+	DB.SetMaxOpenConns(1)
+	DB.SetMaxIdleConns(1)
 	DB.SetConnMaxLifetime(time.Hour)
 
 	// Enable WAL mode and Busy Timeout

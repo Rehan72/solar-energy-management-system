@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Shield, ArrowLeft, User, Mail, MapPin, Lock, CheckCircle, Edit, Eye, EyeOff } from 'lucide-react'
 import LocationPicker from '../../components/LocationPicker'
@@ -15,7 +15,6 @@ export default function CreateAdmin() {
   
   const isEditMode = !!id && !viewParam
   const isViewMode = viewParam === 'true'
-  const token = localStorage.getItem('token')
 
   const [formData, setFormData] = useState({
     first_name: '',
@@ -64,13 +63,7 @@ export default function CreateAdmin() {
   ]
 
   // Fetch admin data for edit/view mode
-  useEffect(() => {
-    if (id) {
-      fetchAdminData()
-    }
-  }, [id])
-
-  const fetchAdminData = async () => {
+  const fetchAdminData = useCallback(async () => {
     setInitialLoading(true)
     try {
       const response = await getRequest(`/superadmin/admins/${id}`)
@@ -98,7 +91,13 @@ export default function CreateAdmin() {
     } finally {
       setInitialLoading(false)
     }
-  }
+  }, [id])
+
+  useEffect(() => {
+    if (id) {
+      fetchAdminData()
+    }
+  }, [id, fetchAdminData])
 
   const handleChange = (field, value) => {
     if (isViewMode) return
@@ -235,7 +234,7 @@ export default function CreateAdmin() {
         <div className="flex items-center space-x-4 mb-6">
           <button
             onClick={() => navigate('/admins')}
-            className="p-2 bg-solar-card rounded-lg hover:bg-solar-panel/20"
+            className="p-2 border border-solar-border rounded-lg hover:bg-solar-yellow/10 transition-all duration-300"
           >
             <ArrowLeft className="w-5 h-5 text-solar-primary" />
           </button>
@@ -244,8 +243,8 @@ export default function CreateAdmin() {
             <p className="text-solar-muted mt-1">Fetching admin data</p>
           </div>
         </div>
-        <div className="bg-solar-card rounded-lg p-8 w-full flex flex-col items-center justify-center h-64">
-          <SunLoader message="Loading admin data..." size="large" />
+        <div className="solar-glass rounded-2xl p-8 w-full flex flex-col items-center justify-center h-64 relative">
+          <SunLoader message="Loading admin data..." size="large" fullscreen={false} />
         </div>
       </div>
     )
@@ -257,7 +256,7 @@ export default function CreateAdmin() {
         <div className="flex items-center space-x-4 mb-6">
           <button
             onClick={() => navigate('/admins')}
-            className="p-2 bg-solar-card rounded-lg hover:bg-solar-panel/20"
+            className="p-2 border border-solar-border rounded-lg hover:bg-solar-yellow/10 transition-all duration-300"
           >
             <ArrowLeft className="w-5 h-5 text-solar-primary" />
           </button>
@@ -267,7 +266,7 @@ export default function CreateAdmin() {
           </div>
         </div>
 
-        <div className="bg-solar-card rounded-lg p-8 text-center w-full">
+        <div className="solar-glass rounded-2xl p-8 text-center w-full">
           <div className="w-16 h-16 bg-solar-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-solar-success" />
           </div>
@@ -280,7 +279,7 @@ export default function CreateAdmin() {
 
   // Helper function to get input class based on mode
   const getInputClass = (fieldName) => {
-    const baseClass = `w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors[fieldName] ? 'border-solar-danger' : 'border-solar-yellow'}`
+    const baseClass = `solar-input ${errors[fieldName] ? 'border-solar-danger' : ''}`
     if (isViewMode) {
       return `${baseClass} opacity-70 cursor-not-allowed`
     }
@@ -291,8 +290,8 @@ export default function CreateAdmin() {
     <div className="w-full relative">
       {/* Full page loading overlay */}
       {loading && (
-        <div className="absolute inset-0 bg-solar-bg/80 z-50 flex flex-col items-center justify-center">
-          <SunLoader message={isEditMode ? 'Updating Admin...' : 'Creating Admin...'} size="large" />
+        <div className="absolute inset-0 bg-solar-bg/80 z-50 flex flex-col items-center justify-center rounded-2xl overflow-hidden">
+          <SunLoader message={isEditMode ? 'Updating Admin...' : 'Creating Admin...'} size="large" fullscreen={false} />
         </div>
       )}
 
@@ -300,7 +299,7 @@ export default function CreateAdmin() {
       <div className="flex items-center space-x-4 mb-6">
         <button
           onClick={() => navigate('/admins')}
-          className="p-2 bg-solar-card rounded-lg hover:bg-solar-panel/20"
+          className="p-2 border border-solar-border rounded-lg hover:bg-solar-yellow/10 transition-all duration-300"
         >
           <ArrowLeft className="w-5 h-5 text-solar-primary" />
         </button>
@@ -314,7 +313,7 @@ export default function CreateAdmin() {
       </div>
 
       {/* Form */}
-      <div className="bg-solar-card rounded-lg p-6 w-full">
+      <div className="solar-glass rounded-2xl p-8 w-full">
         <form onSubmit={handleSubmit} className="space-y-6">
           {errors.submit && (
             <div className="bg-red-800/20 border border-red-800 text-red-800 px-4 py-3 rounded-lg">
@@ -406,7 +405,7 @@ export default function CreateAdmin() {
                 value={formData.phone}
                 onChange={(e) => handleChange('phone', e.target.value)}
                 disabled={isViewMode}
-                className={isViewMode ? 'w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary opacity-70 cursor-not-allowed' : 'w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2'}
+                className={isViewMode ? 'solar-input opacity-70 cursor-not-allowed' : 'solar-input'}
                 style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                 placeholder="+91 9876543210"
               />
@@ -422,7 +421,7 @@ export default function CreateAdmin() {
                 value={formData.region}
                 onChange={(e) => handleChange('region', e.target.value)}
                 disabled={isViewMode}
-                className={isViewMode ? 'w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary opacity-70 cursor-not-allowed' : `w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary focus:outline-none focus:ring-2 ${errors.region ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                className={isViewMode ? 'solar-input opacity-70 cursor-not-allowed' : `solar-input ${errors.region ? 'border-solar-danger' : ''}`}
                 style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
               >
                 <option value="">Select a region</option>
@@ -445,7 +444,7 @@ export default function CreateAdmin() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => handleChange('password', e.target.value)}
-                    className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 pr-10 ${errors.password ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                    className={`solar-input pr-10 ${errors.password ? 'border-solar-danger' : ''}`}
                     style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                     placeholder={isEditMode ? "Leave blank to keep current password" : "Min. 6 characters"}
                   />
@@ -473,7 +472,7 @@ export default function CreateAdmin() {
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={formData.confirmPassword}
                     onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                    className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 pr-10 ${errors.confirmPassword ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                    className={`solar-input pr-10 ${errors.confirmPassword ? 'border-solar-danger' : ''}`}
                     style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                     placeholder="Confirm password"
                   />
@@ -524,7 +523,7 @@ export default function CreateAdmin() {
                   value={formData.address_line2}
                   onChange={(e) => handleChange('address_line2', e.target.value)}
                   disabled={isViewMode}
-                  className={isViewMode ? 'w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary opacity-70 cursor-not-allowed' : 'w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2'}
+                  className={isViewMode ? 'solar-input opacity-70 cursor-not-allowed' : 'solar-input'}
                   style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                   placeholder="Apartment, suite, landmark (optional)"
                 />
@@ -556,7 +555,7 @@ export default function CreateAdmin() {
                   value={formData.state}
                   onChange={(e) => handleChange('state', e.target.value)}
                   disabled={isViewMode}
-                  className={isViewMode ? 'w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary opacity-70 cursor-not-allowed' : `w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary focus:outline-none focus:ring-2 ${errors.state ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                  className={isViewMode ? 'solar-input opacity-70 cursor-not-allowed' : `solar-input ${errors.state ? 'border-solar-danger' : ''}`}
                   style={{ '--tw-ring-color': 'rgb(255, 190, 61)' }}
                 >
                   <option value="">Select a state</option>
@@ -620,17 +619,17 @@ export default function CreateAdmin() {
               <button
                 type="button"
                 onClick={() => navigate('/admins')}
-                className="px-6 py-3 bg-solar-card hover:bg-solar-panel/20 text-solar-primary font-semibold rounded-lg sun-button"
+                className="px-6 py-3 border border-solar-border text-solar-muted rounded-xl hover:bg-solar-yellow/10 transition-all duration-300"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center space-x-2 px-6 py-3 bg-solar-orange text-white font-semibold rounded-lg hover:bg-solar-orange/80 sun-button disabled:opacity-50 disabled:cursor-not-allowed"
+                className="sun-button"
               >
                 {loading ? (
-                  <SunLoader message={isEditMode ? 'Updating Admin...' : 'Creating Admin...'} />
+                  <SunLoader message={isEditMode ? 'Updating...' : 'Creating...'} fullscreen={false} />
                 ) : (
                   <>
                     <Shield className="w-5 h-5" />
@@ -647,7 +646,7 @@ export default function CreateAdmin() {
               <button
                 type="button"
                 onClick={() => navigate('/admins')}
-                className="px-6 py-3 bg-solar-card hover:bg-solar-panel/20 text-solar-primary font-semibold rounded-lg sun-button"
+                className="px-8 py-3 sun-button"
               >
                 Back to Admins
               </button>

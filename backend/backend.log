@@ -1,31 +1,32 @@
 nohup: ignoring input
-2026/01/13 12:56:00 ✅ Database connection established (WAL mode & Busy Timeout optimized)
-2026/01/13 12:56:00 ✅ Migration 1 executed successfully
-2026/01/13 12:56:00 ✅ Migration 2 executed successfully
-2026/01/13 12:56:00 ✅ Migration 3 executed successfully
-2026/01/13 12:56:00 ✅ Migration 4 executed successfully
-2026/01/13 12:56:00 ✅ Migration 5 executed successfully
-2026/01/13 12:56:00 ✅ Migration 6 executed successfully
-2026/01/13 12:56:00 ✅ Migration 7 executed successfully
-2026/01/13 12:56:00 ✅ Migration 8 executed successfully
-2026/01/13 12:56:00 ✅ Migration 9 executed successfully
-2026/01/13 12:56:00 ✅ Migration 10 executed successfully
-2026/01/13 12:56:00 ⚠️  Migration 11 warning: SQL logic error: duplicate column name: installer_id (1)
-2026/01/13 12:56:00 ⚠️  Migration 12 warning: SQL logic error: duplicate column name: project_cost (1)
-2026/01/13 12:56:00 ⚠️  Migration 13 warning: SQL logic error: duplicate column name: plant_id (1)
-2026/01/13 12:56:00 ✅ Migration 14 executed successfully
-2026/01/13 12:56:00 ✅ Migration 15 executed successfully
-2026/01/13 12:56:00 ✅ Migration 16 executed successfully
-2026/01/13 12:56:00 ✅ Migration 17 executed successfully
-2026/01/13 12:56:00 ✅ Migration 18 executed successfully
-2026/01/13 12:56:00 ✅ Migration 19 executed successfully
-2026/01/13 12:56:00 ✅ Migration 20 executed successfully
-2026/01/13 12:56:00 ⚠️  Migration 21 warning: SQL logic error: no such column: "power" (1)
-2026/01/13 12:56:00 ⚠️  Migration 22 warning: SQL logic error: duplicate column name: load_power (1)
-2026/01/13 12:56:00 ⚠️  Migration 23 warning: SQL logic error: duplicate column name: grid_power (1)
-2026/01/13 12:56:00 ⚠️  Migration 24 warning: SQL logic error: duplicate column name: weather_condition (1)
-2026/01/13 12:56:00 🎉 All database migrations completed successfully
-2026/01/13 12:56:00 🏛️  Government subsidy module initialized
+2026/01/13 17:29:33 ✅ Database connection established (WAL mode & Busy Timeout optimized)
+2026/01/13 17:29:33 ✅ Migration 1 executed successfully
+2026/01/13 17:29:33 ✅ Migration 2 executed successfully
+2026/01/13 17:29:33 ✅ Migration 3 executed successfully
+2026/01/13 17:29:33 ✅ Migration 4 executed successfully
+2026/01/13 17:29:33 ✅ Migration 5 executed successfully
+2026/01/13 17:29:33 ✅ Migration 6 executed successfully
+2026/01/13 17:29:33 ✅ Migration 7 executed successfully
+2026/01/13 17:29:33 ✅ Migration 8 executed successfully
+2026/01/13 17:29:33 ✅ Migration 9 executed successfully
+2026/01/13 17:29:33 ✅ Migration 10 executed successfully
+2026/01/13 17:29:33 ⚠️  Migration 11 warning: SQL logic error: duplicate column name: installer_id (1)
+2026/01/13 17:29:33 ⚠️  Migration 12 warning: SQL logic error: duplicate column name: project_cost (1)
+2026/01/13 17:29:33 ⚠️  Migration 13 warning: SQL logic error: duplicate column name: plant_id (1)
+2026/01/13 17:29:33 ✅ Migration 14 executed successfully
+2026/01/13 17:29:33 ✅ Migration 15 executed successfully
+2026/01/13 17:29:33 ✅ Migration 16 executed successfully
+2026/01/13 17:29:33 ✅ Migration 17 executed successfully
+2026/01/13 17:29:33 ✅ Migration 18 executed successfully
+2026/01/13 17:29:33 ✅ Migration 19 executed successfully
+2026/01/13 17:29:33 ✅ Migration 20 executed successfully
+2026/01/13 17:29:33 ⚠️  Migration 21 warning: SQL logic error: no such column: "power" (1)
+2026/01/13 17:29:33 ⚠️  Migration 22 warning: SQL logic error: duplicate column name: load_power (1)
+2026/01/13 17:29:33 ⚠️  Migration 23 warning: SQL logic error: duplicate column name: grid_power (1)
+2026/01/13 17:29:33 ⚠️  Migration 24 warning: SQL logic error: duplicate column name: weather_condition (1)
+2026/01/13 17:29:33 ✅ Migration 25 executed successfully
+2026/01/13 17:29:33 🎉 All database migrations completed successfully
+2026/01/13 17:29:33 🏛️  Government subsidy module initialized
 [GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
 
 [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
@@ -119,9 +120,58 @@ nohup: ignoring input
 [GIN-debug] GET    /govt/subsidies/history   --> sems-backend/internal/govt.GetSubsidyHistoryHandler (6 handlers)
 [GIN-debug] PUT    /govt/subsidies/:id/status --> sems-backend/internal/govt.UpdateSubsidyStatusHandler (6 handlers)
 [GIN-debug] GET    /govt/subsidy/reports     --> main.main.func6 (6 handlers)
-2026/01/13 12:56:00 Server starting on :8080 with regions support
+2026/01/13 17:29:33 Server starting on :8080 with regions support
 [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
 Please check https://github.com/gin-gonic/gin/blob/master/docs/doc.md#dont-trust-all-proxies for details.
 [GIN-debug] Listening and serving HTTP on :8080
-[GIN-debug] [ERROR] listen tcp :8080: bind: address already in use
-2026/01/13 12:56:00 Database connection closed
+[GIN] 2026/01/13 - 17:30:19 | 200 |      82.776µs |       127.0.0.1 | GET      "/health"
+[GIN] 2026/01/13 - 17:30:43 | 204 |      27.129µs |             ::1 | OPTIONS  "/user/notifications/unread-count"
+[GIN] 2026/01/13 - 17:30:43 | 204 |       25.89µs |             ::1 | OPTIONS  "/user/notifications/unread-count"
+[GIN] 2026/01/13 - 17:30:43 | 200 |    1.475004ms |             ::1 | GET      "/user/notifications/unread-count"
+[GIN] 2026/01/13 - 17:30:43 | 200 |     351.595µs |             ::1 | GET      "/user/notifications/unread-count"
+[GIN] 2026/01/13 - 17:30:43 | 204 |       8.561µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/13 - 17:30:43 | 204 |        5.72µs |             ::1 | OPTIONS  "/superadmin/regions"
+[GIN] 2026/01/13 - 17:30:43 | 200 |     404.579µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/13 - 17:30:43 | 200 |     294.574µs |             ::1 | GET      "/superadmin/regions"
+[GIN] 2026/01/13 - 17:31:13 | 204 |       7.182µs |             ::1 | OPTIONS  "/user/notifications/unread-count"
+[GIN] 2026/01/13 - 17:31:13 | 200 |     205.321µs |             ::1 | GET      "/user/notifications/unread-count"
+[GIN] 2026/01/13 - 17:32:19 | 204 |      11.876µs |             ::1 | OPTIONS  "/auth/login"
+2026/01/13 17:32:19 Login endpoint called
+2026/01/13 17:32:19 Login request: email=superAdmin@solar.com
+2026/01/13 17:32:19 Password mismatch: crypto/bcrypt: hashedPassword is not the hash of the given password
+[GIN] 2026/01/13 - 17:32:19 | 401 |   83.617636ms |             ::1 | POST     "/auth/login"
+[GIN] 2026/01/13 - 17:41:37 | 204 |      58.234µs |             ::1 | OPTIONS  "/auth/login"
+2026/01/13 17:41:37 Login endpoint called
+2026/01/13 17:41:37 Login request: email=superAdmin@solar.com
+2026/01/13 17:41:37 Password mismatch: crypto/bcrypt: hashedPassword is not the hash of the given password
+[GIN] 2026/01/13 - 17:41:37 | 401 |   88.312674ms |             ::1 | POST     "/auth/login"
+2026/01/13 17:41:39 Login endpoint called
+2026/01/13 17:41:39 Login request: email=
+2026/01/13 17:41:39 User not found: sql: no rows in result set
+[GIN] 2026/01/13 - 17:41:39 | 401 |       739.3µs |             ::1 | POST     "/auth/login"
+2026/01/13 17:41:41 Login endpoint called
+2026/01/13 17:41:41 Login request: email=
+2026/01/13 17:41:41 User not found: sql: no rows in result set
+[GIN] 2026/01/13 - 17:41:41 | 401 |     673.109µs |             ::1 | POST     "/auth/login"
+[GIN] 2026/01/13 - 17:41:47 | 204 |       8.645µs |             ::1 | OPTIONS  "/auth/login"
+2026/01/13 17:41:47 Login endpoint called
+2026/01/13 17:41:47 Login request: email=
+2026/01/13 17:41:47 User not found: sql: no rows in result set
+[GIN] 2026/01/13 - 17:41:47 | 401 |     884.911µs |             ::1 | POST     "/auth/login"
+2026/01/13 17:41:49 Login endpoint called
+2026/01/13 17:41:49 Login request: email=
+2026/01/13 17:41:49 User not found: sql: no rows in result set
+[GIN] 2026/01/13 - 17:41:49 | 401 |     745.828µs |             ::1 | POST     "/auth/login"
+2026/01/13 17:41:51 Login endpoint called
+2026/01/13 17:41:51 Login request: email=
+2026/01/13 17:41:51 User not found: sql: no rows in result set
+[GIN] 2026/01/13 - 17:41:51 | 401 |     786.193µs |             ::1 | POST     "/auth/login"
+2026/01/13 17:41:52 Login endpoint called
+2026/01/13 17:41:52 Login request: email=
+2026/01/13 17:41:52 User not found: sql: no rows in result set
+[GIN] 2026/01/13 - 17:41:52 | 401 |      1.1388ms |             ::1 | POST     "/auth/login"
+[GIN] 2026/01/13 - 17:43:45 | 204 |      11.225µs |             ::1 | OPTIONS  "/auth/login"
+2026/01/13 17:43:45 Login endpoint called
+2026/01/13 17:43:45 Login request: email=admin@solar.com
+2026/01/13 17:43:45 User not found: sql: no rows in result set
+[GIN] 2026/01/13 - 17:43:45 | 401 |      673.86µs |             ::1 | POST     "/auth/login"

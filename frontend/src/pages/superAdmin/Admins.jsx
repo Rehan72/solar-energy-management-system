@@ -69,7 +69,7 @@ export default function Admins() {
     <div className="space-y-6 relative">
       {/* Loading overlay */}
       {loading && (
-        <div className="absolute inset-0 bg-solar-bg/80 z-50 flex flex-col items-center justify-center">
+        <div className="absolute inset-0 bg-solar-bg/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
           <SunLoader message="Loading admins..." size="large" />
         </div>
       )}
@@ -83,14 +83,14 @@ export default function Admins() {
         <div className="flex space-x-3">
           <button
             onClick={fetchAdmins}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button"
+            className="flex items-center space-x-2 px-4 py-2 border border-solar-border rounded-xl hover:bg-solar-yellow/10 transition-all duration-300"
           >
-            <RefreshCw className="w-4 h-4" />
-            <span>Refresh</span>
+            <RefreshCw className="w-4 h-4 text-solar-muted" />
+            <span className="text-solar-muted font-medium">Refresh</span>
           </button>
           <button 
             onClick={() => navigate('/admins/create')}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-orange text-white font-semibold rounded-lg hover:bg-solar-orange/80 transition sun-button"
+            className="sun-button"
           >
             <UserPlus className="w-4 h-4" />
             <span>Add Admin</span>
@@ -131,7 +131,7 @@ export default function Admins() {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-solar-card rounded-lg p-4 ">
+      <div className="solar-glass rounded-2xl p-6 ">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <SearchBar
@@ -145,7 +145,7 @@ export default function Admins() {
             <select
               value={filterRegion}
               onChange={(e) => setFilterRegion(e.target.value)}
-              className="px-3 py-2 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow"
+              className="solar-input"
             >
               <option value="ALL">All Regions</option>
               <option value="Delhi">Delhi</option>

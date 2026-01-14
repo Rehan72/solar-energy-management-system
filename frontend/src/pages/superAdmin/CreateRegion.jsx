@@ -106,7 +106,7 @@ export default function CreateRegion() {
       <div className="flex items-center space-x-4">
         <button 
           onClick={() => navigate('/regions')}
-          className="p-2 rounded-lg hover:bg-solar-panel/20 transition"
+          className="p-2 border border-solar-border rounded-lg hover:bg-solar-yellow/10 transition-all duration-300"
         >
           <ArrowLeft className="w-5 h-5 text-solar-muted" />
         </button>
@@ -118,7 +118,7 @@ export default function CreateRegion() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
-        <div className="bg-solar-card rounded-xl p-6">
+        <div className="solar-glass rounded-2xl p-8">
           <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
             <Globe className="w-5 h-5 text-solar-yellow mr-2" />
             Basic Information
@@ -132,7 +132,7 @@ export default function CreateRegion() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="e.g., Delhi NCR"
-                className={errors.name ? 'border-red-500' : ''}
+                className="solar-input"
               />
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
@@ -143,7 +143,7 @@ export default function CreateRegion() {
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
-                className={`w-full h-10 bg-solar-night/50 text-solar-primary border rounded-lg px-3 focus:outline-none focus:border-solar-yellow ${errors.state ? 'border-red-500' : 'border-solar-border'}`}
+                className={`solar-input ${errors.state ? 'border-solar-danger' : ''}`}
               >
                 <option value="">Select State</option>
                 {indianStates.map(state => (
@@ -160,7 +160,7 @@ export default function CreateRegion() {
                 value={formData.country}
                 onChange={handleChange}
                 placeholder="e.g., India"
-                className={errors.country ? 'border-red-500' : ''}
+                className={`solar-input ${errors.country ? 'border-solar-danger' : ''}`}
               />
               {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country}</p>}
             </div>
@@ -171,7 +171,7 @@ export default function CreateRegion() {
                 name="timezone"
                 value={formData.timezone}
                 onChange={handleChange}
-                className={`w-full h-10 bg-solar-night/50 text-solar-primary border rounded-lg px-3 focus:outline-none focus:border-solar-yellow ${errors.timezone ? 'border-red-500' : 'border-solar-border'}`}
+                className={`solar-input ${errors.timezone ? 'border-solar-danger' : ''}`}
               >
                 <option value="">Select Timezone</option>
                 {timezones.map(tz => (
@@ -189,14 +189,14 @@ export default function CreateRegion() {
                 onChange={handleChange}
                 placeholder="Optional description about the region..."
                 rows={3}
-                className="w-full bg-solar-night/50 text-solar-primary border border-solar-border rounded-lg px-3 py-2 focus:outline-none focus:border-solar-yellow resize-none"
+                className="solar-input resize-none"
               />
             </div>
           </div>
         </div>
 
         {/* Region Settings */}
-        <div className="bg-solar-card rounded-xl p-6">
+        <div className="solar-glass rounded-2xl p-8">
           <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
             <MapPin className="w-5 h-5 text-solar-orange mr-2" />
             Region Settings
@@ -243,7 +243,7 @@ export default function CreateRegion() {
         </div>
 
         {/* Location Picker */}
-        <div className="bg-solar-card rounded-xl p-6">
+        <div className="solar-glass rounded-2xl p-8">
           <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
             <MapPin className="w-5 h-5 text-solar-orange mr-2" />
             Region Location
@@ -257,7 +257,7 @@ export default function CreateRegion() {
         </div>
 
         {/* Status */}
-        <div className="bg-solar-card rounded-xl p-6">
+        <div className="solar-glass rounded-2xl p-8">
           <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
             <Zap className="w-5 h-5 text-solar-success mr-2" />
             Region Status
@@ -304,14 +304,14 @@ export default function CreateRegion() {
           <Button
             type="button"
             onClick={() => navigate('/regions')}
-            className="bg-gray-500 text-white hover:bg-gray-600"
+            className="px-6 py-3 border border-solar-border text-solar-muted rounded-xl hover:bg-solar-yellow/10 transition-all duration-300"
           >
             Cancel
           </Button>
           <Button
             type="submit"
             disabled={loading}
-            className="bg-solar-yellow text-solar-dark hover:bg-solar-orange flex items-center space-x-2"
+            className="sun-button"
           >
             {loading ? (
               <>

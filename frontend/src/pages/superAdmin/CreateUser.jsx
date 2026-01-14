@@ -123,7 +123,7 @@ export default function CreateUser() {
       }
     }
     fetchData()
-  }, [])
+  }, [currentUserRole])
 
   // Filter admins, installers and plants when region or admin changes
   useEffect(() => {
@@ -156,7 +156,7 @@ export default function CreateUser() {
     setFilteredAdmins(currentFilteredAdmins)
     setFilteredInstallers(currentFilteredInstallers)
     setFilteredPlants(currentFilteredPlants)
-  }, [formData.region, formData.plant_id, formData.admin_id, admins, installers, plants])
+  }, [formData.region, formData.plant_id, formData.admin_id, admins, installers, plants, regions])
 
   // Reset selections when region or admin changes
   const prevRegion = useRef(formData.region)
@@ -287,7 +287,7 @@ export default function CreateUser() {
           </div>
         </div>
 
-        <div className="bg-solar-card rounded-lg p-8 energy-card text-center">
+        <div className="solar-glass rounded-2xl p-8 text-center">
           <div className="w-16 h-16 bg-solar-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-solar-success" />
           </div>
@@ -299,20 +299,20 @@ export default function CreateUser() {
   }
 
   return (
-    <div className="space-y-6">
-      {loading && <SunLoader message="Creating user..." />}
+    <div className="space-y-6 relative min-h-[500px]">
+      {loading && <SunLoader message="Creating user..." fullscreen={false} />}
 
       {/* Progress Steps */}
       <div className="flex justify-center items-center space-x-4 mb-6">
         {[1, 2, 3].map((s) => (
           <div key={s} className="flex items-center">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= s
-              ? "bg-gradient-to-r from-solar-yellow to-solar-orange text-solar-dark"
-              : "bg-gray-300 text-gray-500"
+              ? "bg-solar-yellow text-solar-dark shadow-solar-glow-yellow"
+              : "bg-solar-border text-solar-muted"
               }`}>
               {s}
             </div>
-            {s < 3 && <div className={`w-16 h-1 ${step > s ? "bg-solar-yellow" : "bg-gray-300"}`} />}
+            {s < 3 && <div className={`w-16 h-1 ${step > s ? "bg-solar-yellow" : "bg-solar-border"}`} />}
           </div>
         ))}
       </div>
@@ -321,7 +321,7 @@ export default function CreateUser() {
       <div className="flex items-center space-x-4">
         <button
           onClick={() => navigate('/users')}
-          className="p-2 bg-solar-card rounded-lg hover:bg-solar-panel/20 transition"
+          className="p-2 solar-glass rounded-xl hover:bg-solar-yellow/20 transition-all duration-300"
         >
           <ArrowLeft className="w-5 h-5 text-solar-primary" />
         </button>
@@ -332,7 +332,7 @@ export default function CreateUser() {
       </div>
 
       {/* Form */}
-      <div className="bg-solar-card rounded-lg p-6">
+      <div className="solar-glass rounded-3xl p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           {errors.submit && (
             <div className="bg-solar-danger/20 border border-solar-danger text-solar-danger px-4 py-3 rounded-lg">
@@ -368,10 +368,10 @@ export default function CreateUser() {
                     type="text"
                     value={formData.first_name}
                     onChange={(e) => handleChange('first_name', e.target.value)}
-                    className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.first_name ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                    className={`solar-input ${errors.first_name ? 'border-solar-danger' : ''}`}
                     placeholder="Enter first name"
                   />
-                  {errors.first_name && <p className="text-sm text-red-800 mt-1">{errors.first_name}</p>}
+                  {errors.first_name && <p className="text-sm text-solar-danger mt-1">{errors.first_name}</p>}
                 </div>
 
                 {currentUserRole === 'SUPER_ADMIN' && (
@@ -383,7 +383,7 @@ export default function CreateUser() {
                     <select
                       value={formData.role}
                       onChange={(e) => handleChange('role', e.target.value)}
-                      className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                      className="solar-input"
                     >
                       <option value="USER">User</option>
                       <option value="ADMIN">Admin</option>
@@ -402,10 +402,10 @@ export default function CreateUser() {
                     type="text"
                     value={formData.last_name}
                     onChange={(e) => handleChange('last_name', e.target.value)}
-                    className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.last_name ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                    className={`solar-input ${errors.last_name ? 'border-solar-danger' : ''}`}
                     placeholder="Enter last name"
                   />
-                  {errors.last_name && <p className="text-sm text-red-800 mt-1">{errors.last_name}</p>}
+                  {errors.last_name && <p className="text-sm text-solar-danger mt-1">{errors.last_name}</p>}
                 </div>
 
                 <div>
@@ -417,10 +417,10 @@ export default function CreateUser() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleChange('email', e.target.value)}
-                    className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 ${errors.email ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                    className={`solar-input ${errors.email ? 'border-solar-danger' : ''}`}
                     placeholder="user@example.com"
                   />
-                  {errors.email && <p className="text-sm text-red-800 mt-1">{errors.email}</p>}
+                  {errors.email && <p className="text-sm text-solar-danger mt-1">{errors.email}</p>}
                 </div>
 
                 <div>
@@ -432,7 +432,7 @@ export default function CreateUser() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleChange('phone', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    className="solar-input"
                     placeholder="+91 9876543210"
                   />
                 </div>
@@ -447,7 +447,7 @@ export default function CreateUser() {
                       type={showPassword ? 'text' : 'password'}
                       value={formData.password}
                       onChange={(e) => handleChange('password', e.target.value)}
-                      className={`w-full px-4 py-3 bg-solar-night/80 border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2 pr-10 ${errors.password ? 'border-solar-danger' : 'border-solar-yellow'}`}
+                      className={`solar-input pr-10 ${errors.password ? 'border-solar-danger' : ''}`}
                       placeholder="Min. 6 characters"
                     />
                     <button
@@ -458,7 +458,7 @@ export default function CreateUser() {
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
-                  {errors.password && <p className="text-sm text-red-800 mt-1">{errors.password}</p>}
+                  {errors.password && <p className="text-sm text-solar-danger mt-1">{errors.password}</p>}
                 </div>
 
                 <div className="relative">
@@ -482,7 +482,7 @@ export default function CreateUser() {
                       {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
-                  {errors.confirmPassword && <p className="text-sm text-red-800 mt-1">{errors.confirmPassword}</p>}
+                  {errors.confirmPassword && <p className="text-sm text-solar-danger mt-1">{errors.confirmPassword}</p>}
                 </div>
               </div>
 
@@ -490,7 +490,7 @@ export default function CreateUser() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="px-6 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button"
+                  className="sun-button"
                 >
                   Next: Installation Details
                 </button>
@@ -510,7 +510,7 @@ export default function CreateUser() {
                   <select
                     value={formData.installation_status}
                     onChange={(e) => handleChange('installation_status', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                    className="solar-input"
                   >
                     <option value="NOT_INSTALLED">Not Installed</option>
                     <option value="INSTALLATION_PLANNED">Installation Planned</option>
@@ -525,7 +525,7 @@ export default function CreateUser() {
                   <select
                     value={formData.property_type}
                     onChange={(e) => handleChange('property_type', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                    className="solar-input"
                   >
                     <option value="RESIDENTIAL">Residential</option>
                     <option value="COMMERCIAL">Commercial</option>
@@ -541,7 +541,7 @@ export default function CreateUser() {
                     type="number"
                     value={formData.avg_monthly_bill}
                     onChange={(e) => handleChange('avg_monthly_bill', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    className="solar-input"
                     placeholder="Enter average bill"
                     min="0"
                   />
@@ -555,7 +555,7 @@ export default function CreateUser() {
                     type="number"
                     value={formData.roof_area_sqft}
                     onChange={(e) => handleChange('roof_area_sqft', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    className="solar-input"
                     placeholder="Enter roof area"
                     min="0"
                   />
@@ -569,7 +569,7 @@ export default function CreateUser() {
                     type="number"
                     value={formData.project_cost}
                     onChange={(e) => handleChange('project_cost', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    className="solar-input"
                     placeholder="Enter total amount"
                     min="0"
                   />
@@ -582,7 +582,7 @@ export default function CreateUser() {
                   <select
                     value={formData.connection_type}
                     onChange={(e) => handleChange('connection_type', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                    className="solar-input"
                   >
                     <option value="SINGLE_PHASE">Single Phase</option>
                     <option value="THREE_PHASE">Three Phase</option>
@@ -615,7 +615,7 @@ export default function CreateUser() {
                         type="number"
                         value={formData.plant_capacity_kw}
                         onChange={(e) => handleChange('plant_capacity_kw', e.target.value)}
-                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                        className="solar-input"
                         placeholder="e.g., 5.0"
                         min="0"
                         step="0.01"
@@ -629,7 +629,7 @@ export default function CreateUser() {
                         type="date"
                         value={formData.installation_date}
                         onChange={(e) => handleChange('installation_date', e.target.value)}
-                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                        className="solar-input"
                       />
                     </div>
                     <div>
@@ -640,7 +640,7 @@ export default function CreateUser() {
                         type="text"
                         value={formData.inverter_brand}
                         onChange={(e) => handleChange('inverter_brand', e.target.value)}
-                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                        className="solar-input"
                         placeholder="e.g., Luminous, Microtek"
                       />
                     </div>
@@ -652,7 +652,7 @@ export default function CreateUser() {
                         type="text"
                         value={formData.discom_name}
                         onChange={(e) => handleChange('discom_name', e.target.value)}
-                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                        className="solar-input"
                         placeholder="Enter DISCOM name"
                       />
                     </div>
@@ -664,7 +664,7 @@ export default function CreateUser() {
                         type="text"
                         value={formData.consumer_number}
                         onChange={(e) => handleChange('consumer_number', e.target.value)}
-                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                        className="solar-input"
                         placeholder="Enter consumer ID"
                       />
                     </div>
@@ -705,7 +705,7 @@ export default function CreateUser() {
                   <select
                     value={formData.region}
                     onChange={(e) => handleChange('region', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                    className="solar-input"
                   >
                     <option value="">Select a region</option>
                     {regions?.map(r => (
@@ -722,7 +722,7 @@ export default function CreateUser() {
                   <select
                     value={formData.plant_id}
                     onChange={(e) => handleChange('plant_id', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                    className="solar-input"
                     disabled={!formData.region}
                   >
                     <option value="">Select a plant</option>
@@ -742,7 +742,7 @@ export default function CreateUser() {
                     <select
                       value={formData.admin_id}
                       onChange={(e) => handleChange('admin_id', e.target.value)}
-                      className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                      className="solar-input"
                       disabled={!formData.region}
                     >
                       <option value="">Select an admin</option>
@@ -761,7 +761,7 @@ export default function CreateUser() {
                   <select
                     value={formData.installer_id}
                     onChange={(e) => handleChange('installer_id', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                    className="solar-input"
                     disabled={!formData.region}
                   >
                     <option value="">Select an installer</option>
@@ -779,7 +779,7 @@ export default function CreateUser() {
                     type="text"
                     value={formData.city}
                     onChange={(e) => handleChange('city', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    className="solar-input"
                     placeholder="Enter city"
                   />
                 </div>
@@ -791,7 +791,7 @@ export default function CreateUser() {
                   <select
                     value={formData.state}
                     onChange={(e) => handleChange('state', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary focus:outline-none focus:ring-2"
+                    className="solar-input"
                   >
                     <option value="">Select state</option>
                     {indianStates?.map(state => (
@@ -808,7 +808,7 @@ export default function CreateUser() {
                     type="text"
                     value={formData.pincode}
                     onChange={(e) => handleChange('pincode', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    className="solar-input"
                     placeholder="6-digit pincode"
                     maxLength={6}
                   />
@@ -822,7 +822,7 @@ export default function CreateUser() {
                     type="text"
                     value={formData.address_line1}
                     onChange={(e) => handleChange('address_line1', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-yellow rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:ring-2"
+                    className="solar-input"
                     placeholder="Street, House No."
                   />
                 </div>
@@ -840,14 +840,14 @@ export default function CreateUser() {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="px-6 py-3 bg-solar-card hover:bg-solar-panel/20 text-solar-primary font-semibold rounded-lg transition sun-button"
+                  className="px-6 py-3 border border-solar-border text-solar-muted rounded-xl hover:bg-solar-yellow/10 transition-all duration-300"
                 >
                   Back
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-8 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button disabled:opacity-50"
+                  className="px-8 py-3 sun-button disabled:opacity-50"
                 >
                   {loading ? 'Creating...' : 'Create User'}
                 </button>

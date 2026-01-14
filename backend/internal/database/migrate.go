@@ -203,6 +203,9 @@ func RunMigrations() error {
 		`ALTER TABLE energy_data ADD COLUMN load_power REAL DEFAULT 0;`,
 		`ALTER TABLE energy_data ADD COLUMN grid_power REAL DEFAULT 0;`,
 		`ALTER TABLE energy_data ADD COLUMN weather_condition TEXT;`,
+		// Seed super admin if not exists
+		`INSERT OR IGNORE INTO users (id, email, password_hash, first_name, last_name, role)
+		VALUES ('00000000-0000-4000-a000-000000000001', 'superAdmin@solar.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Super', 'Admin', 'SUPER_ADMIN');`,
 	}
 
 	for i, migration := range migrations {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Activity, TrendingUp, Users, Zap, DollarSign, RefreshCw, BarChart3, Globe, MapPin, TrendingDown } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
@@ -28,9 +28,8 @@ export default function GlobalDashboard() {
     { id: 3, text: "Main Grid load shifted to Solar Storage in Delhi-Central", type: "warning" },
     { id: 4, text: "Routine diagnostic sequence completed for Rajasthan-K1", type: "success" }
   ])
-  const token = localStorage.getItem('token')
 
-  const fetchGlobalStats = async () => {
+  const fetchGlobalStats = useCallback(async () => {
     try {
       setLoading(true)
       let url = `/superadmin/global/stats?period=${period}`
@@ -39,14 +38,23 @@ export default function GlobalDashboard() {
       if (response.data && response.data.stats) {
         setGlobalStats(prev => ({ ...prev, ...response.data.stats }))
       }
-    } catch (error) {
-      console.error('Failed to fetch global stats:', error)
+    } catch (err) {
+      console.error('Failed to fetch global stats:', err)
+      // The original instruction seems to have provided a catch block from another file (EditRegion.jsx)
+      // which included 'notify.error' and 'navigate'. These are not defined here.
+      // To maintain syntactic correctness and avoid introducing undefined variables,
+      // I am keeping the existing error handling for fetchGlobalStats.
+      // If the intention was to add a notification system, 'notify' would need to be imported/defined.
+      // If the intention was to navigate, 'navigate' would need to be imported from 'react-router-dom'.
+      // console.error(err);
+      // notify.error('Failed to fetch region') // Undefined 'notify'
+      // navigate('/regions') // Undefined 'navigate'
     } finally {
       setLoading(false)
     }
-  }
+  }, [period, selectedRegion])
 
-  const fetchRegions = async () => {
+  const fetchRegions = useCallback(async () => {
     try {
       const response = await getRequest('/superadmin/regions')
       if (response.data) {
@@ -55,9 +63,9 @@ export default function GlobalDashboard() {
     } catch (error) {
       console.error('Failed to fetch regions:', error)
     }
-  }
+  }, [])
 
-  const fetchTrendData = async () => {
+  const fetchTrendData = useCallback(async () => {
     try {
       let url = `/superadmin/energy/trend?period=${period}`
       if (selectedRegion) url += `&region=${selectedRegion}`
@@ -68,7 +76,7 @@ export default function GlobalDashboard() {
     } catch (error) {
       console.error('Failed to fetch trend data:', error)
     }
-  }
+  }, [period, selectedRegion])
 
   useEffect(() => {
     fetchRegions()
@@ -77,7 +85,7 @@ export default function GlobalDashboard() {
   useEffect(() => {
     fetchGlobalStats()
     fetchTrendData()
-  }, [selectedRegion, period])
+  }, [selectedRegion, period, fetchGlobalStats, fetchTrendData])
 
   return (
     <motion.div
@@ -86,28 +94,28 @@ export default function GlobalDashboard() {
       className="space-y-8"
     >
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-3xl font-bold sun-glow-text">Global Dashboard</h1>
-          <p className="text-solar-muted mt-2">Comprehensive overview of the entire solar energy management system</p>
+          <h1 className="text-4xl font-black text-solar-primary tracking-tight uppercase">Global Grid Intelligence</h1>
+          <p className="text-solar-muted mt-2 font-medium italic">Autonomous ecosystem oversight and cross-regional telemetry analysis.</p>
         </div>
         <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
-            className="flex-1 md:flex-none px-4 py-2 bg-solar-card border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:ring-2 focus:ring-solar-yellow/50 transition-all font-medium"
+            className="solar-input min-w-[140px]"
           >
-            <option value="week">Last Week</option>
-            <option value="month">Last Month</option>
-            <option value="quarter">Last Quarter</option>
-            <option value="year">Last Year</option>
+            <option value="week">Temporal: 7D</option>
+            <option value="month">Temporal: 30D</option>
+            <option value="quarter">Temporal: 90D</option>
+            <option value="year">Temporal: 365D</option>
           </select>
           <select
             value={selectedRegion}
             onChange={(e) => setSelectedRegion(e.target.value)}
-            className="flex-1 md:flex-none px-4 py-2 bg-solar-card border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:ring-2 focus:ring-solar-yellow/50 transition-all font-medium"
+            className="solar-input min-w-[160px]"
           >
-            <option value="">All Regions</option>
+            <option value="">Jurisdiction: Global</option>
             {regions.map(region => (
               <option key={region.id} value={region.name}>{region.name}</option>
             ))}
@@ -115,21 +123,23 @@ export default function GlobalDashboard() {
           <button
             onClick={fetchGlobalStats}
             disabled={loading}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button disabled:opacity-50"
+            className="sun-button px-6 py-2.5"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
+            <div className="flex items-center space-x-2">
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <span>Sync Feed</span>
+            </div>
           </button>
         </div>
       </div>
 
       {/* Live System Status Ticker */}
-      <div className="glass-card rounded-xl p-3 mb-6 relative overflow-hidden group">
-        <div className="absolute left-0 top-0 bottom-0 w-1 vibrancy z-10"></div>
+      <div className="solar-glass rounded-2xl p-3 relative overflow-hidden group border-solar-panel/20">
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-linear-to-b from-solar-panel to-solar-yellow z-10"></div>
         <div className="flex items-center space-x-6">
-          <div className="flex items-center space-x-2 flex-shrink-0 px-4 border-r border-solar-border/30">
+          <div className="flex items-center space-x-2 shrink-0 px-4 border-r border-solar-border/30">
             <div className="w-2 h-2 rounded-full bg-solar-success animate-ping"></div>
-            <span className="text-[10px] font-black text-solar-primary uppercase tracking-widest">Live Node Status</span>
+            <span className="text-[10px] font-black text-solar-primary uppercase tracking-widest">Spectral Telemetry</span>
           </div>
           <div className="flex-1 overflow-hidden">
             <motion.div
@@ -138,9 +148,9 @@ export default function GlobalDashboard() {
               className="flex space-x-12 whitespace-nowrap"
             >
               {[...tickerEvents, ...tickerEvents].map((event, idx) => (
-                <div key={`${event.id}-${idx}`} className="flex items-center space-x-2">
-                  <span className="text-xs font-bold text-solar-primary opacity-80">{event.text}</span>
-                  <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-solar-night/50 text-solar-muted uppercase border border-solar-border/10">TELEMETRY_SYNC</span>
+                <div key={`${event.id}-${idx}`} className="flex items-center space-x-3">
+                  <span className="text-[10px] font-black text-solar-primary uppercase tracking-tight">{event.text}</span>
+                  <span className="text-[8px] font-black px-1.5 py-0.5 rounded-lg bg-solar-night/50 text-solar-muted uppercase border border-solar-border/10 tracking-widest">SIGNAL_ACK</span>
                 </div>
               ))}
             </motion.div>
@@ -189,15 +199,15 @@ export default function GlobalDashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-solar-card/50 backdrop-blur-md rounded-2xl shadow-xl p-8 energy-card border border-solar-border/30"
+        className="solar-glass rounded-3xl p-8 group relative overflow-hidden border-solar-panel/10"
       >
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-10">
           <div>
-            <h2 className="text-xl font-bold sun-glow-text flex items-center">
-              <Zap className="w-5 h-5 mr-3 text-solar-yellow" />
-              Generation & Demand Analytics
+            <h2 className="text-2xl font-black text-solar-primary flex items-center tracking-tight uppercase">
+              <Zap className="w-6 h-6 mr-3 text-solar-yellow group-hover:scale-110 transition-transform" />
+              Generation & Demand Matrix
             </h2>
-            <p className="text-xs text-solar-muted mt-1">Aggregated energy metrics across all selected regions</p>
+            <p className="text-[10px] font-black text-solar-muted mt-1 uppercase tracking-[0.2em]">Aggregated System Performance Metrics</p>
           </div>
           <div className="flex items-center space-x-6 text-[10px] font-bold uppercase tracking-widest text-solar-muted">
             <div className="flex items-center space-x-2">
@@ -316,29 +326,31 @@ export default function GlobalDashboard() {
 
       {/* System Overview */}
 
-      <div className="bg-gradient-to-br from-solar-card to-solar-night/30 rounded-xl p-8 energy-card border border-solar-border/50 shadow-xl">
-        <h2 className="text-2xl font-bold sun-glow-text mb-6 text-center">System Overview</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* System Overview */}
+      <div className="solar-glass rounded-3xl p-10 relative overflow-hidden border-solar-panel/20">
+        <div className="absolute inset-0 bg-linear-to-br from-solar-panel/5 via-transparent to-solar-yellow/5 opacity-50"></div>
+        <h2 className="text-3xl font-black text-solar-primary mb-12 text-center tracking-tighter uppercase relative z-10">Regional Fleet Summary</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
           <div className="text-center group">
-            <div className="w-20 h-20 bg-gradient-to-br from-solar-success/30 to-solar-success/10 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-              <Activity className="w-10 h-10 text-solar-success drop-shadow-sm" />
+            <div className="w-24 h-24 bg-linear-to-br from-solar-success/20 to-solar-success/5 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-all duration-500 border border-solar-success/20">
+              <Activity className="w-12 h-12 text-solar-success" />
             </div>
-            <h3 className="text-xl font-bold text-solar-primary mb-3 group-hover:text-solar-success transition-colors duration-300">Operational Status</h3>
-            <p className="text-solar-muted leading-relaxed">All systems running optimally with 99.9% uptime across all regions</p>
+            <h3 className="text-xl font-black text-solar-primary mb-3 uppercase tracking-tight">Grid Resilience</h3>
+            <p className="text-sm font-medium text-solar-muted leading-relaxed italic">All system nodes operating at 99.9% uptime with autonomous self-healing protocols.</p>
           </div>
           <div className="text-center group">
-            <div className="w-20 h-20 bg-gradient-to-br from-solar-yellow/30 to-solar-orange/10 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-              <TrendingUp className="w-10 h-10 text-solar-yellow drop-shadow-sm" />
+            <div className="w-24 h-24 bg-linear-to-br from-solar-yellow/20 to-solar-orange/5 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-all duration-500 border border-solar-yellow/20">
+              <TrendingUp className="w-12 h-12 text-solar-yellow" />
             </div>
-            <h3 className="text-xl font-bold text-solar-primary mb-3 group-hover:text-solar-yellow transition-colors duration-300">Performance</h3>
-            <p className="text-solar-muted leading-relaxed">Average system efficiency at 94.2% across all solar plants</p>
+            <h3 className="text-xl font-black text-solar-primary mb-3 uppercase tracking-tight">Spectral Yield</h3>
+            <p className="text-sm font-medium text-solar-muted leading-relaxed italic">Harvesting energy at 94.2% efficiency threshold across the global decentralized fleet.</p>
           </div>
           <div className="text-center group">
-            <div className="w-20 h-20 bg-gradient-to-br from-solar-panel/30 to-solar-panel/10 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-              <Globe className="w-10 h-10 text-solar-panel drop-shadow-sm" />
+            <div className="w-24 h-24 bg-linear-to-br from-solar-panel/20 to-solar-panel/5 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-all duration-500 border border-solar-panel/20">
+              <Globe className="w-12 h-12 text-solar-panel" />
             </div>
-            <h3 className="text-xl font-bold text-solar-primary mb-3 group-hover:text-solar-panel transition-colors duration-300">Environmental Impact</h3>
-            <p className="text-solar-muted leading-relaxed">156.8 tons of CO₂ reduced this month through clean energy</p>
+            <h3 className="text-xl font-black text-solar-primary mb-3 uppercase tracking-tight">Eco-Sync Data</h3>
+            <p className="text-sm font-medium text-solar-muted leading-relaxed italic">Aggregated carbon displacement of 156.8 tons verified by distributed ledger telemetry.</p>
           </div>
         </div>
       </div>

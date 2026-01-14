@@ -117,7 +117,7 @@ export default function SolarMap({ height = "500px", selectedRegion = "", isPubl
                     <div className="p-3 w-64 bg-solar-card rounded-xl">
                       <div className="flex items-center justify-between mb-3 border-b border-solar-border/30 pb-2">
                         <div className="flex items-center space-x-2 truncate">
-                          <div className={`w-2 h-2 flex-shrink-0 rounded-full ${plant?.status === 'ACTIVE' ? 'bg-solar-success' : 'bg-solar-warning'}`}></div>
+                          <div className={`w-2 h-2 shrink-0 rounded-full ${plant?.status === 'ACTIVE' ? 'bg-solar-success' : 'bg-solar-warning'}`}></div>
                           <h3 className="font-bold text-solar-primary text-sm truncate">{plant?.name}</h3>
                         </div>
                         <div className="flex flex-col items-end">

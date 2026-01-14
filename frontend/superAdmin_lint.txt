@@ -1,0 +1,22 @@
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/superAdmin/AdminAnalytics.jsx
+   3:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                  no-unused-vars
+  31:14  error    'error' is defined but never used                                                                              no-unused-vars
+  52:6   warning  React Hook useEffect has a missing dependency: 'fetchStats'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  75:9   error    'regionData' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                     no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/superAdmin/AdminEdit.jsx
+  5:10  error  'notify' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/superAdmin/GlobalDashboard.jsx
+   3:10  error    'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                    no-unused-vars
+  83:6   warning  React Hook useEffect has a missing dependency: 'fetchRegions'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/superAdmin/Plants.jsx
+  144:6  warning  React Hook useMemo has a missing dependency: 'handleDeletePlant'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/superAdmin/Users.jsx
+  17:10  error  'installers' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+✖ 9 problems (6 errors, 3 warnings)
+

@@ -136,26 +136,26 @@ export default function Regions() {
         <div className="flex items-center space-x-2">
           <button 
             onClick={() => navigate(`/regions/${row.id}`)}
-            className="p-2 bg-solar-yellow/20 text-solar-yellow rounded-lg hover:bg-solar-yellow/30 transition"
-            title="View"
+            className="p-2 bg-solar-card hover:bg-solar-panel/10 rounded-lg text-solar-muted hover:text-solar-panel transition-all shadow-sm border border-solar-border/30"
+            title="View Details"
           >
             <Eye className="w-4 h-4" />
           </button>
           <button 
             onClick={() => navigate(`/regions/${row.id}/edit`)}
-            className="p-2 bg-solar-panel/20 text-solar-panel rounded-lg hover:bg-solar-panel/30 transition"
-            title="Edit"
+            className="p-2 bg-solar-card hover:bg-solar-yellow/10 rounded-lg text-solar-muted hover:text-solar-yellow transition-all shadow-sm border border-solar-border/30"
+            title="Edit Region"
           >
             <Edit className="w-4 h-4" />
           </button>
           <button 
             onClick={() => handleDelete(row.id)}
             disabled={deletingId === row.id}
-            className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition disabled:opacity-50"
-            title="Delete"
+            className="p-2 bg-solar-card hover:bg-solar-danger/10 rounded-lg text-solar-muted hover:text-solar-danger transition-all shadow-sm border border-solar-border/30 disabled:opacity-50"
+            title="Delete Region"
           >
             {deletingId === row.id ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-400 border-t-transparent" />
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-solar-danger border-t-transparent" />
             ) : (
               <Trash2 className="w-4 h-4" />
             )}
@@ -167,7 +167,11 @@ export default function Regions() {
 
   return (
     <div className="space-y-6">
-      {loading && <SunLoader message="Loading regions..." />}
+      {loading && (
+        <div className="absolute inset-0 bg-solar-bg/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-2xl transition-all duration-500">
+          <SunLoader message="Loading regions..." size="large" />
+        </div>
+      )}
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -177,17 +181,17 @@ export default function Regions() {
         <div className="flex space-x-3">
           <button
             onClick={fetchRegions}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button"
+            className="flex items-center space-x-2 px-4 py-2 rounded-lg transition sun-button"
           >
             <RefreshCw className="w-4 h-4" />
-            <span>Refresh</span>
+            <span>Refresh Regions</span>
           </button>
           <button 
             onClick={() => navigate('/regions/create')}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-panel text-white font-semibold rounded-lg hover:bg-solar-panel/80 transition sun-button"
+            className="flex items-center space-x-2 px-4 py-2 text-white font-semibold rounded-lg transition sun-button"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Region</span>
+            <span>Add Regional Node</span>
           </button>
         </div>
       </div>

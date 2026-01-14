@@ -33,14 +33,14 @@ export default function LandingPage() {
               <div className="mt-10 flex gap-4">
                 <Link
                   to="/auth"
-                  className="px-6 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-md hover:bg-solar-orange transition sun-button"
+                  className="sun-button"
                 >
                   Get Started
                 </Link>
 
                 <Link
                   to="/login"
-                  className="px-6 py-3 border border-solar-primary rounded-md hover:bg-solar-panel/40 transition sun-button"
+                  className="px-6 py-3 border border-solar-border rounded-xl hover:bg-solar-yellow/10 transition-all duration-300"
                 >
                   View Dashboard
                 </Link>
@@ -49,15 +49,7 @@ export default function LandingPage() {
 
             {/* RIGHT VISUAL - SOLAR MAP */}
             <div className="relative">
-              <div className="
-                bg-solar-night/80
-                backdrop-blur-xl
-                border border-solar-primary
-                rounded-2xl
-                shadow-2xl
-                p-6
-                energy-card
-              ">
+              <div className="solar-glass rounded-3xl p-8">
                 <SolarMap isPublic={true} />
               </div>
             </div>
@@ -151,14 +143,14 @@ export default function LandingPage() {
 
           <Link
             to="/register"
-            className="inline-block mt-8 px-8 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-md hover:bg-solar-orange transition sun-button"
+            className="inline-block mt-8 sun-button"
           >
             Create Free Account
           </Link>
         </section>
 
         {/* ================= FOOTER ================= */}
-        <footer className="py-8 text-center text-sm text-solar-muted border-t border-solar-primary">
+        <footer className="py-8 text-center text-sm text-solar-muted border-t border-solar-border">
           © {new Date().getFullYear()} Solar Energy Management System
         </footer>
 
@@ -205,7 +197,7 @@ function Stat({ value, suffix }) {
 
 function Feature({ title, desc }) {
   return (
-    <div className="bg-solar-night/80 backdrop-blur-xl border border-solar-primary rounded-xl p-6 energy-card">
+    <div className="solar-glass rounded-2xl p-6 h-full">
       <h3 className="text-xl font-semibold text-solar-yellow">{title}</h3>
       <p className="text-solar-muted mt-3">{desc}</p>
     </div>
@@ -214,11 +206,11 @@ function Feature({ title, desc }) {
 
 function Testimonial({ quote, author, benefit }) {
   return (
-    <div className="bg-solar-night/80 backdrop-blur-xl border border-solar-primary rounded-xl p-6 energy-card">
+    <div className="solar-glass rounded-2xl p-6 h-full flex flex-col justify-between">
       <p className="text-solar-muted italic mb-4">"{quote}"</p>
       <div className="flex justify-between items-center">
         <span className="text-solar-yellow font-semibold">{author}</span>
-        <span className="text-green-400 text-sm">{benefit}</span>
+        <span className="text-solar-success text-sm">{benefit}</span>
       </div>
     </div>
   );

@@ -323,9 +323,9 @@ const SolarSimulator = () => {
     );
 };
 
-const DataCard = ({ icon: Icon, label, value, color }) => (
+const DataCard = ({ icon: IconComponent, label, value, color }) => (
     <div className="p-4 bg-solar-night/30 rounded-xl border border-white/5 hover:border-white/10 transition-all flex flex-col items-center text-center">
-        <Icon size={18} className={`${color} mb-2`} />
+        <IconComponent size={18} className={`${color} mb-2`} />
         <span className="text-[10px] uppercase font-bold text-solar-muted tracking-widest">{label}</span>
         <span className="text-sm font-bold text-solar-primary mt-1">{value}</span>
     </div>

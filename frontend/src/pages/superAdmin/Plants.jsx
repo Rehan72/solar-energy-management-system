@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Zap, Plus, RefreshCw, Trash2, Eye, Globe, MapPin, Edit, TrendingUp } from 'lucide-react'
 import StatCard from '../../components/ui/stat-card'
@@ -26,7 +26,7 @@ export default function Plants() {
     'Jaipur'
   ]
 
-  const fetchPlants = async () => {
+  const fetchPlants = useCallback(async () => {
     try {
       setLoading(true)
       const url = selectedRegion ? `/superadmin/plants?region=${selectedRegion}` : '/superadmin/plants'
@@ -38,25 +38,13 @@ export default function Plants() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedRegion])
 
   useEffect(() => {
     fetchPlants()
-  }, [selectedRegion])
+  }, [fetchPlants])
 
-  const getStatusBadgeColor = (status) => {
-    const statusUpper = (status || '').toUpperCase()
-    switch (statusUpper) {
-      case 'ACTIVE':
-        return 'bg-green-500 text-white px-2 py-1 rounded-full text-xs'
-      case 'MAINTENANCE':
-        return 'bg-yellow-500 text-dark px-2 py-1 rounded-full text-xs'
-      case 'INACTIVE':
-        return 'bg-red-500 text-white px-2 py-1 rounded-full text-xs'
-      default:
-        return 'bg-gray-500 text-white px-2 py-1 rounded-full text-xs'
-    }
-  }
+
 
   // Define table columns
   const columns = useMemo(() => [
@@ -64,7 +52,7 @@ export default function Plants() {
       header: 'Plant Entity',
       cell: (row) => (
         <div className="flex items-center space-x-3 py-1">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-solar-panel to-blue-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-solar-panel to-blue-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
             <Zap className="w-5 h-5 text-white" />
           </div>
           <div className="flex flex-col">
@@ -171,20 +159,20 @@ export default function Plants() {
     <div className="space-y-6 relative">
       {/* Loading overlay */}
       {loading && (
-        <div className="absolute inset-0 bg-solar-bg/80 z-50 flex flex-col items-center justify-center">
+        <div className="absolute inset-0 bg-solar-bg/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-2xl transition-all duration-500">
           <SunLoader message="Loading plants..." size="large" />
         </div>
       )}
 
       {/* Filters */}
-      <div className="glass-card rounded-2xl p-6 group">
+      <div className="solar-glass rounded-2xl p-6 group">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
             <Globe className="w-5 h-5 text-solar-panel group-hover:rotate-12 transition-transform" />
             <select
               value={selectedRegion}
               onChange={(e) => setSelectedRegion(e.target.value)}
-              className="px-4 py-2.5 bg-solar-bgActive/50 border border-solar-border/30 rounded-xl text-solar-primary focus:outline-none focus:ring-4 focus:ring-solar-yellow/5 focus:border-solar-yellow/50 transition-all font-bold text-sm"
+              className="solar-input min-w-[200px]"
             >
               <option value="">Global Scoped (All Regions)</option>
               {regions.map(r => (
@@ -199,7 +187,6 @@ export default function Plants() {
             </div>
           </div>
         </div>
-        
       </div>
        <div className="flex justify-between items-center">
         <div>
@@ -209,17 +196,17 @@ export default function Plants() {
         <div className="flex space-x-3">
           <button
             onClick={() => { fetchPlants() }}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button"
+            className="flex items-center space-x-2 px-4 py-2 rounded-lg transition sun-button"
           >
             <RefreshCw className="w-4 h-4" />
-            <span>Refresh</span>
+            <span>Refresh Data</span>
           </button>
           <button 
             onClick={() => navigate('/plants/create')}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-success text-white font-semibold rounded-lg hover:bg-solar-success/80 transition sun-button"
+            className="flex items-center space-x-2 px-4 py-2 text-white font-semibold rounded-lg transition sun-button"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Plant</span>
+            <span>Add Plant Node</span>
           </button>
         </div>
       </div>

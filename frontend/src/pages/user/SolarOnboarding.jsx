@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { putRequest } from "../../lib/apiService";
 import { notify } from "../../lib/toast";
-import { Input } from "../../components/ui/input";
-import { Button } from "../../components/ui/button";
+import { Zap, Sun, Settings, CheckCircle, ArrowRight, ShieldCheck, Activity, Globe, Cpu, CreditCard } from "lucide-react";
+
 
 function SolarOnboarding() {
     const navigate = useNavigate();
@@ -88,83 +88,91 @@ function SolarOnboarding() {
     };
 
     return (
-        <div className="max-w-3xl mx-auto p-6 space-y-8 animate-fadeIn">
-            <div className="text-center">
-                <h1 className="text-3xl font-bold text-solar-primary dark:text-solar-yellow mb-2">
-                    Complete Your Solar Profile
-                </h1>
-                <p className="text-solar-muted">
-                    Tell us about your energy needs to get personalized recommendations.
-                </p>
+        <div className="max-w-3xl mx-auto space-y-10 animate-fadeIn">
+            <div className="text-center space-y-4">
+                <div className="w-20 h-20 bg-linear-to-br from-solar-panel to-solar-yellow rounded-3xl flex items-center justify-center mx-auto shadow-2xl border border-solar-yellow/20">
+                    <Sun size={40} className="text-solar-dark animate-spin-slow" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-black text-solar-primary tracking-tighter uppercase">Onboarding Protocol</h1>
+                  <p className="text-solar-muted font-medium italic mt-2">Initializing your solar grid identity and node configurations.</p>
+                </div>
             </div>
 
-            <div className="bg-solar-card/50 rounded-xl p-8 border border-solar-border shadow-lg">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-solar-primary dark:text-solar-yellow">
-                            Installation Status *
-                        </label>
-                        <select
-                            name="installation_status"
-                            value={formData.installation_status}
-                            onChange={handleChange}
-                            className="w-full h-11 bg-solar-dark/80 dark:bg-solar-night/80 text-solar-primary dark:text-solar-textPrimaryDark border border-solar-border rounded-lg px-3 focus:ring-2 focus:ring-solar-yellow focus:border-solar-yellow transition-all"
-                        >
-                            {installationStatuses.map((status) => (
-                                <option key={status.value} value={status.value}>
-                                    {status.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+            <div className="solar-glass rounded-[40px] p-10 border-solar-panel/10 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <Settings className="w-48 h-48 text-solar-yellow rotate-12" />
+                </div>
+                <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                          <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] ml-1">
+                              Deployment Phase *
+                          </label>
+                          <select
+                              name="installation_status"
+                              value={formData.installation_status}
+                              onChange={handleChange}
+                              className="solar-input"
+                          >
+                              {installationStatuses.map((status) => (
+                                  <option key={status.value} value={status.value}>
+                                      {status.label}
+                                  </option>
+                              ))}
+                          </select>
+                      </div>
 
-                    <div className="space-y-2">
-                        <label className="block text-sm font-medium text-solar-primary dark:text-solar-yellow">
-                            Property Type *
-                        </label>
-                        <select
-                            name="property_type"
-                            value={formData.property_type}
-                            onChange={handleChange}
-                            className="w-full h-11 bg-solar-dark/80 dark:bg-solar-night/80 text-solar-primary dark:text-solar-textPrimaryDark border border-solar-border rounded-lg px-3 focus:ring-2 focus:ring-solar-yellow focus:border-solar-yellow transition-all"
-                        >
-                            {propertyTypes.map((type) => (
-                                <option key={type.value} value={type.value}>
-                                    {type.label}
-                                </option>
-                            ))}
-                        </select>
+                      <div className="space-y-3">
+                          <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] ml-1">
+                              Structural Matrix *
+                          </label>
+                          <select
+                              name="property_type"
+                              value={formData.property_type}
+                              onChange={handleChange}
+                              className="solar-input"
+                          >
+                              {propertyTypes.map((type) => (
+                                  <option key={type.value} value={type.value}>
+                                      {type.label}
+                                  </option>
+                              ))}
+                          </select>
+                      </div>
                     </div>
 
                     {formData.installation_status !== "INSTALLED" && (
-                        <div className="space-y-4 animate-slideUp">
-                            <Field
-                                label="Average Monthly Bill (₹) *"
-                                name="avg_monthly_bill"
-                                value={formData.avg_monthly_bill}
-                                onChange={handleChange}
-                                type="number"
-                                placeholder="e.g., 2500"
-                            />
+                        <div className="space-y-8 pt-6 border-t border-solar-border/10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                              <Field
+                                  label="Cycle Flux (Average Monthly Bill ₹) *"
+                                  name="avg_monthly_bill"
+                                  value={formData.avg_monthly_bill}
+                                  onChange={handleChange}
+                                  type="number"
+                                  placeholder="e.g., 2500"
+                              />
 
-                            <Field
-                                label="Roof Area (sq ft) - Optional"
-                                name="roof_area_sqft"
-                                value={formData.roof_area_sqft}
-                                onChange={handleChange}
-                                type="number"
-                                placeholder="e.g., 500"
-                            />
+                              <Field
+                                  label="Surface Volume (Roof Area Sq Ft) - Optional"
+                                  name="roof_area_sqft"
+                                  value={formData.roof_area_sqft}
+                                  onChange={handleChange}
+                                  type="number"
+                                  placeholder="e.g., 500"
+                              />
+                            </div>
 
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-solar-primary dark:text-solar-yellow">
-                                    Connection Type
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] ml-1">
+                                    Phase Modulation
                                 </label>
                                 <select
                                     name="connection_type"
                                     value={formData.connection_type}
                                     onChange={handleChange}
-                                    className="w-full h-11 bg-solar-dark/80 dark:bg-solar-night/80 text-solar-primary dark:text-solar-textPrimaryDark border border-solar-border rounded-lg px-3 focus:ring-2 focus:ring-solar-yellow focus:border-solar-yellow transition-all"
+                                    className="solar-input"
                                 >
                                     {connectionTypes.map((type) => (
                                         <option key={type.value} value={type.value}>
@@ -174,93 +182,112 @@ function SolarOnboarding() {
                                 </select>
                             </div>
 
-                            <div className="flex items-center space-x-3 p-4 bg-solar-primary/5 rounded-lg border border-solar-primary/10">
+                            <div className="flex items-center space-x-4 p-6 solar-glass bg-solar-primary/5 rounded-2xl border border-solar-primary/20 group/check">
                                 <input
                                     type="checkbox"
                                     name="subsidy_interest"
                                     id="subsidy_interest"
                                     checked={formData.subsidy_interest}
                                     onChange={handleChange}
-                                    className="w-5 h-5 text-solar-yellow border-solar-border rounded focus:ring-solar-yellow cursor-pointer"
+                                    className="w-6 h-6 text-solar-yellow bg-solar-night/50 border-solar-border/30 rounded-lg focus:ring-solar-yellow cursor-pointer transition-all duration-300 group-hover/check:scale-110"
                                 />
-                                <label
-                                    htmlFor="subsidy_interest"
-                                    className="text-sm text-solar-primary dark:text-solar-textPrimaryDark cursor-pointer select-none"
-                                >
-                                    I'm interested in government subsidies
-                                </label>
+                                <div className="space-y-1">
+                                  <label
+                                      htmlFor="subsidy_interest"
+                                      className="text-sm font-black text-solar-primary uppercase tracking-tight cursor-pointer select-none"
+                                  >
+                                      Initialize Incentive Protocol
+                                  </label>
+                                  <p className="text-[10px] text-solar-muted font-medium italic">Signal interest in government solar subsidies and grants.</p>
+                                </div>
                             </div>
                         </div>
                     )}
 
                     {formData.installation_status === "INSTALLED" && (
-                        <div className="space-y-4 animate-slideUp">
-                            <Field
-                                label="Plant Capacity (kW) *"
-                                name="plant_capacity_kw"
-                                value={formData.plant_capacity_kw}
-                                onChange={handleChange}
-                                type="number"
-                                placeholder="e.g., 5"
-                            />
-
-                            <div className="flex items-center space-x-3 p-4 bg-solar-primary/5 rounded-lg border border-solar-primary/10">
-                                <input
-                                    type="checkbox"
-                                    name="net_metering"
-                                    id="net_metering"
-                                    checked={formData.net_metering}
+                        <div className="space-y-8 pt-6 border-t border-solar-border/10">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <Field
+                                    label="Quantum Yield (Plant Capacity kW) *"
+                                    name="plant_capacity_kw"
+                                    value={formData.plant_capacity_kw}
                                     onChange={handleChange}
-                                    className="w-5 h-5 text-solar-yellow border-solar-border rounded focus:ring-solar-yellow cursor-pointer"
+                                    type="number"
+                                    placeholder="e.g., 5"
                                 />
-                                <label
-                                    htmlFor="net_metering"
-                                    className="text-sm text-solar-primary dark:text-solar-textPrimaryDark cursor-pointer select-none"
-                                >
-                                    Net metering enabled
-                                </label>
+
+                                <div className="space-y-3">
+                                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] ml-1">Grid Flux Bi-Directionality</label>
+                                  <div className="flex items-center space-x-4 p-6 solar-glass bg-solar-primary/5 rounded-2xl border border-solar-primary/20 group/check h-[52px]">
+                                      <input
+                                          type="checkbox"
+                                          name="net_metering"
+                                          id="net_metering"
+                                          checked={formData.net_metering}
+                                          onChange={handleChange}
+                                          className="w-6 h-6 text-solar-yellow border-solar-border/30 rounded-lg focus:ring-solar-yellow cursor-pointer group-hover/check:scale-110 transition-transform"
+                                      />
+                                      <label
+                                          htmlFor="net_metering"
+                                          className="text-xs font-black text-solar-primary uppercase tracking-tight cursor-pointer select-none"
+                                      >
+                                          Net Metering Synchronized
+                                      </label>
+                                  </div>
+                                </div>
                             </div>
 
-                            <Field
-                                label="Inverter Brand"
-                                name="inverter_brand"
-                                value={formData.inverter_brand}
-                                onChange={handleChange}
-                                type="text"
-                                placeholder="e.g., SolarEdge, Huawei"
-                            />
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <Field
+                                    label="Hardware Architecture"
+                                    name="inverter_brand"
+                                    value={formData.inverter_brand}
+                                    onChange={handleChange}
+                                    type="text"
+                                    placeholder="e.g., SolarEdge, Huawei"
+                                />
 
-                            <Field
-                                label="DISCOM Name"
-                                name="discom_name"
-                                value={formData.discom_name}
-                                onChange={handleChange}
-                                type="text"
-                                placeholder="e.g., BSES, Tata Power"
-                            />
+                                <Field
+                                    label="Grid Interconnect (DISCOM)"
+                                    name="discom_name"
+                                    value={formData.discom_name}
+                                    onChange={handleChange}
+                                    type="text"
+                                    placeholder="e.g., Tata Power"
+                                />
 
-                            <Field
-                                label="Consumer Number"
-                                name="consumer_number"
-                                value={formData.consumer_number}
-                                onChange={handleChange}
-                                type="text"
-                                placeholder="Your electricity consumer number"
-                            />
+                                <Field
+                                    label="Personnel Reference (Consumer #)"
+                                    name="consumer_number"
+                                    value={formData.consumer_number}
+                                    onChange={handleChange}
+                                    type="text"
+                                    placeholder="Electricity ID"
+                                />
+                            </div>
                         </div>
                     )}
 
-                    <div className="pt-4">
-                        <Button
+                    <div className="pt-8">
+                        <button
                             type="submit"
                             disabled={loading}
-                            className="w-full h-12 text-lg tracking-wide bg-gradient-to-r from-solar-yellow to-solar-orange text-solar-dark border-0 rounded-lg shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.5)] hover:scale-[1.02] transition-all duration-300"
+                            className="w-full h-14 sun-button group"
                         >
-                            {loading && (
-                                <span className="h-5 w-5 border-2 border-solar-dark border-t-transparent rounded-full animate-spin mr-3" />
-                            )}
-                            {loading ? "Updating Profile..." : "Complete Setup"}
-                        </Button>
+                            <div className="flex items-center justify-center space-x-3 font-black uppercase tracking-widest">
+                                {loading ? (
+                                    <>
+                                      <div className="w-5 h-5 border-2 border-solar-dark border-t-transparent rounded-full animate-spin" />
+                                      <span>Synchronizing Registry...</span>
+                                    </>
+                                ) : (
+                                  <>
+                                    <CheckCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                    <span>Complete Onboarding protocol</span>
+                                  </>
+                                )}
+                            </div>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -272,26 +299,17 @@ export default SolarOnboarding;
 
 function Field({ label, name, value, onChange, type, placeholder }) {
     return (
-        <div className="space-y-2">
-            <label className="block text-sm font-medium text-solar-primary dark:text-solar-yellow">
+        <div className="space-y-3">
+            <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] ml-1">
                 {label}
             </label>
-            <Input
+            <input
                 type={type}
                 name={name}
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
-                className="
-          h-11
-          bg-solar-dark/80 dark:bg-solar-night/80
-          text-solar-primary dark:text-solar-textPrimaryDark
-          border border-solar-border dark:border-solar-border
-          focus:ring-2 focus:ring-solar-yellow focus:border-solar-yellow
-          placeholder:text-solar-muted/50
-          rounded-lg
-          transition-all duration-300
-        "
+                className="solar-input"
                 required={type !== "checkbox"}
             />
         </div>

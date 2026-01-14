@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Upload, Loader2, MapPin, Building, User, Phone, Mail, Map } from 'lucide-react'
 import { getRequest, postRequest } from '../../lib/apiService'
@@ -8,7 +8,6 @@ import ProfileImageUpload from '../../components/ProfileImageUpload'
 
 export default function CreateInstaller() {
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [regions, setRegions] = useState([])
   const [plants, setPlants] = useState([])
@@ -46,7 +45,7 @@ export default function CreateInstaller() {
   // Fetch Regions on mount
   useEffect(() => {
     fetchRegions()
-  }, [])
+  }, [fetchRegions])
 
   // Fetch Plants when Region changes
   useEffect(() => {
@@ -58,7 +57,7 @@ export default function CreateInstaller() {
       setAdmins([])
       setRegionAdmins([])
     }
-  }, [formData.region])
+  }, [formData.region, fetchPlants, fetchAdmins])
 
   // Filter Admins when Plant changes
   useEffect(() => {
@@ -78,7 +77,7 @@ export default function CreateInstaller() {
     }
   }, [formData.plant_id, regionAdmins])
 
-  const fetchRegions = async () => {
+  const fetchRegions = useCallback(async () => {
     try {
       const response = await getRequest('/superadmin/regions')
       setRegions(response.data || [])
@@ -86,9 +85,9 @@ export default function CreateInstaller() {
       console.error('Failed to fetch regions', error)
       notify.error('Failed to load regions')
     }
-  }
+  }, [])
 
-  const fetchPlants = async (regionId) => {
+  const fetchPlants = useCallback(async (regionId) => {
     try {
       // Assuming endpoint supports filtering or we filter manually
       // Here we fetch all plants and filter (optimized)
@@ -103,9 +102,9 @@ export default function CreateInstaller() {
     } catch (error) {
       console.error('Failed to fetch plants', error)
     }
-  }
+  }, [])
 
-  const fetchAdmins = async (regionName) => {
+  const fetchAdmins = useCallback(async (regionName) => {
     try {
       const response = await getRequest('/superadmin/admins')
       const allAdmins = response.data.admins || []
@@ -125,7 +124,7 @@ export default function CreateInstaller() {
     } catch (error) {
       console.error('Failed to fetch admins', error)
     }
-  }
+  }, [regions])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -184,7 +183,7 @@ export default function CreateInstaller() {
         <div className="flex items-center space-x-4">
           <button 
             onClick={() => navigate(-1)}
-            className="p-2 rounded-lg bg-solar-card hover:bg-solar-panel/20 text-solar-primary transition"
+            className="p-2 border border-solar-border rounded-lg hover:bg-solar-yellow/10 transition-all duration-300"
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
@@ -199,7 +198,7 @@ export default function CreateInstaller() {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Basic Info Section */}
-        <div className="bg-solar-card/50 backdrop-blur-xl rounded-2xl p-6 border border-solar-border shadow-lg">
+        <div className="solar-glass rounded-2xl p-8">
           <div className="flex items-center space-x-3 mb-6">
             <User className="w-6 h-6 text-solar-yellow" />
             <h2 className="text-xl font-semibold text-solar-primary">Basic Information</h2>
@@ -232,7 +231,7 @@ export default function CreateInstaller() {
                 value={formData.first_name}
                 onChange={handleChange}
                 required
-                className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition"
+                className="solar-input"
               />
             </div>
             <div>
@@ -243,7 +242,7 @@ export default function CreateInstaller() {
                 value={formData.last_name}
                 onChange={handleChange}
                 required
-                className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition"
+                className="solar-input"
               />
             </div>
             <div>
@@ -254,7 +253,7 @@ export default function CreateInstaller() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition"
+                className="solar-input"
               />
             </div>
             <div>
@@ -264,14 +263,14 @@ export default function CreateInstaller() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition"
+                className="solar-input"
               />
             </div>
           </div>
         </div>
 
         {/* Assignment Section */}
-        <div className="bg-solar-card/50 backdrop-blur-xl rounded-2xl p-6 border border-solar-border shadow-lg">
+        <div className="solar-glass rounded-2xl p-8">
           <div className="flex items-center space-x-3 mb-6">
             <Building className="w-6 h-6 text-solar-yellow" />
             <h2 className="text-xl font-semibold text-solar-primary">Assignment</h2>
@@ -285,7 +284,7 @@ export default function CreateInstaller() {
                 value={formData.region}
                 onChange={handleChange}
                 required
-                className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition"
+                className="solar-input"
               >
                 <option value="">Select Region</option>
                 {regions.map(r => (
@@ -301,7 +300,7 @@ export default function CreateInstaller() {
                 onChange={handleChange}
                 required
                 disabled={!formData.region}
-                className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition disabled:opacity-50"
+                className="solar-input disabled:opacity-50"
               >
                 <option value="">Select Plant</option>
                 {plants.map(p => (
@@ -316,7 +315,7 @@ export default function CreateInstaller() {
                 value={formData.admin_id}
                 onChange={handleChange}
                 disabled={!formData.region}
-                className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition disabled:opacity-50"
+                className="solar-input disabled:opacity-50"
               >
                 <option value="">Select Admin</option>
                 {admins.map(a => (
@@ -328,7 +327,7 @@ export default function CreateInstaller() {
         </div>
 
         {/* Address & Location */}
-        <div className="bg-solar-card/50 backdrop-blur-xl rounded-2xl p-6 border border-solar-border shadow-lg">
+        <div className="solar-glass rounded-2xl p-8">
           <div className="flex items-center space-x-3 mb-6">
             <MapPin className="w-6 h-6 text-solar-yellow" />
             <h2 className="text-xl font-semibold text-solar-primary">Address & Location</h2>
@@ -343,7 +342,7 @@ export default function CreateInstaller() {
                 value={formData.address_line1}
                 onChange={handleChange}
                 placeholder="Street address"
-                className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition"
+                className="solar-input"
               />
             </div>
             <div className="md:col-span-2">
@@ -354,7 +353,7 @@ export default function CreateInstaller() {
                 value={formData.address_line2}
                 onChange={handleChange}
                 placeholder="Apartment, suite, etc."
-                className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition"
+                className="solar-input"
               />
             </div>
             <div>
@@ -364,7 +363,7 @@ export default function CreateInstaller() {
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
-                className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition"
+                className="solar-input"
               />
             </div>
             <div>
@@ -373,7 +372,7 @@ export default function CreateInstaller() {
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
-                className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition"
+                className="solar-input"
               >
                 <option value="">Select State</option>
                 {indianStates.map(s => (
@@ -388,7 +387,7 @@ export default function CreateInstaller() {
                 name="pincode"
                 value={formData.pincode}
                 onChange={handleChange}
-                className="w-full h-12 px-4 bg-solar-dark/80 border border-solar-border rounded-xl text-solar-primary focus:ring-2 focus:ring-solar-yellow transition"
+                className="solar-input"
               />
             </div>
           </div>
@@ -408,7 +407,7 @@ export default function CreateInstaller() {
           <button
             type="submit"
             disabled={saving}
-            className="px-8 py-3 bg-linear-to-r from-solar-yellow to-solar-orange text-solar-dark font-bold rounded-xl shadow-lg hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+            className="sun-button"
           >
             {saving ? (
               <>

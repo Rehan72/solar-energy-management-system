@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Users, ArrowLeft, User, Mail, Lock, CheckCircle, Phone, MapPin, Eye, EyeOff, Shield } from 'lucide-react'
 import { Button } from '../../components/ui/button'
@@ -136,53 +136,54 @@ export default function EditUser() {
     'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi'
   ]
 
+  const fetchAdmins = useCallback(async () => {
+    if (currentUserRole !== 'SUPER_ADMIN') {
+      adminsLoadedRef.current = true
+      return
+    }
+    try {
+      const response = await getRequest('/superadmin/admins')
+      const adminsData = (response.data.admins || []).map(admin => ({
+        ...admin,
+        name: `${admin.first_name || ''} ${admin.last_name || ''}`.trim()
+      }))
+      setAdmins(adminsData)
+      // Filter admins based on user's region if user data already loaded
+      if (formData.region) {
+        const filtered = adminsData.filter(admin => admin.region === formData.region)
+        setFilteredAdmins(filtered)
+      } else {
+        setFilteredAdmins(adminsData)
+      }
+      adminsLoadedRef.current = true
+    } catch (error) {
+      console.error('Failed to fetch admins:', error)
+    }
+  }, [currentUserRole, formData.region])
+
+  const fetchInstallers = useCallback(async () => {
+    try {
+      const response = await getRequest('/admin/installers')
+      const installersData = (response.data.installers || []).map(inst => ({
+        ...inst,
+        name: `${inst.first_name || ''} ${inst.last_name || ''}`.trim()
+      }))
+      setInstallers(installersData)
+      if (formData.region) {
+        setFilteredInstallers(installersData.filter(i => i.region === formData.region))
+      } else {
+        setFilteredInstallers(installersData)
+      }
+    } catch (error) {
+      console.error('Failed to fetch installers:', error)
+    }
+  }, [formData.region])
+
   // Fetch admins on mount
   useEffect(() => {
-    const fetchAdmins = async () => {
-      if (currentUserRole !== 'SUPER_ADMIN') {
-        adminsLoadedRef.current = true
-        return
-      }
-      try {
-        const response = await getRequest('/superadmin/admins')
-        const adminsData = (response.data.admins || []).map(admin => ({
-          ...admin,
-          name: `${admin.first_name || ''} ${admin.last_name || ''}`.trim()
-        }))
-        setAdmins(adminsData)
-        // Filter admins based on user's region if user data already loaded
-        if (formData.region) {
-          const filtered = adminsData.filter(admin => admin.region === formData.region)
-          setFilteredAdmins(filtered)
-        } else {
-          setFilteredAdmins(adminsData)
-        }
-        adminsLoadedRef.current = true
-      } catch (error) {
-        console.error('Failed to fetch admins:', error)
-      }
-    }
     fetchAdmins()
-
-    const fetchInstallers = async () => {
-      try {
-        const response = await getRequest('/admin/installers')
-        const installersData = (response.data.installers || []).map(inst => ({
-          ...inst,
-          name: `${inst.first_name || ''} ${inst.last_name || ''}`.trim()
-        }))
-        setInstallers(installersData)
-        if (formData.region) {
-          setFilteredInstallers(installersData.filter(i => i.region === formData.region))
-        } else {
-          setFilteredInstallers(installersData)
-        }
-      } catch (error) {
-        console.error('Failed to fetch installers:', error)
-      }
-    }
     fetchInstallers()
-  }, [])
+  }, [fetchAdmins, fetchInstallers])
 
   // Re-filter admins when admins are first loaded and user has a region
   useEffect(() => {
@@ -212,7 +213,7 @@ export default function EditUser() {
       if (formData.admin_id) setFormData(prev => ({ ...prev, admin_id: '' }))
       if (formData.installer_id) setFormData(prev => ({ ...prev, installer_id: '' }))
     }
-  }, [formData.region, admins, installers])
+  }, [formData.region, admins, installers, formData.admin_id, formData.installer_id])
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -321,39 +322,14 @@ export default function EditUser() {
     }
   }
 
-  const getRoleOptions = () => {
-    if (currentUserRole === 'SUPER_ADMIN') {
-      return [
-        { value: 'USER', label: 'User' },
-        { value: 'ADMIN', label: 'Admin' },
-        { value: 'SUPER_ADMIN', label: 'Super Admin' }
-      ]
-    } else if (currentUserRole === 'ADMIN') {
-      return [
-        { value: 'USER', label: 'User' }
-      ]
-    }
-    return []
-  }
+
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => navigate('/users')}
-            className="p-2 bg-solar-card rounded-lg hover:bg-solar-panel/20 transition"
-          >
-            <ArrowLeft className="w-5 h-5 text-solar-primary" />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold sun-glow-text">Edit User</h1>
-            <p className="text-solar-muted mt-1">Update user information</p>
-          </div>
-        </div>
-        <div className="bg-solar-card rounded-lg p-8 energy-card text-center">
-          <div className="animate-spin w-8 h-8 border-2 border-solar-yellow border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-solar-muted">Loading user details...</p>
+      <div className="space-y-6 relative min-h-[400px]">
+        {/* Full page loading overlay */}
+        <div className="absolute inset-0 bg-solar-bg/80 z-50 flex flex-col items-center justify-center rounded-2xl overflow-hidden">
+          <SunLoader message="Synchronizing user data..." size="large" fullscreen={false} />
         </div>
       </div>
     )
@@ -365,41 +341,56 @@ export default function EditUser() {
         <div className="flex items-center space-x-4">
           <button
             onClick={() => navigate('/users')}
-            className="p-2 bg-solar-card rounded-lg hover:bg-solar-panel/20 transition"
+            className="p-2 solar-glass rounded-lg hover:bg-solar-panel/20 transition-all border border-solar-border/30"
           >
             <ArrowLeft className="w-5 h-5 text-solar-primary" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold sun-glow-text">Edit User</h1>
-            <p className="text-solar-muted mt-1">Update user information</p>
+            <h1 className="text-3xl font-black text-solar-primary tracking-tight uppercase">Registry Updated</h1>
+            <p className="text-solar-muted mt-1 font-medium italic">Synchronizing fleet records...</p>
           </div>
         </div>
 
-        <div className="bg-solar-card rounded-lg p-8 energy-card text-center">
-          <div className="w-16 h-16 bg-solar-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-solar-success" />
+        <div className="solar-glass rounded-3xl p-12 text-center border-solar-success/20 group">
+          <div className="w-20 h-20 bg-solar-success/10 rounded-2xl flex items-center justify-center mx-auto mb-8 border border-solar-success/20 group-hover:scale-110 transition-transform duration-500">
+            <CheckCircle className="w-10 h-10 text-solar-success animate-pulse" />
           </div>
-          <h2 className="text-xl font-semibold text-solar-primary mb-2">User Updated Successfully!</h2>
-          <p className="text-solar-muted">Redirecting to users list...</p>
+          <h2 className="text-2xl font-black text-solar-primary mb-3 uppercase tracking-tight">Personnel Optimized</h2>
+          <p className="text-solar-muted font-medium italic">Telemetry data successfully propagated to the central registry.</p>
+          <div className="mt-8 flex justify-center items-center space-x-2 text-solar-muted">
+            <div className="w-2 h-2 bg-solar-yellow rounded-full animate-bounce"></div>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Redirecting to command center...</span>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {saving && <SunLoader message="Saving changes..." />}
+    <div className="space-y-8 animate-fadeIn">
+      {saving && <SunLoader message="Propagating registry changes..." />}
+      
       {/* Progress Steps */}
-      <div className="flex justify-center items-center space-x-4 mb-6">
+      <div className="flex justify-center items-center max-w-2xl mx-auto mb-12">
         {[1, 2, 3].map((s) => (
-          <div key={s} className="flex items-center">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= s
-              ? "bg-gradient-to-r from-solar-yellow to-solar-orange text-solar-dark"
-              : "bg-gray-300 text-gray-500"
+          <div key={s} className="flex items-center flex-1 last:flex-none">
+            <div className={`relative shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all duration-500 border ${step >= s
+              ? "bg-linear-to-br from-solar-panel to-solar-yellow text-solar-dark border-solar-yellow shadow-[0_0_20px_rgba(255,209,102,0.3)]"
+              : "solar-glass text-solar-muted border-solar-border/30 opacity-40"
               }`}>
               {s}
+              {step === s && <div className="absolute -inset-1 bg-solar-yellow/20 rounded-2xl blur-sm animate-pulse"></div>}
             </div>
-            {s < 3 && <div className={`w-16 h-1 ${step > s ? "bg-solar-yellow" : "bg-gray-300"}`} />}
+            {s < 3 && (
+              <div className="flex-1 mx-4 relative">
+                <div className="h-0.5 w-full bg-solar-border/20 rounded-full" />
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: step > s ? "100%" : "0%" }}
+                  className="absolute inset-0 h-0.5 bg-linear-to-r from-solar-panel to-solar-yellow rounded-full shadow-[0_0_10px_rgba(255,209,102,0.5)]" 
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -408,87 +399,90 @@ export default function EditUser() {
       <div className="flex items-center space-x-4">
         <button
           onClick={() => navigate('/users')}
-          className="p-2 bg-solar-card rounded-lg hover:bg-solar-panel/20 transition"
+          className="p-2 solar-glass rounded-lg hover:bg-solar-panel/20 transition-all border border-solar-border/30"
         >
           <ArrowLeft className="w-5 h-5 text-solar-primary" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold sun-glow-text">Edit User</h1>
-          <p className="text-solar-muted mt-1">Update user information step by step</p>
+          <h1 className="text-3xl font-black text-solar-primary tracking-tight uppercase">Modify Personnel Node</h1>
+          <p className="text-solar-muted mt-1 font-medium italic">Calibrating system access and jurisdictional parameters.</p>
         </div>
       </div>
 
       {/* Form */}
-      <div className="bg-solar-card rounded-lg p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="solar-glass rounded-3xl p-8 relative overflow-hidden group">
+        <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+          <Users className="w-32 h-32 text-solar-yellow" />
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
           {error && (
-            <div className="bg-solar-danger/20 border border-solar-danger text-solar-danger px-4 py-3 rounded-lg">
-              {error}
+            <div className="bg-solar-danger/10 border border-solar-danger/30 text-solar-danger px-6 py-4 rounded-xl flex items-center space-x-3 animate-shake">
+              <Shield className="w-5 h-5" />
+              <span className="text-sm font-black uppercase tracking-tight">{error}</span>
             </div>
           )}
 
           {/* Step 1: Basic Details */}
           {step === 1 && (
-            <div className="space-y-4 animate-fadeIn">
-              <h3 className="text-lg font-semibold text-solar-primary">Basic Information</h3>
+            <div className="space-y-8 animate-fadeIn">
+              <h3 className="text-xl font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+                <User className="w-5 h-5 mr-3 text-solar-yellow" />
+                Identity parameters
+              </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* First Name */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    <User className="w-4 h-4 inline mr-2" />
-                    First Name
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Given Name Designation
                   </label>
                   <input
                     type="text"
                     value={formData.first_name}
                     onChange={(e) => handleChange('first_name', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
+                    className="solar-input"
                     placeholder="Enter first name"
                   />
                 </div>
 
                 {/* Last Name */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    <User className="w-4 h-4 inline mr-2" />
-                    Last Name
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Surname Reference
                   </label>
                   <input
                     type="text"
                     value={formData.last_name}
                     onChange={(e) => handleChange('last_name', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
+                    className="solar-input"
                     placeholder="Enter last name"
                   />
                 </div>
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    <Mail className="w-4 h-4 inline mr-2" />
-                    Email Address
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Digital Signature (Email)
                   </label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleChange('email', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
+                    className="solar-input"
                     placeholder="user@example.com"
                   />
                 </div>
 
                 {/* Phone */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    <Phone className="w-4 h-4 inline mr-2" />
-                    Phone Number
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Comm-Link (Phone)
                   </label>
                   <input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => handleChange('phone', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
+                    className="solar-input"
                     placeholder="+91 9876543210"
                   />
                 </div>
@@ -512,17 +506,16 @@ export default function EditUser() {
 
                 {/* Password */}
                 <div className="relative">
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    <Lock className="w-4 h-4 inline mr-2" />
-                    New Password (Optional)
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Access Protocol (Optional)
                   </label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={formData.password}
                       onChange={(e) => handleChange('password', e.target.value)}
-                      className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition pr-10"
-                      placeholder="Enter new password"
+                      className="solar-input pr-12"
+                      placeholder="Rotate access key..."
                     />
                     <button
                       type="button"
@@ -536,17 +529,16 @@ export default function EditUser() {
 
                 {/* Confirm Password */}
                 <div className="relative">
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    <Lock className="w-4 h-4 inline mr-2" />
-                    Confirm New Password (Optional)
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Verify Access Key
                   </label>
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={formData.confirmPassword}
                       onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                      className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition pr-10"
-                      placeholder="Confirm new password"
+                      className="solar-input pr-12"
+                      placeholder="Confirm new key..."
                     />
                     <button
                       type="button"
@@ -560,13 +552,16 @@ export default function EditUser() {
               </div>
 
               {/* Navigation Buttons for Step 1 */}
-              <div className="flex justify-end space-x-4 pt-4">
+              <div className="flex justify-end pt-8">
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="px-6 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button"
+                  className="sun-button px-10 py-3"
                 >
-                  Next: Installation Details
+                  <div className="flex items-center space-x-2">
+                    <span>Analyze Installation Data</span>
+                    <ArrowLeft className="w-4 h-4 rotate-180" />
+                  </div>
                 </button>
               </div>
             </div>
@@ -574,85 +569,88 @@ export default function EditUser() {
 
           {/* Step 2: Installation Details */}
           {step === 2 && (
-            <div className="space-y-4 animate-fadeIn">
-              <h3 className="text-lg font-semibold text-solar-primary">Installation Details</h3>
+            <div className="space-y-8 animate-fadeIn">
+              <h3 className="text-xl font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+                <Zap className="w-5 h-5 mr-3 text-solar-yellow" />
+                Infrastructure Analytics
+              </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Installation Status */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    Installation Status
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Node Deployment Status
                   </label>
                   <select
                     value={formData.installation_status}
                     onChange={(e) => handleChange('installation_status', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow transition"
+                    className="solar-input"
                   >
-                    <option value="NOT_INSTALLED">Not Installed</option>
-                    <option value="INSTALLATION_PLANNED">Installation Planned</option>
-                    <option value="INSTALLED">Installed</option>
+                    <option value="NOT_INSTALLED">Not Yet Deployed</option>
+                    <option value="INSTALLATION_PLANNED">Deployment Imminent</option>
+                    <option value="INSTALLED">Synchronized (Installed)</option>
                   </select>
                 </div>
 
                 {/* Property Type */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    Property Type
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Structural Classification
                   </label>
                   <select
                     value={formData.property_type}
                     onChange={(e) => handleChange('property_type', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow transition"
+                    className="solar-input"
                   >
-                    <option value="RESIDENTIAL">Residential</option>
-                    <option value="COMMERCIAL">Commercial</option>
-                    <option value="INDUSTRIAL">Industrial</option>
-                    <option value="AGRICULTURAL">Agricultural</option>
+                    <option value="RESIDENTIAL">Residential Node</option>
+                    <option value="COMMERCIAL">Commercial Array</option>
+                    <option value="INDUSTRIAL">Industrial Grid</option>
+                    <option value="AGRICULTURAL">Agricultural Plot</option>
                   </select>
                 </div>
 
                 {/* Average Monthly Bill */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    Average Monthly Bill (₹)
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Mean Energy Expenditure (₹)
                   </label>
                   <input
                     type="number"
                     value={formData.avg_monthly_bill}
                     onChange={(e) => handleChange('avg_monthly_bill', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
-                    placeholder="Enter average monthly bill"
+                    className="solar-input"
+                    placeholder="Mean monthly usage..."
                     min="0"
                   />
                 </div>
 
                 {/* Roof Area */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    Roof Area (sq ft)
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Surface Aperture (SQ FT)
                   </label>
                   <input
                     type="number"
                     value={formData.roof_area_sqft}
                     onChange={(e) => handleChange('roof_area_sqft', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
-                    placeholder="Enter roof area"
+                    className="solar-input"
+                    placeholder="Verified roof area..."
                     min="0"
                   />
                 </div>
 
                 {/* Connection Type */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    Connection Type
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Grid Phase Topology
                   </label>
                   <select
                     value={formData.connection_type}
                     onChange={(e) => handleChange('connection_type', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow transition"
+                    className="solar-input"
                   >
-                    <option value="SINGLE_PHASE">Single Phase</option>
-                    <option value="THREE_PHASE">Three Phase</option>
+                    <option value="SINGLE_PHASE">Monophase (Single)</option>
+                    <option value="THREE_PHASE">Triphase (Three)</option>
                   </select>
                 </div>
 
@@ -663,30 +661,34 @@ export default function EditUser() {
                     id="subsidy_interest"
                     checked={formData.subsidy_interest}
                     onChange={(e) => handleChange('subsidy_interest', e.target.checked)}
-                    className="w-5 h-5 rounded border-solar-border text-solar-yellow focus:ring-solar-yellow"
+                    className="w-5 h-5 rounded-lg border-solar-border bg-solar-night/50 text-solar-yellow focus:ring-solar-yellow/50 transition-all cursor-pointer"
                   />
-                  <label htmlFor="subsidy_interest" className="ml-3 text-solar-primary">
-                    Interested in Government Subsidy
+                  <label htmlFor="subsidy_interest" className="ml-3 text-xs font-black text-solar-muted uppercase tracking-widest cursor-pointer hover:text-solar-primary transition-colors">
+                    Registry Subsidy Intent Verified
                   </label>
                 </div>
               </div>
 
               {/* Fields for Installed Users */}
               {formData.installation_status === 'INSTALLED' && (
-                <div className="mt-6 p-4 bg-solar-panel/20 rounded-lg border border-solar-border">
-                  <h4 className="text-md font-semibold text-solar-primary mb-4">Installed Plant Details</h4>
+                <div className="mt-8 p-8 solar-glass rounded-2xl border border-solar-yellow/20 relative overflow-hidden group/installed">
+                  <div className="absolute inset-0 bg-solar-yellow/[0.02] pointer-events-none"></div>
+                  <h4 className="text-sm font-black text-solar-yellow mb-6 uppercase tracking-[0.2em] flex items-center">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Synchronized Plant Telemetry
+                  </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Plant Capacity */}
                     <div>
-                      <label className="block text-sm font-medium text-solar-primary mb-2">
-                        Plant Capacity (kW)
+                      <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                        Maximum Power Flux (kW)
                       </label>
                       <input
                         type="number"
                         value={formData.plant_capacity_kw}
                         onChange={(e) => handleChange('plant_capacity_kw', e.target.value)}
-                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
-                        placeholder="Enter plant capacity"
+                        className="solar-input border-solar-yellow/10"
+                        placeholder="Installed capacity..."
                         min="0"
                         step="0.01"
                       />
@@ -699,52 +701,52 @@ export default function EditUser() {
                         id="net_metering"
                         checked={formData.net_metering}
                         onChange={(e) => handleChange('net_metering', e.target.checked)}
-                        className="w-5 h-5 rounded border-solar-border text-solar-yellow focus:ring-solar-yellow"
+                        className="w-5 h-5 rounded-lg border-solar-border bg-solar-night/50 text-solar-success focus:ring-solar-success/50 transition-all cursor-pointer"
                       />
-                      <label htmlFor="net_metering" className="ml-3 text-solar-primary">
-                        Net Metering Enabled
+                      <label htmlFor="net_metering" className="ml-3 text-xs font-black text-solar-muted uppercase tracking-widest cursor-pointer hover:text-solar-primary transition-colors">
+                        Bidirectional Flow (Net Meter) Enabled
                       </label>
                     </div>
 
                     {/* Inverter Brand */}
                     <div>
-                      <label className="block text-sm font-medium text-solar-primary mb-2">
-                        Inverter Brand
+                      <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                        Conversion Unit Brand (Inverter)
                       </label>
                       <input
                         type="text"
                         value={formData.inverter_brand}
                         onChange={(e) => handleChange('inverter_brand', e.target.value)}
-                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
-                        placeholder="Enter inverter brand"
+                        className="solar-input border-solar-yellow/10"
+                        placeholder="Inverter specification..."
                       />
                     </div>
 
                     {/* DISCOM Name */}
                     <div>
-                      <label className="block text-sm font-medium text-solar-primary mb-2">
-                        DISCOM Name
+                      <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                        Grid Administrator (DISCOM)
                       </label>
                       <input
                         type="text"
                         value={formData.discom_name}
                         onChange={(e) => handleChange('discom_name', e.target.value)}
-                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
-                        placeholder="Enter DISCOM name"
+                        className="solar-input border-solar-yellow/10"
+                        placeholder="Local DISCOM identity..."
                       />
                     </div>
 
                     {/* Consumer Number */}
                     <div>
-                      <label className="block text-sm font-medium text-solar-primary mb-2">
-                        Consumer Number
+                      <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                        End-Point ID (Consumer No.)
                       </label>
                       <input
                         type="text"
                         value={formData.consumer_number}
                         onChange={(e) => handleChange('consumer_number', e.target.value)}
-                        className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
-                        placeholder="Enter consumer number"
+                        className="solar-input border-solar-yellow/10"
+                        placeholder="Grid consumer reference..."
                       />
                     </div>
                   </div>
@@ -752,20 +754,23 @@ export default function EditUser() {
               )}
 
               {/* Navigation Buttons for Step 2 */}
-              <div className="flex justify-between space-x-4 pt-4">
+              <div className="flex justify-between pt-8">
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="px-6 py-3 bg-solar-card hover:bg-solar-panel/20 text-solar-primary font-semibold rounded-lg transition sun-button"
+                  className="px-10 py-3 text-solar-muted font-black uppercase tracking-widest text-xs hover:text-solar-primary transition-all underline underline-offset-8 decoration-solar-border/50 hover:decoration-solar-yellow"
                 >
-                  Back
+                  Return to Identity
                 </button>
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="px-6 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button"
+                  className="sun-button px-10 py-3"
                 >
-                  Next: Location & Admin
+                  <div className="flex items-center space-x-2">
+                    <span>Finalize Jurisdictional Data</span>
+                    <ArrowLeft className="w-4 h-4 rotate-180" />
+                  </div>
                 </button>
               </div>
             </div>
@@ -773,22 +778,24 @@ export default function EditUser() {
 
           {/* Step 3: Location & Admin */}
           {step === 3 && (
-            <div className="space-y-4 animate-fadeIn">
-              <h3 className="text-lg font-semibold text-solar-primary">Location & Admin Assignment</h3>
+            <div className="space-y-8 animate-fadeIn">
+              <h3 className="text-xl font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+                <MapPin className="w-5 h-5 mr-3 text-solar-orange" />
+                Geospatial Assignment
+              </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Region */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    <MapPin className="w-4 h-4 inline mr-2" />
-                    Region
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Operational Sector (Region)
                   </label>
                   <select
                     value={formData.region}
                     onChange={(e) => handleChange('region', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow transition"
+                    className="solar-input"
                   >
-                    <option value="">Select a region</option>
+                    <option value="">Select jurisdiction...</option>
                     {regions.map(region => (
                       <option key={region} value={region}>{region}</option>
                     ))}
@@ -798,17 +805,16 @@ export default function EditUser() {
                 {/* Assigned Admin */}
                 {currentUserRole === 'SUPER_ADMIN' && (
                   <div>
-                    <label className="block text-sm font-medium text-solar-primary mb-2">
-                      <Shield className="w-4 h-4 inline mr-2" />
-                      Assigned Admin
+                    <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                      Assigned Administrator
                     </label>
                     <select
                       value={formData.admin_id}
                       onChange={(e) => handleChange('admin_id', e.target.value)}
-                      className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow transition"
+                      className="solar-input"
                       disabled={!formData.region}
                     >
-                      <option value="">Select an admin</option>
+                      <option value="">Select administrator...</option>
                       {filteredAdmins.length > 0 ? (
                         filteredAdmins.map(admin => (
                           <option key={admin.id} value={admin.id}>
@@ -816,28 +822,27 @@ export default function EditUser() {
                           </option>
                         ))
                       ) : (
-                        <option value="" disabled>No admins found in this region</option>
+                        <option value="" disabled>No admins found in this jurisdiction</option>
                       )}
                     </select>
                     {!formData.region && (
-                      <p className="text-sm text-solar-muted mt-1">Select a region first to see available admins</p>
+                      <p className="text-[10px] text-solar-muted mt-2 uppercase tracking-tight italic">Select jurisdiction first to sync admins</p>
                     )}
                   </div>
                 )}
 
                 {/* Assigned Installer */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    <Shield className="w-4 h-4 inline mr-2" />
-                    Assigned Installer
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Assigned Field personnel
                   </label>
                   <select
                     value={formData.installer_id}
                     onChange={(e) => handleChange('installer_id', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow transition"
+                    className="solar-input"
                     disabled={!formData.region}
                   >
-                    <option value="">Select an installer</option>
+                    <option value="">Select installer...</option>
                     {filteredInstallers.length > 0 ? (
                       filteredInstallers.map(inst => (
                         <option key={inst.id} value={inst.id}>
@@ -845,67 +850,67 @@ export default function EditUser() {
                         </option>
                       ))
                     ) : (
-                      <option value="" disabled>No installers found in this region</option>
+                      <option value="" disabled>No installers found in this jurisdiction</option>
                     )}
                   </select>
                   {!formData.region && (
-                    <p className="text-sm text-solar-muted mt-1">Select a region first to see available installers</p>
+                    <p className="text-[10px] text-solar-muted mt-2 uppercase tracking-tight italic">Select jurisdiction first to sync personnel</p>
                   )}
                 </div>
 
                 {/* Address Line 1 */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    Address Line 1
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Geospatial Reference Line 1 (Street)
                   </label>
                   <input
                     type="text"
                     value={formData.address_line1}
                     onChange={(e) => handleChange('address_line1', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
-                    placeholder="Street address, house number"
+                    className="solar-input"
+                    placeholder="Physical deployment coordinates..."
                   />
                 </div>
 
                 {/* Address Line 2 */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    Address Line 2 (Optional)
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Geospatial Reference Line 2 (Optional)
                   </label>
                   <input
                     type="text"
                     value={formData.address_line2}
                     onChange={(e) => handleChange('address_line2', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
-                    placeholder="Apartment, suite, landmark (optional)"
+                    className="solar-input"
+                    placeholder="Secondary coordinates or landmark..."
                   />
                 </div>
 
                 {/* City */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    City
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Urban Sector (City)
                   </label>
                   <input
                     type="text"
                     value={formData.city}
                     onChange={(e) => handleChange('city', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
-                    placeholder="Enter city"
+                    className="solar-input"
+                    placeholder="City designation..."
                   />
                 </div>
 
                 {/* State */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    State
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Administrative State
                   </label>
                   <select
                     value={formData.state}
                     onChange={(e) => handleChange('state', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary focus:outline-none focus:border-solar-yellow transition"
+                    className="solar-input"
                   >
-                    <option value="">Select a state</option>
+                    <option value="">Select state...</option>
                     {indianStates.map(state => (
                       <option key={state} value={state}>{state}</option>
                     ))}
@@ -914,61 +919,65 @@ export default function EditUser() {
 
                 {/* Pincode */}
                 <div>
-                  <label className="block text-sm font-medium text-solar-primary mb-2">
-                    Pincode
+                  <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-2 block">
+                    Postal routing Code
                   </label>
                   <input
                     type="text"
                     value={formData.pincode}
                     onChange={(e) => handleChange('pincode', e.target.value)}
-                    className="w-full px-4 py-3 bg-solar-night/80 border border-solar-border rounded-lg text-solar-primary placeholder-solar-muted focus:outline-none focus:border-solar-yellow transition"
-                    placeholder="Enter pincode"
+                    className="solar-input"
+                    placeholder="6-digit PIN..."
                     maxLength={6}
                   />
                 </div>
               </div>
 
               {/* Location Picker */}
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-solar-primary mb-2">
-                  Location
+              <div className="mt-8 solar-glass rounded-2xl p-4 border-solar-border/20">
+                <label className="text-[10px] font-black text-solar-muted uppercase tracking-[0.2em] mb-4 block">
+                  Precision Coordinate mapping
                 </label>
-                <LocationPicker
-                  latitude={formData.latitude}
-                  longitude={formData.longitude}
-                  onLocationChange={({ latitude, longitude }) => {
-                    handleChange('latitude', latitude)
-                    handleChange('longitude', longitude)
-                  }}
-                  placeholder="Search for location"
-                />
+                <div className="rounded-xl overflow-hidden border border-solar-border/30">
+                  <LocationPicker
+                    latitude={formData.latitude}
+                    longitude={formData.longitude}
+                    onLocationChange={({ latitude, longitude }) => {
+                      handleChange('latitude', latitude)
+                      handleChange('longitude', longitude)
+                    }}
+                    placeholder="Acquire location signature..."
+                  />
+                </div>
               </div>
 
               {/* Navigation Buttons for Step 3 */}
-              <div className="flex justify-between space-x-4 pt-4">
+              <div className="flex justify-between pt-8">
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="px-6 py-3 bg-solar-card hover:bg-solar-panel/20 text-solar-primary font-semibold rounded-lg transition sun-button"
+                  className="px-10 py-3 text-solar-muted font-black uppercase tracking-widest text-xs hover:text-solar-primary transition-all underline underline-offset-8 decoration-solar-border/50 hover:decoration-solar-yellow"
                 >
-                  Back
+                  Return to Infrastructure
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex items-center space-x-2 px-6 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="sun-button px-12 py-3 disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
-                  {saving ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-solar-dark border-t-transparent rounded-full animate-spin"></div>
-                      <span>Saving...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Users className="w-5 h-5" />
-                      <span>Update User</span>
-                    </>
-                  )}
+                  <div className="flex items-center space-x-3">
+                    {saving ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-solar-dark border-t-transparent rounded-full animate-spin"></div>
+                        <span>Synchronizing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Users className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        <span>Update Registry Node</span>
+                      </>
+                    )}
+                  </div>
                 </button>
               </div>
             </div>

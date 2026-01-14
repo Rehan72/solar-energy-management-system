@@ -1,0 +1,24 @@
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/Dashboard.jsx
+  19:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  17 |     }
+  18 |     const userData = JSON.parse(localStorage.getItem('user'))
+> 19 |     setUser(userData)
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  20 |
+  21 |     if (userData && userData.role === 'USER' && !userData.property_type) {
+  22 |       navigate('/solar-onboarding')  react-hooks/set-state-in-effect
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/tool/SolarSimulator.jsx
+  172:38  warning  The ref value 'timers.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'timers.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+  326:27  error    'IconComponent' is defined but never used                                                                                                                                                                                                                    no-unused-vars
+
+✖ 3 problems (2 errors, 1 warning)
+

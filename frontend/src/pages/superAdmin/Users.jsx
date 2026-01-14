@@ -149,7 +149,7 @@ export default function Users() {
         </div>
       )
     }
-  ], [navigate, admins, installers, plants])
+  ], [navigate, admins, plants])
 
   const userHasAssignments = (user) => {
     return user.admin_id || user.installer_id || user.plant_id
@@ -159,7 +159,7 @@ export default function Users() {
     <div className="space-y-6 relative">
       {/* Loading overlay */}
       {loading && (
-        <div className="absolute inset-0 bg-solar-bg/80 z-50 flex flex-col items-center justify-center">
+        <div className="absolute inset-0 bg-solar-bg/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
           <SunLoader message="Loading users..." size="large" />
         </div>
       )}
@@ -172,14 +172,14 @@ export default function Users() {
         <div className="flex space-x-3">
           <button
             onClick={fetchUsers}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button"
+            className="flex items-center space-x-2 px-4 py-2 border border-solar-border rounded-xl hover:bg-solar-yellow/10 transition-all duration-300"
           >
-            <RefreshCw className="w-4 h-4" />
-            <span>Refresh</span>
+            <RefreshCw className="w-4 h-4 text-solar-muted" />
+            <span className="text-solar-muted font-medium">Refresh</span>
           </button>
           <button
             onClick={() => navigate('/users/create')}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button"
+            className="sun-button"
           >
             <UserPlus className="w-4 h-4" />
             <span>Add User</span>
@@ -227,7 +227,7 @@ export default function Users() {
       </div>
 
       {/* Filters and Search */}
-      <div className="glass-card rounded-2xl p-6 mb-8 group">
+      <div className="solar-glass rounded-2xl p-6 mb-8 group">
         <div className="flex flex-col md:flex-row gap-6 items-center">
           <div className="flex-1 w-full relative">
             <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-solar-muted group-focus-within:text-solar-yellow transition-colors" />
@@ -236,7 +236,7 @@ export default function Users() {
               placeholder="Query database for users, endpoints, or emails..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-6 py-3 bg-solar-bgActive/50 border border-solar-border/30 rounded-xl text-solar-primary placeholder-solar-muted/50 focus:outline-none focus:border-solar-yellow/50 focus:ring-4 focus:ring-solar-yellow/5 transition-all text-sm font-medium"
+              className="solar-input pl-12"
             />
           </div>
           <div className="flex items-center space-x-2 text-[10px] font-black text-solar-muted uppercase tracking-widest bg-solar-night/30 px-4 py-2 rounded-lg border border-solar-border/10">

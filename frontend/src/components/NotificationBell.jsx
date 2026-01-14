@@ -188,7 +188,7 @@ function NotificationBell() {
                                             }`}
                                     >
                                         <div className="flex items-start gap-3">
-                                            <span className="text-2xl flex-shrink-0">
+                                            <span className="text-2xl shrink-0">
                                                 {getTypeIcon(notification.type)}
                                             </span>
                                             <div className="flex-1 min-w-0">
@@ -196,7 +196,7 @@ function NotificationBell() {
                                                     <h4 className="font-medium text-solar-primary text-sm">
                                                         {notification.title}
                                                     </h4>
-                                                    <span className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${getSeverityColor(notification.severity)}`}>
+                                                    <span className={`text-xs px-2 py-1 rounded-full shrink-0 ${getSeverityColor(notification.severity)}`}>
                                                         {notification.severity}
                                                     </span>
                                                 </div>

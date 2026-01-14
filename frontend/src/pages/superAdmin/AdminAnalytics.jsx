@@ -84,29 +84,31 @@ export default function AdminAnalytics() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-6"
+      className="space-y-8"
     >
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold sun-glow-text">Admin Analytics</h1>
-          <p className="text-solar-muted mt-1">Platform performance and user metrics</p>
+          <h1 className="text-3xl font-black text-solar-primary tracking-tight uppercase">Fleet Intelligence Hub</h1>
+          <p className="text-solar-muted mt-1 font-medium italic">Advanced performance analytics and regional growth telemetry.</p>
         </div>
         <div className="flex items-center space-x-4">
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
-            className="h-10 bg-solar-card text-solar-primary border border-solar-border rounded-lg px-3"
+            className="solar-input min-w-[140px]"
           >
-            <option value="week">Last Week</option>
-            <option value="month">Last Month</option>
-            <option value="quarter">Last Quarter</option>
+            <option value="week">Temporal: 7D</option>
+            <option value="month">Temporal: 30D</option>
+            <option value="quarter">Temporal: 90D</option>
           </select>
           <button
             onClick={fetchStats}
-            className="flex items-center space-x-2 px-4 py-2 bg-solar-card hover:bg-solar-panel/20 rounded-lg transition sun-button"
+            className="sun-button px-6 py-2.5"
           >
-            <RefreshCw className="w-4 h-4" />
-            <span>Refresh</span>
+            <div className="flex items-center space-x-2">
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <span>Sync Flux</span>
+            </div>
           </button>
         </div>
       </div>
@@ -154,27 +156,35 @@ export default function AdminAnalytics() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-solar-card/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 energy-card border border-solar-border/30"
+          className="solar-glass rounded-3xl p-8 group border-solar-panel/10"
         >
-          <h3 className="text-lg font-bold text-solar-primary mb-6 flex items-center">
-            <TrendingUp className="w-5 h-5 text-solar-yellow mr-2" />
-            Platform Growth
+          <h3 className="text-xl font-black text-solar-primary mb-8 flex items-center uppercase tracking-tight">
+            <TrendingUp className="w-5 h-5 text-solar-yellow mr-3 group-hover:scale-110 transition-transform" />
+            Adoption Matrix
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={userGrowthData}>
               <defs>
                 <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#FFD166" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#FFD166" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.1)" vertical={false} />
+              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'rgba(148, 163, 184, 0.6)', fontSize: 10 }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: 'rgba(148, 163, 184, 0.6)', fontSize: 10 }} />
               <Tooltip
-                contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                contentStyle={{
+                  backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(245, 158, 11, 0.2)',
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)',
+                  backdropFilter: 'blur(10px)'
+                }}
+                itemStyle={{ fontSize: '12px', fontWeight: '600' }}
+                labelStyle={{ color: '#94a3b8', marginBottom: '8px', fontSize: '10px' }}
               />
-              <Area type="monotone" dataKey="users" stroke="#F59E0B" strokeWidth={3} fillOpacity={1} fill="url(#colorUsers)" name="Total Users" />
+              <Area type="monotone" dataKey="users" stroke="#FFD166" strokeWidth={3} fillOpacity={1} fill="url(#colorUsers)" name="Total Users" />
             </AreaChart>
           </ResponsiveContainer>
         </motion.div>
@@ -184,11 +194,11 @@ export default function AdminAnalytics() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-solar-card/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 energy-card border border-solar-border/30"
+          className="solar-glass rounded-3xl p-8 group border-solar-panel/10"
         >
-          <h3 className="text-lg font-bold text-solar-primary mb-6 flex items-center">
-            <Zap className="w-5 h-5 text-solar-orange mr-2" />
-            Energy Analytics
+          <h3 className="text-xl font-black text-solar-primary mb-8 flex items-center uppercase tracking-tight">
+            <Zap className="w-5 h-5 text-solar-yellow mr-3 group-hover:scale-110 transition-transform" />
+            Photon Exchange yield
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={energyData}>
@@ -202,11 +212,19 @@ export default function AdminAnalytics() {
                   <stop offset="95%" stopColor="#EA580C" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-              <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.1)" vertical={false} />
+              <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: 'rgba(148, 163, 184, 0.6)', fontSize: 10 }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: 'rgba(148, 163, 184, 0.6)', fontSize: 10 }} />
               <Tooltip
-                contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                contentStyle={{
+                  backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(245, 158, 11, 0.2)',
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)',
+                  backdropFilter: 'blur(10px)'
+                }}
+                itemStyle={{ fontSize: '12px', fontWeight: '600' }}
+                labelStyle={{ color: '#94a3b8', marginBottom: '8px', fontSize: '10px' }}
               />
               <Area type="monotone" dataKey="generated" stroke="#FFD166" strokeWidth={3} fillOpacity={1} fill="url(#colorGenerated)" name="Generated (kWh)" />
               <Area type="monotone" dataKey="consumed" stroke="#EA580C" strokeWidth={3} fillOpacity={1} fill="url(#colorConsumed)" name="Consumed (kWh)" />
@@ -220,23 +238,30 @@ export default function AdminAnalytics() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="bg-solar-card/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 energy-card border border-solar-border/30"
+        className="solar-glass rounded-3xl p-8 group border-solar-panel/10"
       >
-        <h3 className="text-lg font-bold text-solar-primary mb-6 flex items-center">
-          <Globe className="w-5 h-5 text-solar-success mr-2" />
-          Regional Distribution Metrics
+        <h3 className="text-xl font-black text-solar-primary mb-8 flex items-center uppercase tracking-tight">
+          <Globe className="w-5 h-5 text-solar-success mr-3 group-hover:rotate-12 transition-transform" />
+          Territorial Jurisdiction balance
         </h3>
         <ResponsiveContainer width="100%" height={350}>
           <BarChart data={regionalData} layout="vertical" margin={{ left: 20, right: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
-            <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-            <YAxis dataKey="region" type="category" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 500 }} width={120} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.1)" horizontal={false} />
+            <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: 'rgba(148, 163, 184, 0.6)', fontSize: 10 }} />
+            <YAxis dataKey="region" type="category" axisLine={false} tickLine={false} tick={{ fill: 'rgba(148, 163, 184, 0.8)', fontSize: 11, fontWeight: 700 }} width={120} />
             <Tooltip
-              cursor={{ fill: 'rgba(226, 232, 240, 0.4)' }}
-              contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+              cursor={{ fill: 'rgba(148, 163, 184, 0.05)' }}
+              contentStyle={{
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                borderRadius: '16px',
+                border: '1px solid rgba(245, 158, 11, 0.2)',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)',
+                backdropFilter: 'blur(10px)'
+              }}
+              itemStyle={{ fontSize: '11px', fontWeight: '600' }}
             />
-            <Bar dataKey="users" fill="#10B981" radius={[0, 4, 4, 0]} name="Users" barSize={20} />
-            <Bar dataKey="plants" fill="#F59E0B" radius={[0, 4, 4, 0]} name="Plants" barSize={20} />
+            <Bar dataKey="users" fill="#10B981" radius={[0, 8, 8, 0]} name="PersonnelCount" barSize={16} />
+            <Bar dataKey="plants" fill="#FFD166" radius={[0, 8, 8, 0]} name="AssetDensity" barSize={16} />
           </BarChart>
         </ResponsiveContainer>
       </motion.div>

@@ -66,14 +66,14 @@ function Register() {
   if (success) {
     return (
       <div className="space-y-6">
-        <div className="bg-solar-card rounded-lg p-8 energy-card text-center">
+        <div className="solar-glass rounded-2xl p-8 text-center">
           <div className="w-16 h-16 bg-solar-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-solar-success" />
           </div>
           <h2 className="text-xl font-semibold text-solar-primary mb-2">Registration Successful!</h2>
           <p className="text-solar-muted mb-6">Your account has been created. Please login to complete your profile.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button onClick={() => navigate("/login")} className="flex items-center justify-center space-x-2 px-6 py-3 bg-solar-yellow text-solar-dark font-semibold rounded-lg hover:bg-solar-orange transition sun-button">
+            <button onClick={() => navigate("/login")} className="flex items-center justify-center space-x-2 sun-button">
               <ArrowLeft className="w-5 h-5" />
               <span>Go to Login</span>
             </button>
@@ -105,7 +105,7 @@ function Register() {
         <Button
             type="submit"
             disabled={loading}
-            className="w-full h-11 text-base tracking-wide bg-linear-to-r from-solar-yellow to-solar-orange text-solar-dark border-0 rounded-lg shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:shadow-[0_0_30px_rgba(245,158,11,0.5)] hover:scale-[1.02] transition-all duration-300 mt-4"
+            className="w-full h-11 sun-button mt-4"
         >
             {loading && <span className="h-4 w-4 border-2 border-solar-dark border-t-transparent rounded-full animate-spin mr-2" />}
             {loading ? "Creating Account..." : "Create Account"}
@@ -124,30 +124,38 @@ export default Register;
 /* ================================
    🔌 SOLAR INPUT FIELD
    =============================== */
+import { Eye, EyeOff } from "lucide-react";
+
 function Field({ label, name, value, onChange, type, placeholder }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === "password";
+  const inputType = isPassword ? (showPassword ? "text" : "password") : type;
+
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-solar-primary dark:text-solar-yellow">
         {label}
       </label>
-      <Input
-        type={type}
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className="
-          h-11
-          bg-solar-dark/80 dark:bg-solar-night/80
-          text-solar-primary dark:text-solar-textPrimaryDark
-          border border-solar-border dark:border-solar-border
-          focus:ring-2 focus:ring-solar-yellow focus:border-solar-yellow
-          placeholder:text-solar-muted/50
-          rounded-lg
-          transition-all duration-300
-        "
-        required={type !== "checkbox"}
-      />
+      <div className="relative">
+        <Input
+          type={inputType}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className="solar-input h-11 pr-10"
+          required={type !== "checkbox"}
+        />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-solar-muted hover:text-solar-yellow transition-colors"
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

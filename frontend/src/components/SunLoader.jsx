@@ -4,9 +4,13 @@ import React from 'react';
  * SunLoader - A premium, mesmerizing solar-themed loading component.
  * Features multi-layered glow animations, rotating rays, and a vibrant sun core.
  */
-const SunLoader = ({ message = 'Harnessing Solar Energy...' }) => {
+const SunLoader = ({ message = 'Harnessing Solar Energy...', fullscreen = true }) => {
+  const positionClasses = fullscreen 
+    ? "fixed inset-0 z-[99999]" 
+    : "absolute inset-0 z-50 rounded-2xl";
+
   return (
-    <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center z-[99999] overflow-hidden">
+    <div className={`${positionClasses} bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center overflow-hidden`}>
       {/* Background Ambient Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[120px] animate-pulse"></div>
 

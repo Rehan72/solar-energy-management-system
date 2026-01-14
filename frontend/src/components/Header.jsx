@@ -16,14 +16,14 @@ function Header({ setSidebarOpen }) {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   return (
-    <header className="bg-solar-card/80 backdrop-blur-md border-b border-solar-border shadow-sm">
+    <header className="solar-glass border-b border-solar-border sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Mobile menu button */}
           <div className="flex items-center lg:hidden">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="text-solar-muted hover:text-solar-primary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-solar-yellow sun-button p-2 rounded-lg"
+              className="text-solar-muted hover:text-solar-yellow focus:outline-none focus:ring-2 focus:ring-solar-yellow p-2 rounded-xl transition-colors duration-300"
             >
               <span className="sr-only">Open sidebar</span>
               <svg
@@ -63,7 +63,7 @@ function Header({ setSidebarOpen }) {
             <div className="relative">
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-solar-yellow sun-button p-1"
+                className="flex items-center text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-solar-yellow p-1 bg-solar-night/50 hover:bg-solar-night transition-all duration-300"
               >
                 {user.profile_image ? (
                   <img
@@ -87,7 +87,7 @@ function Header({ setSidebarOpen }) {
 
               {/* Dropdown menu */}
               {showDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-[#ffffff] rounded-lg shadow-lg border border-solar-border py-1 z-50">
+                <div className="absolute right-0 mt-3 w-56 solar-glass rounded-2xl py-2 z-50 animate-fade-in">
                   <div className="px-4 py-2 border-b border-solar-border">
                     <p className="text-sm font-medium text-solar-primary">
                       {user.first_name && user.last_name
@@ -106,7 +106,7 @@ function Header({ setSidebarOpen }) {
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center px-4 py-2 text-sm text-red-500 hover:bg-red-500/10 sun-button"
+                    className="w-full flex items-center px-4 py-2 text-sm text-solar-danger hover:bg-solar-danger/10 sun-button"
                   >
                     <LogOut size={16} className="mr-2" />
                     Logout

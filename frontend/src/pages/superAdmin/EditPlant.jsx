@@ -154,35 +154,41 @@ export default function EditPlant() {
 
   if (fetchingPlant) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <SunLoader message="Loading plant data..." />
+      <div className="space-y-6 relative min-h-[400px]">
+        <div className="absolute inset-0 bg-solar-bg/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-2xl transition-all duration-500">
+          <SunLoader message="Acquiring asset telemetry..." size="large" />
+        </div>
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      {loading && <SunLoader message="Updating plant..." />}
+      {loading && <SunLoader message="Propagating asset updates..." />}
       {/* Header */}
-      <div className="flex items-center space-x-4">
-        <button 
-          onClick={() => navigate('/plants')}
-          className="p-2 rounded-lg hover:bg-solar-panel/20 transition"
-        >
-          <ArrowLeft className="w-5 h-5 text-solar-muted" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold sun-glow-text">Edit Plant</h1>
-          <p className="text-solar-muted mt-1">Update solar power plant information</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <button 
+            onClick={() => navigate('/plants')}
+            className="p-2 solar-glass rounded-lg hover:bg-solar-panel/20 transition-all border border-solar-border/30"
+          >
+            <ArrowLeft className="w-5 h-5 text-solar-primary" />
+          </button>
+          <div>
+            <h1 className="text-3xl font-black text-solar-primary tracking-tight uppercase">
+              Modify Asset <span className="text-solar-yellow ml-2 text-sm font-black tracking-widest">[NODE-{id?.toString().padStart(4, '0')}]</span>
+            </h1>
+            <p className="text-solar-muted mt-1 font-medium italic">Standardizing infrastructure parameters for the regional grid.</p>
+          </div>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
-        <div className="bg-solar-card rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <Zap className="w-5 h-5 text-solar-yellow mr-2" />
-            Basic Information
+        <div className="solar-glass rounded-2xl p-6 group">
+          <h2 className="text-lg font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+            <Zap className="w-5 h-5 text-solar-yellow mr-3 group-hover:scale-110 transition-transform" />
+            Core Deployment Data
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -193,7 +199,7 @@ export default function EditPlant() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="e.g., Delhi Solar Farm Phase 1"
-                className={errors.name ? 'border-red-500' : ''}
+                className={`solar-input ${errors.name ? 'border-red-500' : ''}`}
               />
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
@@ -210,7 +216,7 @@ export default function EditPlant() {
                   name="region_id"
                   value={formData.region_id}
                   onChange={handleChange}
-                  className={`w-full h-10 bg-solar-night/50 text-solar-primary border rounded-lg px-3 focus:outline-none focus:border-solar-yellow ${errors.region_id ? 'border-red-500' : 'border-solar-border'}`}
+                  className={`solar-input ${errors.region_id ? 'border-red-500' : ''}`}
                 >
                   <option value="">Select Region</option>
                   {regions.map(region => (
@@ -234,7 +240,7 @@ export default function EditPlant() {
                 value={formData.location}
                 onChange={handleChange}
                 placeholder="e.g., Sector 15, Rohini, Delhi - 110085"
-                className={errors.location ? 'border-red-500' : ''}
+                className={`solar-input ${errors.location ? 'border-red-500' : ''}`}
               />
               {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
             </div>
@@ -247,17 +253,17 @@ export default function EditPlant() {
                 onChange={handleChange}
                 placeholder="Optional description about the solar plant..."
                 rows={3}
-                className="w-full bg-solar-night/50 text-solar-primary border border-solar-border rounded-lg px-3 py-2 focus:outline-none focus:border-solar-yellow resize-none"
+                className="solar-input min-h-[100px] resize-none py-3"
               />
             </div>
           </div>
         </div>
 
         {/* Capacity & Performance */}
-        <div className="bg-solar-card rounded-xl p-6 ">
-          <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <Battery className="w-5 h-5 text-solar-success mr-2" />
-            Capacity & Performance
+        <div className="solar-glass rounded-2xl p-6 group">
+          <h2 className="text-lg font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+            <Battery className="w-5 h-5 text-solar-success mr-3 group-hover:scale-110 transition-transform" />
+            Energy Intelligence
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
@@ -271,7 +277,7 @@ export default function EditPlant() {
                 value={formData.capacity_kw}
                 onChange={handleChange}
                 placeholder="e.g., 1000"
-                className={errors.capacity_kw ? 'border-red-500' : ''}
+                className={`solar-input ${errors.capacity_kw ? 'border-red-500' : ''}`}
               />
               {errors.capacity_kw && <p className="text-red-500 text-sm mt-1">{errors.capacity_kw}</p>}
             </div>
@@ -286,6 +292,7 @@ export default function EditPlant() {
                 value={formData.current_output_kw}
                 onChange={handleChange}
                 placeholder="e.g., 0"
+                className="solar-input"
               />
             </div>
             <div>
@@ -300,7 +307,7 @@ export default function EditPlant() {
                 value={formData.efficiency}
                 onChange={handleChange}
                 placeholder="e.g., 85"
-                className={errors.efficiency ? 'border-red-500' : ''}
+                className={`solar-input ${errors.efficiency ? 'border-red-500' : ''}`}
               />
               {errors.efficiency && <p className="text-red-500 text-sm mt-1">{errors.efficiency}</p>}
             </div>
@@ -308,88 +315,101 @@ export default function EditPlant() {
         </div>
 
         {/* Location Picker */}
-        <div className="bg-solar-card rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <MapPin className="w-5 h-5 text-solar-orange mr-2" />
-            Plant Location
+        <div className="solar-glass rounded-2xl p-6 group">
+          <h2 className="text-lg font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+            <MapPin className="w-5 h-5 text-solar-orange mr-3 group-hover:scale-110 transition-transform" />
+            Geospatial Positioning
           </h2>
-          <p className="text-sm text-solar-muted mb-4">Search for a location or use the map to pin the exact plant position</p>
-          <LocationPicker
-            latitude={coordinates.latitude}
-            longitude={coordinates.longitude}
-            onLocationChange={handleLocationChange}
-          />
+          <p className="text-xs font-bold text-solar-muted uppercase mb-4 tracking-widest">Update GPS telemetry coordinates</p>
+          <div className="rounded-xl overflow-hidden border border-solar-border/30">
+            <LocationPicker
+              latitude={coordinates.latitude}
+              longitude={coordinates.longitude}
+              onLocationChange={handleLocationChange}
+            />
+          </div>
         </div>
 
         {/* Status */}
-        <div className="bg-solar-card rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <TrendingUp className="w-5 h-5 text-solar-primary mr-2" />
-            Plant Status
+        <div className="solar-glass rounded-2xl p-6 group">
+          <h2 className="text-lg font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+            <TrendingUp className="w-5 h-5 text-solar-panel mr-3 group-hover:scale-110 transition-transform" />
+            Operational State
           </h2>
-          <div className="flex items-center space-x-4">
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="status"
-                value="ACTIVE"
-                checked={formData.status === 'ACTIVE'}
-                onChange={handleChange}
-                className="accent-solar-success"
-              />
-              <span className="text-solar-primary">Active</span>
+          <div className="flex flex-wrap gap-6">
+            <label className="flex items-center space-x-3 cursor-pointer group">
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="radio"
+                  name="status"
+                  value="ACTIVE"
+                  checked={formData.status === 'ACTIVE'}
+                  onChange={handleChange}
+                  className="w-5 h-5 accent-solar-success appearance-none border-2 border-solar-border rounded-full checked:bg-solar-success checked:border-solar-success transition-all"
+                />
+                <div className={`absolute w-2 h-2 bg-white rounded-full scale-0 transition-transform ${formData.status === 'ACTIVE' ? 'scale-100' : ''}`}></div>
+              </div>
+              <span className={`text-sm font-black uppercase tracking-widest ${formData.status === 'ACTIVE' ? 'text-solar-success' : 'text-solar-muted'}`}>System Active</span>
             </label>
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="status"
-                value="MAINTENANCE"
-                checked={formData.status === 'MAINTENANCE'}
-                onChange={handleChange}
-                className="accent-solar-warning"
-              />
-              <span className="text-solar-primary">Under Maintenance</span>
+            <label className="flex items-center space-x-3 cursor-pointer group">
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="radio"
+                  name="status"
+                  value="MAINTENANCE"
+                  checked={formData.status === 'MAINTENANCE'}
+                  onChange={handleChange}
+                  className="w-5 h-5 accent-solar-warning appearance-none border-2 border-solar-border rounded-full checked:bg-solar-warning checked:border-solar-warning transition-all"
+                />
+                <div className={`absolute w-2 h-2 bg-white rounded-full scale-0 transition-transform ${formData.status === 'MAINTENANCE' ? 'scale-100' : ''}`}></div>
+              </div>
+              <span className={`text-sm font-black uppercase tracking-widest ${formData.status === 'MAINTENANCE' ? 'text-solar-warning' : 'text-solar-muted'}`}>Under Maintenance</span>
             </label>
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="status"
-                value="INACTIVE"
-                checked={formData.status === 'INACTIVE'}
-                onChange={handleChange}
-                className="accent-solar-danger"
-              />
-              <span className="text-solar-primary">Inactive</span>
+            <label className="flex items-center space-x-3 cursor-pointer group">
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="radio"
+                  name="status"
+                  value="INACTIVE"
+                  checked={formData.status === 'INACTIVE'}
+                  onChange={handleChange}
+                  className="w-5 h-5 accent-solar-danger appearance-none border-2 border-solar-border rounded-full checked:bg-solar-danger checked:border-solar-danger transition-all"
+                />
+                <div className={`absolute w-2 h-2 bg-white rounded-full scale-0 transition-transform ${formData.status === 'INACTIVE' ? 'scale-100' : ''}`}></div>
+              </div>
+              <span className={`text-sm font-black uppercase tracking-widest ${formData.status === 'INACTIVE' ? 'text-solar-danger' : 'text-solar-muted'}`}>Node Inactive</span>
             </label>
           </div>
         </div>
 
         {/* Submit Buttons */}
-        <div className="flex justify-end space-x-4">
-          <Button
+        <div className="flex justify-end space-x-6 pt-4">
+          <button
             type="button"
             onClick={() => navigate('/plants')}
-            className="bg-gray-500 text-white hover:bg-gray-600"
+            className="px-8 py-3 text-solar-muted font-black uppercase tracking-widest text-xs hover:text-solar-primary transition-all underline underline-offset-8 decoration-solar-border/50 hover:decoration-solar-yellow"
           >
-            Cancel
-          </Button>
-          <Button
+            Abort Protocol
+          </button>
+          <button
             type="submit"
             disabled={loading}
-            className="bg-solar-yellow text-solar-dark hover:bg-solar-orange flex items-center space-x-2"
+            className="sun-button px-10 py-3"
           >
-            {loading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-solar-dark border-t-transparent" />
-                <span>Updating...</span>
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                <span>Update Plant</span>
-              </>
-            )}
-          </Button>
+            <div className="flex items-center space-x-2">
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Propagating...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span>Update Asset Node</span>
+                </>
+              )}
+            </div>
+          </button>
         </div>
       </form>
     </div>

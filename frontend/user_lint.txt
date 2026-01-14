@@ -1,0 +1,20 @@
+
+/home/rehanul.haque@tekmindz.com/Desktop/solar-energy-management-system/frontend/src/pages/user/EnergyAnalytics.jsx
+  28:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  26 |
+  27 |   useEffect(() => {
+> 28 |     fetchData()
+     |     ^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |   }, [fetchData])
+  30 |
+  31 |   // Sample data when API is not available  react-hooks/set-state-in-effect
+
+✖ 1 problem (1 error, 0 warnings)
+

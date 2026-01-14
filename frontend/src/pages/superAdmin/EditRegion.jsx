@@ -71,7 +71,8 @@ export default function EditRegion() {
           notify.error('Region not found')
           navigate('/regions')
         }
-      } catch (error) {
+      } catch (err) {
+        console.error(err)
         notify.error('Failed to fetch region')
         navigate('/regions')
       } finally {
@@ -142,34 +143,41 @@ export default function EditRegion() {
 
   if (fetching) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-solar-yellow border-t-transparent"></div>
+      <div className="space-y-6 relative min-h-[400px]">
+        <div className="absolute inset-0 bg-solar-bg/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-2xl transition-all duration-500">
+          <SunLoader message="Synchronizing regional grid data..." size="large" />
+        </div>
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
+      {loading && <SunLoader message="Propagating regional updates..." />}
       {/* Header */}
-      <div className="flex items-center space-x-4">
-        <button 
-          onClick={() => navigate('/regions')}
-          className="p-2 rounded-lg hover:bg-solar-panel/20 transition"
-        >
-          <ArrowLeft className="w-5 h-5 text-solar-muted" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-bold sun-glow-text">Edit Region</h1>
-          <p className="text-solar-muted mt-1">Update region information</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <button 
+            onClick={() => navigate('/regions')}
+            className="p-2 solar-glass rounded-lg hover:bg-solar-panel/20 transition-all border border-solar-border/30"
+          >
+            <ArrowLeft className="w-5 h-5 text-solar-primary" />
+          </button>
+          <div>
+            <h1 className="text-3xl font-black text-solar-primary tracking-tight uppercase">
+              Modify Region <span className="text-solar-orange ml-2 text-sm font-black tracking-widest">[REG-NODE-{id?.toString().slice(-4)}]</span>
+            </h1>
+            <p className="text-solar-muted mt-1 font-medium italic">Adjusting geographical territory parameters for the global grid.</p>
+          </div>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
-        <div className="bg-solar-card rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <Globe className="w-5 h-5 text-solar-yellow mr-2" />
-            Basic Information
+        <div className="solar-glass rounded-2xl p-6 group">
+          <h2 className="text-lg font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+            <Globe className="w-5 h-5 text-solar-yellow mr-3 group-hover:rotate-12 transition-transform" />
+            Geographical Intelligence
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -180,7 +188,7 @@ export default function EditRegion() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="e.g., Delhi NCR"
-                className={errors.name ? 'border-red-500' : ''}
+                className={`solar-input ${errors.name ? 'border-red-500' : ''}`}
               />
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
@@ -191,7 +199,7 @@ export default function EditRegion() {
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
-                className={`w-full h-10 bg-solar-night/50 text-solar-primary border rounded-lg px-3 focus:outline-none focus:border-solar-yellow ${errors.state ? 'border-red-500' : 'border-solar-border'}`}
+                className={`solar-input ${errors.state ? 'border-red-500' : ''}`}
               >
                 <option value="">Select State</option>
                 {indianStates.map(state => (
@@ -208,7 +216,7 @@ export default function EditRegion() {
                 value={formData.country}
                 onChange={handleChange}
                 placeholder="e.g., India"
-                className={errors.country ? 'border-red-500' : ''}
+                className={`solar-input ${errors.country ? 'border-red-500' : ''}`}
               />
               {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country}</p>}
             </div>
@@ -219,7 +227,7 @@ export default function EditRegion() {
                 name="timezone"
                 value={formData.timezone}
                 onChange={handleChange}
-                className={`w-full h-10 bg-solar-night/50 text-solar-primary border rounded-lg px-3 focus:outline-none focus:border-solar-yellow ${errors.timezone ? 'border-red-500' : 'border-solar-border'}`}
+                className={`solar-input ${errors.timezone ? 'border-red-500' : ''}`}
               >
                 <option value="">Select Timezone</option>
                 {timezones.map(tz => (
@@ -237,17 +245,17 @@ export default function EditRegion() {
                 onChange={handleChange}
                 placeholder="Optional description about the region..."
                 rows={3}
-                className="w-full bg-solar-night/50 text-solar-primary border border-solar-border rounded-lg px-3 py-2 focus:outline-none focus:border-solar-yellow resize-none"
+                className="solar-input min-h-[100px] resize-none py-3"
               />
             </div>
           </div>
         </div>
 
         {/* Region Settings */}
-        <div className="bg-solar-card rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <MapPin className="w-5 h-5 text-solar-orange mr-2" />
-            Region Settings
+        <div className="solar-glass rounded-2xl p-6 group">
+          <h2 className="text-lg font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+            <Users className="w-5 h-5 text-solar-orange mr-3 group-hover:scale-110 transition-transform" />
+            Infrastructure Targets
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
@@ -260,6 +268,7 @@ export default function EditRegion() {
                 value={formData.expected_users || ''}
                 onChange={handleChange}
                 placeholder="e.g., 100"
+                className="solar-input"
               />
             </div>
             <div>
@@ -272,6 +281,7 @@ export default function EditRegion() {
                 value={formData.expected_plants || ''}
                 onChange={handleChange}
                 placeholder="e.g., 10"
+                className="solar-input"
               />
             </div>
             <div>
@@ -285,94 +295,108 @@ export default function EditRegion() {
                 value={formData.capacity_mw || ''}
                 onChange={handleChange}
                 placeholder="e.g., 500"
+                className="solar-input"
               />
             </div>
           </div>
         </div>
 
         {/* Location Picker */}
-        <div className="bg-solar-card rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <MapPin className="w-5 h-5 text-solar-orange mr-2" />
-            Region Location
+        <div className="solar-glass rounded-2xl p-6 group">
+          <h2 className="text-lg font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+            <MapPin className="w-5 h-5 text-solar-orange mr-3 group-hover:scale-110 transition-transform" />
+            Geospatial Jurisdiction
           </h2>
-          <p className="text-sm text-solar-muted mb-4">Search for a location or use the map to pin the exact region position</p>
-          <LocationPicker
-            latitude={coordinates.latitude}
-            longitude={coordinates.longitude}
-            onLocationChange={handleLocationChange}
-          />
+          <p className="text-xs font-bold text-solar-muted uppercase mb-4 tracking-widest">Calibrate regional GPS telemetry</p>
+          <div className="rounded-xl overflow-hidden border border-solar-border/30">
+            <LocationPicker
+              latitude={coordinates.latitude}
+              longitude={coordinates.longitude}
+              onLocationChange={handleLocationChange}
+            />
+          </div>
         </div>
 
         {/* Status */}
-        <div className="bg-solar-card rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-solar-primary mb-4 flex items-center">
-            <Zap className="w-5 h-5 text-solar-success mr-2" />
-            Region Status
+        <div className="solar-glass rounded-2xl p-6 group">
+          <h2 className="text-lg font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
+            <Zap className="w-5 h-5 text-solar-success mr-3 group-hover:scale-110 transition-transform" />
+            Regional Operational State
           </h2>
-          <div className="flex items-center space-x-4">
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="status"
-                value="ACTIVE"
-                checked={formData.status === 'ACTIVE'}
-                onChange={handleChange}
-                className="accent-solar-success"
-              />
-              <span className="text-solar-primary">Active</span>
+          <div className="flex flex-wrap gap-6">
+            <label className="flex items-center space-x-3 cursor-pointer group">
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="radio"
+                  name="status"
+                  value="ACTIVE"
+                  checked={formData.status === 'ACTIVE'}
+                  onChange={handleChange}
+                  className="w-5 h-5 accent-solar-success appearance-none border-2 border-solar-border rounded-full checked:bg-solar-success checked:border-solar-success transition-all"
+                />
+                <div className={`absolute w-2 h-2 bg-white rounded-full scale-0 transition-transform ${formData.status === 'ACTIVE' ? 'scale-100' : ''}`}></div>
+              </div>
+              <span className={`text-sm font-black uppercase tracking-widest ${formData.status === 'ACTIVE' ? 'text-solar-success' : 'text-solar-muted'}`}>Grid Online</span>
             </label>
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="status"
-                value="MAINTENANCE"
-                checked={formData.status === 'MAINTENANCE'}
-                onChange={handleChange}
-                className="accent-solar-warning"
-              />
-              <span className="text-solar-primary">Under Maintenance</span>
+            <label className="flex items-center space-x-3 cursor-pointer group">
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="radio"
+                  name="status"
+                  value="MAINTENANCE"
+                  checked={formData.status === 'MAINTENANCE'}
+                  onChange={handleChange}
+                  className="w-5 h-5 accent-solar-warning appearance-none border-2 border-solar-border rounded-full checked:bg-solar-warning checked:border-solar-warning transition-all"
+                />
+                <div className={`absolute w-2 h-2 bg-white rounded-full scale-0 transition-transform ${formData.status === 'MAINTENANCE' ? 'scale-100' : ''}`}></div>
+              </div>
+              <span className={`text-sm font-black uppercase tracking-widest ${formData.status === 'MAINTENANCE' ? 'text-solar-warning' : 'text-solar-muted'}`}>Sector Maintenance</span>
             </label>
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name="status"
-                value="INACTIVE"
-                checked={formData.status === 'INACTIVE'}
-                onChange={handleChange}
-                className="accent-solar-danger"
-              />
-              <span className="text-solar-primary">Inactive</span>
+            <label className="flex items-center space-x-3 cursor-pointer group">
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="radio"
+                  name="status"
+                  value="INACTIVE"
+                  checked={formData.status === 'INACTIVE'}
+                  onChange={handleChange}
+                  className="w-5 h-5 accent-solar-danger appearance-none border-2 border-solar-border rounded-full checked:bg-solar-danger checked:border-solar-danger transition-all"
+                />
+                <div className={`absolute w-2 h-2 bg-white rounded-full scale-0 transition-transform ${formData.status === 'INACTIVE' ? 'scale-100' : ''}`}></div>
+              </div>
+              <span className={`text-sm font-black uppercase tracking-widest ${formData.status === 'INACTIVE' ? 'text-solar-danger' : 'text-solar-muted'}`}>Grid Offline</span>
             </label>
           </div>
         </div>
 
         {/* Submit Buttons */}
-        <div className="flex justify-end space-x-4">
-          <Button
+        <div className="flex justify-end space-x-6 pt-4">
+          <button
             type="button"
             onClick={() => navigate('/regions')}
-            className="bg-gray-500 text-white hover:bg-gray-600"
+            className="px-8 py-3 text-solar-muted font-black uppercase tracking-widest text-xs hover:text-solar-primary transition-all underline underline-offset-8 decoration-solar-border/50 hover:decoration-solar-yellow"
           >
-            Cancel
-          </Button>
-          <Button
+            Abort Synchronization
+          </button>
+          <button
             type="submit"
             disabled={loading}
-            className="bg-solar-yellow text-solar-dark hover:bg-solar-orange flex items-center space-x-2"
+            className="sun-button px-10 py-3"
           >
-            {loading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-solar-dark border-t-transparent" />
-                <span>Updating...</span>
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                <span>Update Region</span>
-              </>
-            )}
-          </Button>
+            <div className="flex items-center space-x-2">
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Synchronizing...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span>Update Regional Node</span>
+                </>
+              )}
+            </div>
+          </button>
         </div>
       </form>
     </div>
