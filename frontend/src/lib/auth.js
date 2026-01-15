@@ -31,8 +31,7 @@ export const isAuthenticated = () => {
 
 // Logout function - clears storage and redirects to login
 export const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+  localStorage.clear();
 
   // Redirect to login page
   window.location.href = "/login";

@@ -4,6 +4,7 @@ import { LogOut, User, RefreshCw, BarChart3, Users, Activity, Settings, Shield, 
 import StatCard from '../ui/stat-card'
 import { getRequest } from '../../lib/apiService'
 import { notify } from '../../lib/toast'
+import { logout } from '../../lib/auth'
 import LivePowerDashboard from './LivePowerDashboard'
 
 function SuperAdminDashboard() {
@@ -53,9 +54,7 @@ function SuperAdminDashboard() {
 
   const handleLogout = () => {
     notify.success('Logged out successfully');
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    navigate('/login')
+    logout();
   }
 
   const refreshData = () => {

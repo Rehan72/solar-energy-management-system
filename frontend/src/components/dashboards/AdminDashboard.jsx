@@ -5,6 +5,7 @@ import UserTable from '../common/UserTable'
 import StatCard from '../ui/stat-card'
 import { getRequest } from '../../lib/apiService'
 import { notify } from '../../lib/toast'
+import { logout } from '../../lib/auth'
 import LivePowerDashboard from './LivePowerDashboard'
 
 function AdminDashboard() {
@@ -44,9 +45,7 @@ function AdminDashboard() {
 
   const handleLogout = () => {
     notify.success('Logged out successfully');
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    navigate('/login')
+    logout();
   }
 
   const refreshData = () => {

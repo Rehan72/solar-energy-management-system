@@ -11,6 +11,7 @@ import WeatherWidget from '../WeatherWidget'
 import FinancialWidget from './FinancialWidget'
 import TicketList from './TicketList'
 import NotificationBell from '../NotificationBell'
+import { logout } from '../../lib/auth'
 
 function UserDashboard() {
   const [energyData, setEnergyData] = useState({ solar: 0, load: 0, battery: 0, grid: 0 })
@@ -64,9 +65,7 @@ function UserDashboard() {
 
   const handleLogout = () => {
     notify.success('Logged out successfully');
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    navigate('/login')
+    logout();
   }
 
   const refreshData = () => {
