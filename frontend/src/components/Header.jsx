@@ -16,7 +16,7 @@ function Header({ setSidebarOpen }) {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   return (
-    <header className="solar-glass border-b border-solar-border sticky top-0 z-30">
+    <header className="border-b border-solar-border/50 sticky top-0 z-30 backdrop-blur-sm bg-linear-to-r from-solar-bg/90 via-solar-bg/50 to-transparent transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Mobile menu button */}

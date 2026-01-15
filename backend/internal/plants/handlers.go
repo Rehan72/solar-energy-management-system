@@ -35,6 +35,16 @@ type UpdatePlantRequest struct {
 	Description     string   `json:"description"`
 }
 
+// @Summary Create a new plant
+// @Description Create a new power plant
+// @Tags Plants
+// @Accept json
+// @Produce json
+// @Param plant body CreatePlantRequest true "Plant creation data"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/plants [post]
 func CreatePlantHandler(c *gin.Context) {
 	var req CreatePlantRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -87,6 +97,15 @@ func CreatePlantHandler(c *gin.Context) {
 	})
 }
 
+// @Summary Get all plants
+// @Description Get a list of all power plants
+// @Tags Plants
+// @Accept json
+// @Produce json
+// @Param region query string false "Region filter"
+// @Success 200 {object} map[string][]Plant
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/plants [get]
 func GetPlantsHandler(c *gin.Context) {
 	region := c.Query("region")
 	var plants []Plant
@@ -108,6 +127,17 @@ func GetPlantsHandler(c *gin.Context) {
 	})
 }
 
+// @Summary Get plant by ID
+// @Description Get details of a specific power plant
+// @Tags Plants
+// @Accept json
+// @Produce json
+// @Param id path string true "Plant ID"
+// @Success 200 {object} map[string]Plant
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/plants/{id} [get]
 func GetPlantHandler(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
@@ -132,6 +162,18 @@ func GetPlantHandler(c *gin.Context) {
 	})
 }
 
+// @Summary Update plant
+// @Description Update plant details
+// @Tags Plants
+// @Accept json
+// @Produce json
+// @Param id path string true "Plant ID"
+// @Param plant body UpdatePlantRequest true "Plant update data"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/plants/{id} [put]
 func UpdatePlantHandler(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
@@ -204,6 +246,17 @@ func UpdatePlantHandler(c *gin.Context) {
 	})
 }
 
+// @Summary Delete plant
+// @Description Delete a power plant
+// @Tags Plants
+// @Accept json
+// @Produce json
+// @Param id path string true "Plant ID"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/plants/{id} [delete]
 func DeletePlantHandler(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)

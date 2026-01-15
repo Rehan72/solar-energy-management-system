@@ -142,6 +142,16 @@ func getMockWeather(lat, lon float64) *WeatherResponse {
 
 // Handlers
 
+// @Summary Get weather
+// @Description Get current weather and forecast for a location
+// @Tags Weather
+// @Accept json
+// @Produce json
+// @Param lat query number false "Latitude"
+// @Param lon query number false "Longitude"
+// @Success 200 {object} WeatherResponse
+// @Failure 500 {object} map[string]string
+// @Router /weather [get]
 func GetWeatherHandler(c *gin.Context) {
 	// lat := parseFloat(c.Query("lat"))
 	// lon := parseFloat(c.Query("lon"))

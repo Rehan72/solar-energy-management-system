@@ -15,6 +15,17 @@ type UpdateDeviceRequest struct {
 	IsActive *bool  `json:"is_active"`
 }
 
+// @Summary Get user devices
+// @Description Get all devices for the current user
+// @Tags Devices
+// @Accept json
+// @Produce json
+// @Param type query string false "Filter by device type"
+// @Param active query boolean false "Filter only active devices"
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /user/devices [get]
 func GetDevicesHandler(c *gin.Context) {
 	userIDStr, exists := c.Get("user_id")
 	if !exists {
@@ -44,6 +55,17 @@ func GetDevicesHandler(c *gin.Context) {
 	})
 }
 
+// @Summary Get device by ID
+// @Description Get details of a specific device
+// @Tags Devices
+// @Accept json
+// @Produce json
+// @Param id path string true "Device ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 404 {object} map[string]string
+// @Router /user/devices/{id} [get]
+// @Router /admin/devices/{id} [get]
+// @Router /superadmin/devices/{id} [get]
 func GetDeviceHandler(c *gin.Context) {
 	deviceID := c.Param("id")
 	id, err := uuid.Parse(deviceID)
@@ -61,6 +83,18 @@ func GetDeviceHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"device": device})
 }
 
+// @Summary Update device
+// @Description Update device details
+// @Tags Devices
+// @Accept json
+// @Produce json
+// @Param id path string true "Device ID"
+// @Param device body UpdateDeviceRequest true "Device update data"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /user/devices/{id} [put]
+// @Router /admin/devices/{id} [put]
 func UpdateDeviceHandler(c *gin.Context) {
 	deviceID := c.Param("id")
 	id, err := uuid.Parse(deviceID)
@@ -104,6 +138,16 @@ func UpdateDeviceHandler(c *gin.Context) {
 	})
 }
 
+// @Summary Delete device
+// @Description Delete a device
+// @Tags Devices
+// @Accept json
+// @Produce json
+// @Param id path string true "Device ID"
+// @Success 200 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /user/devices/{id} [delete]
+// @Router /admin/devices/{id} [delete]
 func DeleteDeviceHandler(c *gin.Context) {
 	deviceID := c.Param("id")
 	id, err := uuid.Parse(deviceID)
@@ -121,6 +165,15 @@ func DeleteDeviceHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Device deleted successfully"})
 }
 
+// @Summary Regenerate API Key
+// @Description Regenerate the API key for a device
+// @Tags Devices
+// @Accept json
+// @Produce json
+// @Param id path string true "Device ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 404 {object} map[string]string
+// @Router /user/devices/{id}/regenerate-key [post]
 func RegenerateAPIKeyHandler(c *gin.Context) {
 	deviceID := c.Param("id")
 	id, err := uuid.Parse(deviceID)
@@ -152,6 +205,16 @@ func RegenerateAPIKeyHandler(c *gin.Context) {
 }
 
 // CreateUserDeviceHandler - Allows users to create their own devices
+// @Summary Create user device
+// @Description Create a new device for the current user
+// @Tags Devices
+// @Accept json
+// @Produce json
+// @Param device body CreateDeviceRequest true "Device creation data"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /user/devices [post]
 func CreateUserDeviceHandler(c *gin.Context) {
 	userIDStr, exists := c.Get("user_id")
 	if !exists {
@@ -197,6 +260,17 @@ func CreateUserDeviceHandler(c *gin.Context) {
 }
 
 // GetDevicePowerHandler - Returns power generation details for a specific device
+// @Summary Get device power data
+// @Description Get current power generation stats for a device
+// @Tags Devices
+// @Accept json
+// @Produce json
+// @Param id path string true "Device ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 404 {object} map[string]string
+// @Router /user/devices/{id}/power [get]
+// @Router /admin/devices/{id}/power [get]
+// @Router /superadmin/devices/{id}/power [get]
 func GetDevicePowerHandler(c *gin.Context) {
 	deviceID := c.Param("id")
 	id, err := uuid.Parse(deviceID)
@@ -281,6 +355,17 @@ func GetDevicePowerHandler(c *gin.Context) {
 }
 
 // GetAllDevicesHandler - Returns all devices across all users (for admin)
+// @Summary Get all devices (Admin)
+// @Description Get all devices in the system
+// @Tags SuperAdmin
+// @Accept json
+// @Produce json
+// @Param search query string false "Search term"
+// @Param status query string false "Status filter (ACTIVE/INACTIVE)"
+// @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} map[string]string
+// @Router /admin/devices [get]
+// @Router /superadmin/devices [get]
 func GetAllDevicesHandler(c *gin.Context) {
 	// Get query params for filtering
 	searchTerm := c.Query("search")

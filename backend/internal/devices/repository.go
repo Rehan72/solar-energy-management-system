@@ -32,6 +32,7 @@ func nullTimeToTime(n sql.NullTime) *time.Time {
 func CreateDevice(userID uuid.UUID, name, deviceType, location string) (*Device, error) {
 	namePtr := &name
 	locationPtr := &location
+	now := time.Now()
 	device := &Device{
 		ID:         uuid.New(),
 		UserID:     &userID,
@@ -40,17 +41,17 @@ func CreateDevice(userID uuid.UUID, name, deviceType, location string) (*Device,
 		Location:   locationPtr,
 		APIKey:     generateAPIKey(),
 		IsActive:   true,
+		CreatedAt:  now,
+		UpdatedAt:  now,
 	}
 
 	query := `
-		INSERT INTO devices (id, user_id, name, device_type, location, api_key, is_active)
-		VALUES (?, ?, ?, ?, ?, ?, ?)
-		RETURNING created_at, updated_at`
+		INSERT INTO devices (id, user_id, name, device_type, location, api_key, is_active, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
-	err := database.DB.QueryRow(query,
+	_, err := database.DB.Exec(query,
 		device.ID, uuidToString(device.UserID), device.Name, device.DeviceType,
-		device.Location, device.APIKey, device.IsActive).
-		Scan(&device.CreatedAt, &device.UpdatedAt)
+		device.Location, device.APIKey, device.IsActive, device.CreatedAt, device.UpdatedAt)
 
 	if err != nil {
 		return nil, err

@@ -99,7 +99,7 @@ export default function GlobalDashboard() {
           <h1 className="text-4xl font-black text-solar-primary tracking-tight uppercase">Global Grid Intelligence</h1>
           <p className="text-solar-muted mt-2 font-medium italic">Autonomous ecosystem oversight and cross-regional telemetry analysis.</p>
         </div>
-        <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+        <div className="flex items-center gap-4">
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value)}

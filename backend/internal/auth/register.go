@@ -24,6 +24,17 @@ type RegisterRequest struct {
 	Pincode      string `json:"pincode"`
 }
 
+// @Summary Register
+// @Description Register a new user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param user body RegisterRequest true "Registration data"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 409 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /auth/register [post]
 func Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

@@ -23,6 +23,17 @@ type OnboardingRequest struct {
 	Longitude    float64 `json:"longitude"`
 }
 
+// @Summary Complete Onboarding
+// @Description Complete user onboarding process
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param data body OnboardingRequest true "Onboarding data"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /user/onboarding [post]
 func CompleteOnboarding(c *gin.Context) {
 	userID := c.GetString("user_id") // Assuming AuthMiddleware sets this
 	if userID == "" {

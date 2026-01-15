@@ -17,6 +17,17 @@ type UpdateTicketRequest struct {
 	Status TicketStatus `json:"status" binding:"required"`
 }
 
+// @Summary Create a ticket
+// @Description Create a new support ticket
+// @Tags Tickets
+// @Accept json
+// @Produce json
+// @Param ticket body CreateTicketRequest true "Ticket creation data"
+// @Success 201 {object} Ticket
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /user/tickets [post]
 func CreateTicketHandler(c *gin.Context) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -41,6 +52,15 @@ func CreateTicketHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, ticket)
 }
 
+// @Summary Get user tickets
+// @Description Get current user's tickets
+// @Tags Tickets
+// @Accept json
+// @Produce json
+// @Success 200 {object} []Ticket
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /user/tickets [get]
 func GetUserTicketsHandler(c *gin.Context) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -58,6 +78,16 @@ func GetUserTicketsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, tickets)
 }
 
+// @Summary Get installer tickets
+// @Description Get tickets assigned to current installer
+// @Tags Tickets
+// @Accept json
+// @Produce json
+// @Success 200 {object} []Ticket
+// @Failure 401 {object} map[string]string
+// @Failure 403 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /installer/tickets [get]
 func GetInstallerTicketsHandler(c *gin.Context) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -81,6 +111,17 @@ func GetInstallerTicketsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, tickets)
 }
 
+// @Summary Update ticket status
+// @Description Update status of a ticket
+// @Tags Tickets
+// @Accept json
+// @Produce json
+// @Param id path string true "Ticket ID"
+// @Param status body UpdateTicketRequest true "New status"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /installer/tickets/{id}/status [put]
 func UpdateTicketStatusHandler(c *gin.Context) {
 	id := c.Param("id")
 	var req UpdateTicketRequest

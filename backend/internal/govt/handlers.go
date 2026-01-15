@@ -21,6 +21,14 @@ type UpdateSubsidyRequest struct {
 }
 
 // GetPendingSubsidiesHandler returns all users with PENDING subsidy status
+// @Summary Get pending subsidies
+// @Description Get a list of users with PENDING subsidy status
+// @Tags Government
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} map[string]string
+// @Router /govt/subsidies/pending [get]
 func GetPendingSubsidiesHandler(c *gin.Context) {
 	usersList, err := users.GetUsersBySubsidyStatus(users.SubsidyStatusPending)
 	if err != nil {
@@ -35,6 +43,14 @@ func GetPendingSubsidiesHandler(c *gin.Context) {
 }
 
 // GetSubsidyHistoryHandler returns processed subsidies (APPROVED/REJECTED/DISBURSED)
+// @Summary Get subsidy history
+// @Description Get a history of processed subsidies (Approved, Rejected, Disbursed)
+// @Tags Government
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} map[string]string
+// @Router /govt/subsidies/history [get]
 func GetSubsidyHistoryHandler(c *gin.Context) {
 	approved, err := users.GetUsersBySubsidyStatus(users.SubsidyStatusApproved)
 	if err != nil {
@@ -65,6 +81,18 @@ func GetSubsidyHistoryHandler(c *gin.Context) {
 }
 
 // UpdateSubsidyStatusHandler handles approval/rejection
+// @Summary Update subsidy status
+// @Description Approve or Reject a subsidy application
+// @Tags Government
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Param status body UpdateSubsidyRequest true "New status"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /govt/subsidies/{id}/status [put]
 func UpdateSubsidyStatusHandler(c *gin.Context) {
 	userID := c.Param("id")
 	var req UpdateSubsidyRequest
@@ -108,6 +136,13 @@ func UpdateSubsidyStatusHandler(c *gin.Context) {
 }
 
 // GetDashboardStatsHandler returns overview for Govt dashboard
+// @Summary Get government dashboard stats
+// @Description Get statistics for the government dashboard (counts of pending, approved, rejected, disbursed)
+// @Tags Government
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]int
+// @Router /govt/dashboard/stats [get]
 func GetDashboardStatsHandler(c *gin.Context) {
 	pending, _ := users.GetUsersBySubsidyStatus(users.SubsidyStatusPending)
 	approved, _ := users.GetUsersBySubsidyStatus(users.SubsidyStatusApproved)

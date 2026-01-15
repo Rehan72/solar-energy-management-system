@@ -79,6 +79,28 @@ export default function GovtDashboard() {
     }
   };
 
+  const handleGenerateReport = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`${API_URL}/govt/subsidy/reports`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `subsidy_report_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success("Report generated successfully");
+    } catch (error) {
+      console.error("Error generating report:", error);
+      toast.error("Failed to generate report");
+    }
+  };
+
   if (loading) return <div className="p-8 text-center">Loading dashboard...</div>;
 
   return (
@@ -96,13 +118,13 @@ export default function GovtDashboard() {
           <Button variant="outline" asChild>
             <Link to="/govt/history">View History</Link>
           </Button>
-          <Button variant="default">Generate Reports</Button>
+          <Button variant="default" onClick={handleGenerateReport}>Generate Reports</Button>
         </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-slate-900 border-amber-200 dark:border-amber-900">
+        <Card className="bg-linear-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-slate-900 border-amber-200 dark:border-amber-900">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-amber-900 dark:text-amber-100">
               Pending Applications
@@ -115,7 +137,7 @@ export default function GovtDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-slate-900 border-green-200 dark:border-green-900">
+        <Card className="bg-linear-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-slate-900 border-green-200 dark:border-green-900">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-green-900 dark:text-green-100">
               Approved
@@ -128,7 +150,7 @@ export default function GovtDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-slate-900 border-red-200 dark:border-red-900">
+        <Card className="bg-linear-to-br from-red-50 to-red-100 dark:from-red-950 dark:to-slate-900 border-red-200 dark:border-red-900">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-red-900 dark:text-red-100">
               Rejected
@@ -141,7 +163,7 @@ export default function GovtDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-slate-900 border-blue-200 dark:border-blue-900">
+        <Card className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-slate-900 border-blue-200 dark:border-blue-900">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-900 dark:text-blue-100">
               Total Processed

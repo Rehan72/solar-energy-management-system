@@ -11,14 +11,14 @@ function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen w-full font-sans bg-solar-bg overflow-hidden">
+    <div className="relative h-screen w-full font-sans bg-solar-bg overflow-hidden">
       {/* 🌌 Visual Background Layers */}
       <BackgroundLayer />
       <FloatingParticles />
       <SunCanvas />
 
       {/* 🔐 App Layout */}
-      <div className="relative z-10 flex min-h-screen flex-col">
+      <div className="relative z-10 flex h-full flex-col">
         {/* Header */}
         <header className="relative z-30 shrink-0">
           <Header setSidebarOpen={setSidebarOpen} />

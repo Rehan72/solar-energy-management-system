@@ -15,6 +15,14 @@ type CompleteInstallationRequest struct {
 }
 
 // GetAvailableJobsHandler returns all users with status INSTALLATION_PLANNED
+// @Summary Get available installation jobs
+// @Description Get a list of jobs available for installation
+// @Tags Installer
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} map[string]string
+// @Router /installer/jobs [get]
 func GetAvailableJobsHandler(c *gin.Context) {
 	jobs, err := users.GetUsersByInstallationStatus(users.InstallationStatusPlanned)
 	if err != nil {
@@ -29,6 +37,18 @@ func GetAvailableJobsHandler(c *gin.Context) {
 }
 
 // CompleteInstallationHandler marks a job as INSTALLED and links device
+// @Summary Complete installation
+// @Description Mark an installation job as complete and link a device
+// @Tags Installer
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID (Job ID)"
+// @Param completion body CompleteInstallationRequest true "Completion details"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /installer/jobs/{id}/complete [post]
 func CompleteInstallationHandler(c *gin.Context) {
 	userID := c.Param("id")
 	var req CompleteInstallationRequest

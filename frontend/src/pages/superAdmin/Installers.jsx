@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import{motion} from 'framer-motion'
 import { Shield, UserPlus, Search, Filter, RefreshCw, MapPin, Mail, Calendar, Edit, Trash2, Eye } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../../components/ui/stat-card'

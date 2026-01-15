@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"sems-backend/internal/database"
 	"sems-backend/internal/devices"
-	"sems-backend/internal/plants"
 	"strings"
 	"time"
 
@@ -51,12 +50,13 @@ func IngestData(c *gin.Context) {
 		}
 
 		// Demo mode power update
-		demoUserID := "00000000-0000-0000-0000-000000000001"
-		var plantID string
-		err := database.DB.QueryRow("SELECT plant_id FROM users WHERE id = ?", demoUserID).Scan(&plantID)
-		if err == nil && plantID != "" {
-			plants.UpdatePlantCurrentPower(plantID)
-		}
+		// demoUserID := "00000000-0000-0000-0000-000000000001"
+		// var plantID string
+		// Optimization: Skip synchronous update
+		// err := database.DB.QueryRow("SELECT plant_id FROM users WHERE id = ?", demoUserID).Scan(&plantID)
+		// if err == nil && plantID != "" {
+		// 	plants.UpdatePlantCurrentPower(plantID)
+		// }
 
 		c.JSON(http.StatusOK, gin.H{"message": "Data ingested successfully (demo mode)"})
 		return
@@ -96,9 +96,11 @@ func IngestData(c *gin.Context) {
 	// Update plant current output
 	var plantID string
 	err = database.DB.QueryRow("SELECT plant_id FROM users WHERE id = ?", device.UserID).Scan(&plantID)
-	if err == nil && plantID != "" {
-		plants.UpdatePlantCurrentPower(plantID)
-	}
+	// Optimization: Skip synchronous update of plant power to prevent DB lock (SQLITE_BUSY)
+	// TODO: Move this to a background worker
+	// if err == nil && plantID != "" {
+	// 	plants.UpdatePlantCurrentPower(plantID)
+	// }
 
 	c.JSON(http.StatusOK, gin.H{"message": "Data ingested successfully"})
 }

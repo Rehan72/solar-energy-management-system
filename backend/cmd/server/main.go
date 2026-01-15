@@ -69,10 +69,10 @@ func main() {
 
 	// CORS middleware
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
+		AllowOrigins:     []string{"http://localhost:5173", "http://127.0.0.1:5173"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
-		AllowCredentials: false,
+		AllowCredentials: true,
 	}))
 
 	r.GET("/health", func(c *gin.Context) {
@@ -156,10 +156,10 @@ func main() {
 	inventoryGroup := r.Group("/inventory")
 	inventoryGroup.Use(middleware.AuthMiddleware())
 	{
-		inventoryGroup.GET("/", inventoryH.GetAllItems)
+		inventoryGroup.GET("", inventoryH.GetAllItems)
 		inventoryGroup.GET("/:id", inventoryH.GetItem)
 		// Write access restricted to ADMIN and SUPER_ADMIN
-		inventoryGroup.POST("/", middleware.RequireRole("ADMIN", "SUPER_ADMIN"), inventoryH.CreateItem)
+		inventoryGroup.POST("", middleware.RequireRole("ADMIN", "SUPER_ADMIN"), inventoryH.CreateItem)
 		inventoryGroup.PUT("/:id", middleware.RequireRole("ADMIN", "SUPER_ADMIN"), inventoryH.UpdateItem)
 		inventoryGroup.DELETE("/:id", middleware.RequireRole("ADMIN", "SUPER_ADMIN"), inventoryH.DeleteItem)
 	}

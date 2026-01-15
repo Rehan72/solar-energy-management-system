@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Users as UsersIcon, UserPlus, Search, Filter, RefreshCw, Eye, Edit, User, Shield, Globe, Zap } from 'lucide-react'
+import { Users as UsersIcon, UserPlus, Search, Filter, RefreshCw, Eye, Edit, User, Shield, Globe, Zap, Database, Wand2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../../components/ui/stat-card'
 import { getRequest } from '../../lib/apiService'
 import { notify } from '../../lib/toast'
 import SunLoader from '../../components/SunLoader'
 import DataTable from '../../components/common/DataTable'
+import { putRequest } from '../../lib/apiService'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '../../components/ui/dialog'
 import { useMemo } from 'react'
 
 export default function Users() {
@@ -16,6 +18,9 @@ export default function Users() {
   const [admins, setAdmins] = useState([])
   const [installers, setInstallers] = useState([])
   const [plants, setPlants] = useState([])
+  const [nexusModalOpen, setNexusModalOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [nexusId, setNexusId] = useState('')
 
   const fetchUsers = async () => {
     try {
@@ -33,6 +38,30 @@ export default function Users() {
       console.error('Failed to fetch users:', error)
       notify.error('Failed to load users')
     } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleOpenNexusModal = (user) => {
+    setSelectedUser(user)
+    setNexusId(user.personnel_nexus_id || '')
+    setNexusModalOpen(true)
+  }
+
+  const handleSaveNexusId = async () => {
+    if (!selectedUser) return
+    
+    try {
+      setLoading(true)
+      await putRequest(`/superadmin/users/${selectedUser.id}`, {
+        personnel_nexus_id: nexusId
+      })
+      notify.success('Personnel Nexus ID updated successfully')
+      setNexusModalOpen(false)
+      fetchUsers()
+    } catch (error) {
+      console.error('Failed to update Nexus ID:', error)
+      notify.error('Failed to update Nexus ID')
       setLoading(false)
     }
   }
@@ -146,6 +175,15 @@ export default function Users() {
           >
             <Edit className="w-4 h-4" />
           </button>
+          {row.role === 'USER' && (
+            <button
+              onClick={() => handleOpenNexusModal(row)}
+              className="p-2 bg-solar-card hover:bg-solar-primary/10 rounded-lg text-solar-muted hover:text-solar-primary transition-all duration-200 shadow-sm border border-solar-border/30"
+              title="Assign Personnel Nexus ID"
+            >
+              <Database className="w-4 h-4" />
+            </button>
+          )}
         </div>
       )
     }
@@ -153,6 +191,12 @@ export default function Users() {
 
   const userHasAssignments = (user) => {
     return user.admin_id || user.installer_id || user.plant_id
+  }
+
+  const handleGenerateNexusId = () => {
+    const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase()
+    const timestamp = Date.now().toString(36).slice(-4).toUpperCase()
+    setNexusId(`NEXUS-${timestamp}${randomStr}`)
   }
 
   return (
@@ -257,6 +301,52 @@ export default function Users() {
           className="w-full"
         />
       </div>
+
+      <Dialog open={nexusModalOpen} onOpenChange={setNexusModalOpen}>
+        <DialogContent className="solar-glass border-solar-border/50 text-solar-text sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-solar-primary">Personnel Nexus Metadata</DialogTitle>
+            <DialogDescription className="text-solar-muted">
+              Assign a unique Personnel Nexus ID to {selectedUser?.first_name} {selectedUser?.last_name}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <label className="text-xs font-bold text-solar-muted uppercase mb-2 block">Nexus User ID</label>
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={nexusId}
+                onChange={(e) => setNexusId(e.target.value)}
+                className="solar-input w-full"
+                placeholder="Enter Nexus ID..."
+                autoFocus
+              />
+              <button
+                onClick={handleGenerateNexusId}
+                className="px-3 py-2 bg-solar-card hover:bg-solar-yellow/10 rounded-lg text-solar-muted hover:text-solar-yellow transition-all border border-solar-border/30"
+                title="Auto-Generate ID"
+              >
+                <Wand2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          <DialogFooter>
+            <button 
+              onClick={() => setNexusModalOpen(false)} 
+              className="px-4 py-2 rounded-lg hover:bg-solar-bg/50 text-solar-muted transition-colors text-sm font-medium"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleSaveNexusId} 
+              className="sun-button"
+            >
+              <Database className="w-4 h-4 mr-2" />
+              <span>Save ID</span>
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

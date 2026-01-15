@@ -109,7 +109,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
         initial={false}
         animate={isOpen ? "open" : "closed"}
         variants={sidebarVariants}
-        className={`fixed lg:static z-50 top-0 left-0 h-screen flex flex-col
+        className={`fixed lg:static z-50 top-0 left-0 h-screen lg:h-full flex flex-col
           solar-glass text-solar-primary border-r border-solar-border
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         `}

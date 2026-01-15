@@ -105,7 +105,7 @@ function Register() {
         <Button
             type="submit"
             disabled={loading}
-            className="w-full h-11 sun-button mt-4"
+            className="w-full sun-button mt-4"
         >
             {loading && <span className="h-4 w-4 border-2 border-solar-dark border-t-transparent rounded-full animate-spin mr-2" />}
             {loading ? "Creating Account..." : "Create Account"}

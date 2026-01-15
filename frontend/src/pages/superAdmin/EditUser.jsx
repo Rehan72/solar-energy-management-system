@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Users, ArrowLeft, User, Mail, Lock, CheckCircle, Phone, MapPin, Eye, EyeOff, Shield } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { Users, ArrowLeft, User, Mail, Lock, CheckCircle, Phone, MapPin, Eye, EyeOff, Shield, Zap, ZapIcon } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import LocationPicker from '../../components/LocationPicker'
 import { getRequest, putRequest } from '../../lib/apiService'
@@ -571,7 +572,7 @@ export default function EditUser() {
           {step === 2 && (
             <div className="space-y-8 animate-fadeIn">
               <h3 className="text-xl font-black text-solar-primary mb-6 flex items-center uppercase tracking-tight">
-                <Zap className="w-5 h-5 mr-3 text-solar-yellow" />
+                <ZapIcon className="w-5 h-5 mr-3 text-solar-yellow" />
                 Infrastructure Analytics
               </h3>
 

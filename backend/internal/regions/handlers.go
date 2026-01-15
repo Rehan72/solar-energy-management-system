@@ -12,6 +12,14 @@ import (
 )
 
 // GetRegionsHandler handles GET /superadmin/regions
+// @Summary Get all regions
+// @Description Get a list of all regions
+// @Tags Regions
+// @Accept json
+// @Produce json
+// @Success 200 {object} []Region
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/regions [get]
 func GetRegionsHandler(c *gin.Context) {
 	regions, err := GetAllRegions()
 	if err != nil {
@@ -23,6 +31,16 @@ func GetRegionsHandler(c *gin.Context) {
 }
 
 // CreateRegionHandler handles POST /superadmin/regions
+// @Summary Create a region
+// @Description Create a new region
+// @Tags Regions
+// @Accept json
+// @Produce json
+// @Param region body RegionRequest true "Region creation data"
+// @Success 201 {object} Region
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/regions [post]
 func CreateRegionHandler(c *gin.Context) {
 	var req RegionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -45,6 +63,18 @@ func CreateRegionHandler(c *gin.Context) {
 }
 
 // UpdateRegionHandler handles PUT /superadmin/regions/:id
+// @Summary Update a region
+// @Description Update region details
+// @Tags Regions
+// @Accept json
+// @Produce json
+// @Param id path string true "Region ID"
+// @Param region body RegionRequest true "Region update data"
+// @Success 200 {object} Region
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/regions/{id} [put]
 func UpdateRegionHandler(c *gin.Context) {
 	idStr := c.Param("id")
 	if idStr == "" {
@@ -79,6 +109,17 @@ func UpdateRegionHandler(c *gin.Context) {
 }
 
 // DeleteRegionHandler handles DELETE /superadmin/regions/:id
+// @Summary Delete a region
+// @Description Delete a region by ID
+// @Tags Regions
+// @Accept json
+// @Produce json
+// @Param id path string true "Region ID"
+// @Success 200 {object} map[string]string
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/regions/{id} [delete]
 func DeleteRegionHandler(c *gin.Context) {
 	idStr := c.Param("id")
 	if idStr == "" {

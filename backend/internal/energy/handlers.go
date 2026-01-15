@@ -18,6 +18,18 @@ type AnalyticsPoint struct {
 }
 
 // GetEnergyHistoryHandler returns historical energy data
+// @Summary Get energy history
+// @Description Get historical energy data
+// @Tags Energy
+// @Accept json
+// @Produce json
+// @Param days query int false "Number of days (default 7)"
+// @Param device_id query string false "Device ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /user/energy/history [get]
+// @Router /superadmin/energy/history [get]
 func GetEnergyHistoryHandler(c *gin.Context) {
 	userIDStr, exists := c.Get("user_id")
 	if !exists {
@@ -54,6 +66,16 @@ func GetEnergyHistoryHandler(c *gin.Context) {
 }
 
 // GetEnergyAnalyticsHandler returns energy analytics and statistics
+// @Summary Get energy analytics
+// @Description Get energy analytics and statistics
+// @Tags Energy
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]EnergyAnalytics
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /user/energy/analytics [get]
+// @Router /superadmin/energy/analytics [get]
 func GetEnergyAnalyticsHandler(c *gin.Context) {
 	userIDStr, exists := c.Get("user_id")
 	if !exists {
@@ -207,6 +229,17 @@ type SavingsStats struct {
 }
 
 // GetGlobalEnergyTrendHandler returns aggregated energy trends for super admin
+// @Summary Get global energy trend
+// @Description Get aggregated energy trends (Super Admin only)
+// @Tags Energy
+// @Accept json
+// @Produce json
+// @Param region query string false "Region filter"
+// @Param period query string false "Time period (week, month, quarter, year)"
+// @Success 200 {object} map[string][]AnalyticsPoint
+// @Failure 403 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/energy/trend [get]
 func GetGlobalEnergyTrendHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
 	if currentUserRole != "SUPER_ADMIN" {

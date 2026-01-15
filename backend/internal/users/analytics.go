@@ -64,7 +64,17 @@ type PublicRegionHierarchy struct {
 	Plants []PublicPlantInfo `json:"plants"`
 }
 
-// GetGlobalStatsHandler returns global statistics for super admin
+// @Summary Get global stats
+// @Description Get global statistics for SuperAdmin
+// @Tags SuperAdmin
+// @Accept json
+// @Produce json
+// @Param region query string false "Region filter"
+// @Param period query string false "Period (week, month, quarter, year)"
+// @Success 200 {object} map[string]GlobalStats
+// @Failure 403 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/global/stats [get]
 func GetGlobalStatsHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
 	if currentUserRole != "SUPER_ADMIN" {
@@ -83,7 +93,16 @@ func GetGlobalStatsHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"stats": stats})
 }
 
-// GetAdminStatsHandler returns statistics for admin dashboard
+// @Summary Get admin stats
+// @Description Get statistics for Admin dashboard
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Param period query string false "Period (week, month, quarter, year)"
+// @Success 200 {object} map[string]GlobalStats
+// @Failure 403 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /admin/analytics [get]
 func GetAdminStatsHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
 	currentUserID := c.GetString("user_id")
@@ -216,7 +235,15 @@ func GetStats(adminID string, region string, period string) (*GlobalStats, error
 	return stats, nil
 }
 
-// GetRegionalStatsHandler returns statistics grouped by region
+// @Summary Get regional stats
+// @Description Get statistics grouped by region
+// @Tags SuperAdmin
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 403 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/stats/regional [get]
 func GetRegionalStatsHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
 	if currentUserRole != "SUPER_ADMIN" {
@@ -258,7 +285,15 @@ func GetRegionalStatsHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"data": results})
 }
 
-// GetSystemHierarchyHandler returns the full system hierarchy: Region -> Plant -> Admin -> User
+// @Summary Get system hierarchy
+// @Description Get full system hierarchy (Region -> Plant -> Admin -> User)
+// @Tags SuperAdmin
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 403 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/hierarchy [get]
 func GetSystemHierarchyHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
 	if currentUserRole != "SUPER_ADMIN" {
@@ -410,7 +445,14 @@ func GetSystemHierarchyHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"data": result})
 }
 
-// GetPublicHierarchyHandler returns basic plant info for public map view
+// @Summary Get public hierarchy
+// @Description Get basic plant info for public map
+// @Tags Public
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 500 {object} map[string]string
+// @Router /public/hierarchy [get]
 func GetPublicHierarchyHandler(c *gin.Context) {
 	// 1. Fetch all plants
 	plantsRows, err := database.DB.Query(`

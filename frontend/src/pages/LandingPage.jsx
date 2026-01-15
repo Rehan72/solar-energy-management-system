@@ -5,12 +5,15 @@ import SolarMap from "../components/SolarMap";
 import SunCanvas from "../components/SunCanvas";
 import FloatingParticles from "../components/FloatingParticles";
 import SunReflectionText from "../components/SunReflectionText";
+import PublicNavbar from "../components/PublicNavbar";
+import { Zap } from "lucide-react";
 
 export default function LandingPage() {
   return (
     <div className="relative min-h-screen overflow-hidden text-solar-primary">
       <BackgroundLayer />
       <FloatingParticles />
+      <PublicNavbar />
       <SunCanvas />
       {/* 🌟 CONTENT */}
       <div className="relative z-10">
@@ -30,7 +33,7 @@ export default function LandingPage() {
                 production using real-time IoT data and AI-powered insights.
               </p>
 
-              <div className="mt-10 flex gap-4">
+              <div className="mt-10 flex flex-wrap gap-4">
                 <Link
                   to="/auth"
                   className="sun-button"
@@ -39,10 +42,11 @@ export default function LandingPage() {
                 </Link>
 
                 <Link
-                  to="/login"
-                  className="px-6 py-3 border border-solar-border rounded-xl hover:bg-solar-yellow/10 transition-all duration-300"
+                  to="/solar-installation"
+                  className="sun-button sun-button-outline"
                 >
-                  View Dashboard
+                  <Zap size={18} />
+                  System Components
                 </Link>
               </div>
             </div>

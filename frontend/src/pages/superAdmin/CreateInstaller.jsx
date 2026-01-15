@@ -42,41 +42,6 @@ export default function CreateInstaller() {
     longitude: 78.9629
   })
 
-  // Fetch Regions on mount
-  useEffect(() => {
-    fetchRegions()
-  }, [fetchRegions])
-
-  // Fetch Plants when Region changes
-  useEffect(() => {
-    if (formData.region) {
-      fetchPlants(formData.region)
-      fetchAdmins(formData.region) // Admins might be regional
-    } else {
-      setPlants([])
-      setAdmins([])
-      setRegionAdmins([])
-    }
-  }, [formData.region, fetchPlants, fetchAdmins])
-
-  // Filter Admins when Plant changes
-  useEffect(() => {
-    if (formData.plant_id && regionAdmins.length > 0) {
-      // Show admins assigned to this plant OR unassigned regional admins
-      const filtered = regionAdmins.filter(a => a.plant_id === formData.plant_id || !a.plant_id)
-      setAdmins(filtered)
-    } else {
-      // If no plant selected, show all regional admins (optional, or keeping it empty until plant selected)
-      // Current requirement seems to be "based on plant selection".
-      // Let's default to showing all region admins if they select a region but not yet a plant?
-      // No, let's stick to cleaning up when no plant.
-      // Actually, if Plant ID is not selected, setAdmins([]) is correct based on code flow. 
-      // But if user wants to see admins for the Region generally?
-      // "admin shoudle be display based on plant selection" -> implies plant dependency.
-      setAdmins([])
-    }
-  }, [formData.plant_id, regionAdmins])
-
   const fetchRegions = useCallback(async () => {
     try {
       const response = await getRequest('/superadmin/regions')
@@ -125,6 +90,41 @@ export default function CreateInstaller() {
       console.error('Failed to fetch admins', error)
     }
   }, [regions])
+
+  // Fetch Regions on mount
+  useEffect(() => {
+    fetchRegions()
+  }, [fetchRegions])
+
+  // Fetch Plants when Region changes
+  useEffect(() => {
+    if (formData.region) {
+      fetchPlants(formData.region)
+      fetchAdmins(formData.region) // Admins might be regional
+    } else {
+      setPlants([])
+      setAdmins([])
+      setRegionAdmins([])
+    }
+  }, [formData.region, fetchPlants, fetchAdmins])
+
+  // Filter Admins when Plant changes
+  useEffect(() => {
+    if (formData.plant_id && regionAdmins.length > 0) {
+      // Show admins assigned to this plant OR unassigned regional admins
+      const filtered = regionAdmins.filter(a => a.plant_id === formData.plant_id || !a.plant_id)
+      setAdmins(filtered)
+    } else {
+      // If no plant selected, show all regional admins (optional, or keeping it empty until plant selected)
+      // Current requirement seems to be "based on plant selection".
+      // Let's default to showing all region admins if they select a region but not yet a plant?
+      // No, let's stick to cleaning up when no plant.
+      // Actually, if Plant ID is not selected, setAdmins([]) is correct based on code flow. 
+      // But if user wants to see admins for the Region generally?
+      // "admin shoudle be display based on plant selection" -> implies plant dependency.
+      setAdmins([])
+    }
+  }, [formData.plant_id, regionAdmins])
 
   const handleChange = (e) => {
     const { name, value } = e.target

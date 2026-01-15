@@ -29,6 +29,7 @@ import EnergyAnalytics from "../pages/user/EnergyAnalytics";
 import Notifications from "../pages/user/Notifications";
 import SuperAdminDashboard from "../components/dashboards/SuperAdminDashboard";
 import GovtDashboard from "../pages/govt/GovtDashboard";
+import GovtHistory from "../pages/govt/GovtHistory";
 import InstallerDashboard from "../pages/installer/InstallerDashboard";
 import SolarSimulator from "../pages/tool/SolarSimulator";
 
@@ -223,6 +224,11 @@ export default [
   {
     element: GovtDashboard,
     path: `/govt/dashboard`,
+    exact: true
+  },
+  {
+    element: GovtHistory,
+    path: `/govt/history`,
     allowedRoles: ["GOVT", "SUPER_ADMIN"],
     exact: true
   },
@@ -237,6 +243,11 @@ export default [
   {
     element: Inventory,
     path: `/admin/inventory`,
+    exact: true
+  },
+  {
+    element: InventoryForm,
+    path: `/admin/inventory/new`,
     allowedRoles: ["ADMIN", "SUPER_ADMIN"],
     exact: true
   },

@@ -17,12 +17,23 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Token string `json:"token"`
+	Token string      `json:"token"`
 	User  interface{} `json:"user"`
 }
 
 var jwtSecret = []byte("SEMS_SECRET") // TODO: Move to env
 
+// @Summary Login
+// @Description Authenticate user and return JWT token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param credentials body LoginRequest true "Login Credentials"
+// @Success 200 {object} LoginResponse
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /auth/login [post]
 func Login(c *gin.Context) {
 	// Debug logging
 	log.Println("Login endpoint called")

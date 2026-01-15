@@ -85,6 +85,7 @@ type UpdateUserRequest struct {
 	SubsidyStatus      string  `json:"subsidy_status"`
 	SchemeName         string  `json:"scheme_name"`
 	ApplicationID      string  `json:"application_id"`
+	PersonnelNexusID   string  `json:"personnel_nexus_id"`
 }
 
 type UpdateSolarProfileRequest struct {
@@ -111,6 +112,18 @@ type UpdateSolarProfileRequest struct {
 	ApplicationID      string  `json:"application_id"`
 }
 
+// @Summary Create a new user
+// @Description Create a new user (SuperAdmin/Admin can create users/admins/installers)
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user body CreateUserRequest true "User creation data"
+// @Success 201 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 403 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /admin/users [post]
+// @Router /superadmin/admins [post]
 func CreateUserHandler(c *gin.Context) {
 	var req CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -185,6 +198,17 @@ func CreateUserHandler(c *gin.Context) {
 	})
 }
 
+// @Summary Get all users
+// @Description Get a list of users, optionally filtered by role
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param role query string false "Role filter (USER, ADMIN, INSTALLER)"
+// @Success 200 {object} map[string]interface{}
+// @Failure 403 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /admin/users [get]
+// @Router /superadmin/users [get]
 func GetUsersHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
 
@@ -241,6 +265,17 @@ func GetUsersHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"users": users})
 }
 
+// @Summary Get user by ID
+// @Description Get detailed information for a specific user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {object} map[string]interface{}
+// @Failure 403 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /admin/users/{id} [get]
+// @Router /superadmin/admins/{id} [get]
 func GetUserHandler(c *gin.Context) {
 	id := c.Param("id")
 	user, err := GetUserByID(id)
@@ -261,6 +296,15 @@ func GetUserHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 
+// @Summary Get current user profile
+// @Description Get profile of the currently logged-in user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /user/profile [get]
 func GetCurrentUserHandler(c *gin.Context) {
 	currentUserID := c.GetString("user_id")
 	if currentUserID == "" {
@@ -277,6 +321,20 @@ func GetCurrentUserHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 
+// @Summary Update user
+// @Description Update user details
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Param user body UpdateUserRequest true "User update data"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 403 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /admin/users/{id} [put]
+// @Router /superadmin/admins/{id} [put]
 func UpdateUserHandler(c *gin.Context) {
 	id := c.Param("id")
 	var req UpdateUserRequest
@@ -383,6 +441,9 @@ func UpdateUserHandler(c *gin.Context) {
 	}
 	user.SchemeName = req.SchemeName
 	user.ApplicationID = req.ApplicationID
+	if req.PersonnelNexusID != "" {
+		user.PersonnelNexusID = req.PersonnelNexusID
+	}
 
 	err = UpdateUser(user)
 	if err != nil {
@@ -394,6 +455,18 @@ func UpdateUserHandler(c *gin.Context) {
 }
 
 // UpdateSolarProfileHandler - Updates solar-specific profile for a user
+// @Summary Update solar profile
+// @Description Update solar-specific profile settings for the user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param profile body UpdateSolarProfileRequest true "Solar Profile data"
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /user/solar-profile [put]
 func UpdateSolarProfileHandler(c *gin.Context) {
 	currentUserID := c.GetString("user_id")
 	if currentUserID == "" {
@@ -465,6 +538,15 @@ func UpdateSolarProfileHandler(c *gin.Context) {
 }
 
 // GetSolarProfileHandler - Returns solar profile for current user
+// @Summary Get solar profile
+// @Description Get solar profile for the current user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /user/solar-profile [get]
 func GetSolarProfileHandler(c *gin.Context) {
 	currentUserID := c.GetString("user_id")
 	if currentUserID == "" {
@@ -507,6 +589,17 @@ func GetSolarProfileHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"solar_profile": solarProfile})
 }
 
+// @Summary Delete user
+// @Description Delete a user by ID
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {object} map[string]string
+// @Failure 403 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /admin/users/{id} [delete]
+// @Router /superadmin/admins/{id} [delete]
 func DeleteUserHandler(c *gin.Context) {
 	id := c.Param("id")
 
@@ -529,6 +622,15 @@ func DeleteUserHandler(c *gin.Context) {
 }
 
 // For SuperAdmin: Get all admins
+// @Summary Get all admins
+// @Description Get a list of all administrators (SuperAdmin only)
+// @Tags SuperAdmin
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 403 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/admins [get]
 func GetAdminsHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
 	if currentUserRole != "SUPER_ADMIN" {
@@ -547,6 +649,16 @@ func GetAdminsHandler(c *gin.Context) {
 }
 
 // For SuperAdmin & Admin: Get all installers
+// @Summary Get all installers
+// @Description Get a list of all installers
+// @Tags SuperAdmin
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 403 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /superadmin/installers [get]
+// @Router /admin/installers [get]
 func GetInstallersHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
 	if currentUserRole != "SUPER_ADMIN" && currentUserRole != "ADMIN" {

@@ -34,7 +34,7 @@ export default function SunCanvas({ offsetY = 0 }) {
           width: '80px',
           height: '80px',
           background: 'radial-gradient(circle, #FFD166 0%, #FFA500 100%)',
-          top: '20px',
+          top: '50px',
           right: '20px',
           boxShadow: '0 0 60px #FFD166, 0 0 100px #FFA500',
           transform: `translateY(${sunTranslateY}px)`,
@@ -48,7 +48,7 @@ export default function SunCanvas({ offsetY = 0 }) {
           width: '200px',
           height: '200px',
           background: 'radial-gradient(circle, rgba(255,209,102,0.4) 0%, rgba(255,209,102,0) 70%)',
-          top: '-40px',
+          top: '50px',
           right: '-40px',
           transform: `translateY(${sunTranslateY}px)`,
         }}
@@ -88,7 +88,7 @@ export default function SunCanvas({ offsetY = 0 }) {
         style={{
           width: '200px',
           height: '200px',
-          top: '10px',
+          top: '110px',
           right: '10px',
           transform: `translateY(${sunTranslateY + 40}px)`,
         }}

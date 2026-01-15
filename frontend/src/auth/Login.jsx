@@ -53,7 +53,7 @@ function Login() {
         type="button"
         onClick={handleLogin}
         disabled={loading}
-        className="w-full h-11 sun-button"
+        className="w-full sun-button"
       >
         {loading && (
           <span className="h-4 w-4 border-2 border-solar-dark border-t-transparent rounded-full animate-spin mr-2" />

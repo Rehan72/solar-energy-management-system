@@ -9,6 +9,7 @@ import LandingPage from './pages/LandingPage'
 import Master from './router/Master'
 import { ThemeProvider } from './contexts/ThemeContext'
 import SolarToaster from './components/Toaster'
+import SolarInstallationShowcase from './pages/SolarInstallationShowcase'
 import './App.css'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/register" element={<AuthPage />} />
           <Route path="/solar-onboarding" element={<SolarOnboarding />} />
           <Route path="/onboarding" element={<Onboarding />} /> {/* New Route */}
+          <Route path="/solar-installation" element={<SolarInstallationShowcase />} />
           <Route path="/*" element={<Master />} />
         </Routes>
       </Router>

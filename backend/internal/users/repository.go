@@ -20,7 +20,7 @@ func nullStringToString(ns sql.NullString) string {
 func GetUsersByAdmin(adminID string) ([]*User, error) {
 	users := []*User{}
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at, personnel_nexus_id
 		FROM users
 		WHERE admin_id = ?`
 	rows, err := database.DB.Query(query, adminID)
@@ -30,7 +30,7 @@ func GetUsersByAdmin(adminID string) ([]*User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		user := &User{}
-		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
+		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID, personnelNexusID sql.NullString
 		var aID, installerID, pID sql.NullString
 		var latitude, longitude, avgMonthlyBill, roofAreaSqft, plantCapacityKW sql.NullFloat64
 		var installationDate, lastDataReceived sql.NullTime
@@ -43,7 +43,7 @@ func GetUsersByAdmin(adminID string) ([]*User, error) {
 			&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 			&plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 			&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
-			&isActive, &user.CreatedAt, &user.UpdatedAt)
+			&isActive, &user.CreatedAt, &user.UpdatedAt, &personnelNexusID)
 		if err != nil {
 			return nil, err
 		}
@@ -81,6 +81,7 @@ func GetUsersByAdmin(adminID string) ([]*User, error) {
 		user.SchemeName = nullStringToString(schemeName)
 		user.ApplicationID = nullStringToString(applicationID)
 		user.IsActive = nullBoolToBool(isActive)
+		user.PersonnelNexusID = nullStringToString(personnelNexusID)
 		users = append(users, user)
 	}
 	return users, nil
@@ -181,14 +182,14 @@ func CreateUser(firstName, lastName, email, passwordHash, role, phone, profileIm
 
 func GetUserByEmail(email string) (*User, error) {
 	user := &User{}
-	var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
+	var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID, personnelNexusID sql.NullString
 	var adminID, installerID, pID sql.NullString
 	var latitude, longitude, avgMonthlyBill, roofAreaSqft, plantCapacityKW, projectCost sql.NullFloat64
 	var installationDate, lastDataReceived sql.NullTime
 	var subsidyInterest, netMetering, deviceLinked, subsidyApplied, isActive sql.NullBool
 
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at, personnel_nexus_id
 		FROM users
 		WHERE email = ?`
 	err := database.DB.QueryRow(query, email).Scan(
@@ -198,7 +199,7 @@ func GetUserByEmail(email string) (*User, error) {
 		&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 		&projectCost, &plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 		&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
-		&isActive, &user.CreatedAt, &user.UpdatedAt,
+		&isActive, &user.CreatedAt, &user.UpdatedAt, &personnelNexusID,
 	)
 	if err != nil {
 		return nil, err
@@ -240,6 +241,7 @@ func GetUserByEmail(email string) (*User, error) {
 	user.ApplicationID = nullStringToString(applicationID)
 	user.IsActive = nullBoolToBool(isActive)
 	user.Role = strings.ToUpper(user.Role)
+	user.PersonnelNexusID = nullStringToString(personnelNexusID)
 	return user, nil
 }
 
@@ -247,7 +249,7 @@ func GetUserByEmail(email string) (*User, error) {
 func GetUsersByRole(role string) ([]*User, error) {
 	users := []*User{}
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at, personnel_nexus_id
 		FROM users
 		WHERE role = ?`
 	rows, err := database.DB.Query(query, role)
@@ -257,7 +259,7 @@ func GetUsersByRole(role string) ([]*User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		user := &User{}
-		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
+		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID, personnelNexusID sql.NullString
 		var adminID, installerID, pID sql.NullString
 		var latitude, longitude, avgMonthlyBill, roofAreaSqft, projectCost, plantCapacityKW sql.NullFloat64
 		var installationDate, lastDataReceived sql.NullTime
@@ -270,7 +272,7 @@ func GetUsersByRole(role string) ([]*User, error) {
 			&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 			&projectCost, &plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 			&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
-			&isActive, &user.CreatedAt, &user.UpdatedAt)
+			&isActive, &user.CreatedAt, &user.UpdatedAt, &personnelNexusID)
 		if err != nil {
 			return nil, err
 		}
@@ -311,6 +313,7 @@ func GetUsersByRole(role string) ([]*User, error) {
 		user.ApplicationID = nullStringToString(applicationID)
 		user.IsActive = nullBoolToBool(isActive)
 		user.Role = strings.ToUpper(user.Role)
+		user.PersonnelNexusID = nullStringToString(personnelNexusID)
 		users = append(users, user)
 	}
 	return users, nil
@@ -319,7 +322,7 @@ func GetUsersByRole(role string) ([]*User, error) {
 func GetAllUsers() ([]*User, error) {
 	users := []*User{}
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at, personnel_nexus_id
 		FROM users
 		WHERE role = 'USER'` // Only return users with role "USER", exclude ADMIN and SUPER_ADMIN
 	rows, err := database.DB.Query(query)
@@ -329,7 +332,7 @@ func GetAllUsers() ([]*User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		user := &User{}
-		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
+		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID, personnelNexusID sql.NullString
 		var adminID, installerID, pID sql.NullString
 		var latitude, longitude, avgMonthlyBill, roofAreaSqft, projectCost, plantCapacityKW sql.NullFloat64
 		var installationDate, lastDataReceived sql.NullTime
@@ -342,7 +345,7 @@ func GetAllUsers() ([]*User, error) {
 			&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 			&projectCost, &plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 			&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
-			&isActive, &user.CreatedAt, &user.UpdatedAt)
+			&isActive, &user.CreatedAt, &user.UpdatedAt, &personnelNexusID)
 		if err != nil {
 			return nil, err
 		}
@@ -383,6 +386,7 @@ func GetAllUsers() ([]*User, error) {
 		user.ApplicationID = nullStringToString(applicationID)
 		user.IsActive = nullBoolToBool(isActive)
 		user.Role = strings.ToUpper(user.Role)
+		user.PersonnelNexusID = nullStringToString(personnelNexusID)
 		users = append(users, user)
 	}
 	return users, nil
@@ -392,7 +396,7 @@ func GetAllUsers() ([]*User, error) {
 func GetAllUsersIncludingAdmins() ([]*User, error) {
 	users := []*User{}
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at, personnel_nexus_id
 		FROM users`
 	rows, err := database.DB.Query(query)
 	if err != nil {
@@ -401,7 +405,7 @@ func GetAllUsersIncludingAdmins() ([]*User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		user := &User{}
-		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
+		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID, personnelNexusID sql.NullString
 		var adminID, installerID, pID sql.NullString
 		var latitude, longitude, avgMonthlyBill, roofAreaSqft, projectCost, plantCapacityKW sql.NullFloat64
 		var installationDate, lastDataReceived sql.NullTime
@@ -414,7 +418,7 @@ func GetAllUsersIncludingAdmins() ([]*User, error) {
 			&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 			&projectCost, &plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 			&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
-			&isActive, &user.CreatedAt, &user.UpdatedAt)
+			&isActive, &user.CreatedAt, &user.UpdatedAt, &personnelNexusID)
 		if err != nil {
 			return nil, err
 		}
@@ -455,6 +459,7 @@ func GetAllUsersIncludingAdmins() ([]*User, error) {
 		user.ApplicationID = nullStringToString(applicationID)
 		user.IsActive = nullBoolToBool(isActive)
 		user.Role = strings.ToUpper(user.Role)
+		user.PersonnelNexusID = nullStringToString(personnelNexusID)
 		users = append(users, user)
 	}
 	return users, nil
@@ -462,14 +467,14 @@ func GetAllUsersIncludingAdmins() ([]*User, error) {
 
 func GetUserByID(id string) (*User, error) {
 	user := &User{}
-	var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
+	var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID, personnelNexusID sql.NullString
 	var adminID, installerID, pID sql.NullString
 	var latitude, longitude, avgMonthlyBill, roofAreaSqft, plantCapacityKW, projectCost sql.NullFloat64
 	var installationDate, lastDataReceived sql.NullTime
 	var subsidyInterest, netMetering, deviceLinked, subsidyApplied, isActive sql.NullBool
 
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at, personnel_nexus_id
 		FROM users
 		WHERE id = ?`
 	err := database.DB.QueryRow(query, id).Scan(
@@ -479,7 +484,7 @@ func GetUserByID(id string) (*User, error) {
 		&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
 		&projectCost, &plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 		&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
-		&isActive, &user.CreatedAt, &user.UpdatedAt)
+		&isActive, &user.CreatedAt, &user.UpdatedAt, &personnelNexusID)
 	if err != nil {
 		return nil, err
 	}
@@ -520,13 +525,14 @@ func GetUserByID(id string) (*User, error) {
 	user.ApplicationID = nullStringToString(applicationID)
 	user.IsActive = nullBoolToBool(isActive)
 	user.Role = strings.ToUpper(user.Role)
+	user.PersonnelNexusID = nullStringToString(personnelNexusID)
 	return user, nil
 }
 
 func UpdateUser(user *User) error {
 	query := `
 		UPDATE users
-		SET first_name = ?, last_name = ?, email = ?, role = ?, phone = ?, profile_image = ?, address_line1 = ?, address_line2 = ?, city = ?, state = ?, pincode = ?, region = ?, latitude = ?, longitude = ?, admin_id = ?, installer_id = ?, plant_id = ?, installation_status = ?, property_type = ?, avg_monthly_bill = ?, roof_area_sqft = ?, connection_type = ?, subsidy_interest = ?, project_cost = ?, plant_capacity_kw = ?, installation_date = ?, net_metering = ?, inverter_brand = ?, discom_name = ?, consumer_number = ?, device_linked = ?, device_id = ?, last_data_received = ?, subsidy_applied = ?, subsidy_status = ?, scheme_name = ?, application_id = ?, is_active = ?, updated_at = ?
+		SET first_name = ?, last_name = ?, email = ?, role = ?, phone = ?, profile_image = ?, address_line1 = ?, address_line2 = ?, city = ?, state = ?, pincode = ?, region = ?, latitude = ?, longitude = ?, admin_id = ?, installer_id = ?, plant_id = ?, installation_status = ?, property_type = ?, avg_monthly_bill = ?, roof_area_sqft = ?, connection_type = ?, subsidy_interest = ?, project_cost = ?, plant_capacity_kw = ?, installation_date = ?, net_metering = ?, inverter_brand = ?, discom_name = ?, consumer_number = ?, device_linked = ?, device_id = ?, last_data_received = ?, subsidy_applied = ?, subsidy_status = ?, scheme_name = ?, application_id = ?, is_active = ?, updated_at = ?, personnel_nexus_id = ?
 		WHERE id = ?`
 	_, err := database.DB.Exec(query,
 		user.FirstName, user.LastName, user.Email, user.Role, user.Phone, user.ProfileImage,
@@ -536,7 +542,7 @@ func UpdateUser(user *User) error {
 		user.PlantCapacityKW, user.InstallationDate, user.NetMetering, user.InverterBrand,
 		user.DISCOMName, user.ConsumerNumber, user.DeviceLinked, user.DeviceID, user.LastDataReceived,
 		user.SubsidyApplied, user.SubsidyStatus, user.SchemeName, user.ApplicationID, user.IsActive,
-		time.Now(), user.ID)
+		time.Now(), user.PersonnelNexusID, user.ID)
 	return err
 }
 
@@ -552,7 +558,7 @@ func DeleteUser(id string) error {
 func GetUsersByInstallationStatus(status InstallationStatus) ([]*User, error) {
 	users := []*User{}
 	query := `
-		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at
+		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at, personnel_nexus_id
 		FROM users
 		WHERE installation_status = ?`
 	rows, err := database.DB.Query(query, status)
@@ -562,7 +568,7 @@ func GetUsersByInstallationStatus(status InstallationStatus) ([]*User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		user := &User{}
-		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
+		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID, personnelNexusID sql.NullString
 		var adminID, installerID, pID sql.NullString
 		var latitude, longitude, avgMonthlyBill, roofAreaSqft, projectCost, plantCapacityKW sql.NullFloat64
 		var installationDate, lastDataReceived sql.NullTime
@@ -573,9 +579,9 @@ func GetUsersByInstallationStatus(status InstallationStatus) ([]*User, error) {
 			&user.Role, &phone, &profileImage, &addressLine1, &addressLine2,
 			&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID, &pID,
 			&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
-			&plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
+			&projectCost, &plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 			&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
-			&isActive, &user.CreatedAt, &user.UpdatedAt)
+			&isActive, &user.CreatedAt, &user.UpdatedAt, &personnelNexusID)
 		if err != nil {
 			return nil, err
 		}
@@ -615,6 +621,7 @@ func GetUsersByInstallationStatus(status InstallationStatus) ([]*User, error) {
 		user.ApplicationID = nullStringToString(applicationID)
 		user.IsActive = nullBoolToBool(isActive)
 		user.Role = strings.ToUpper(user.Role)
+		user.PersonnelNexusID = nullStringToString(personnelNexusID)
 		users = append(users, user)
 	}
 	return users, nil
@@ -634,9 +641,9 @@ func GetUsersBySubsidyStatus(status SubsidyStatus) ([]*User, error) {
 	defer rows.Close()
 	for rows.Next() {
 		user := &User{}
-		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID sql.NullString
+		var phone, profileImage, addressLine1, addressLine2, city, state, pincode, region, installationStatus, propertyType, connectionType, inverterBrand, discomName, consumerNumber, deviceID, subsidyStatus, schemeName, applicationID, personnelNexusID sql.NullString
 		var adminID, installerID, pID sql.NullString
-		var latitude, longitude, avgMonthlyBill, roofAreaSqft, plantCapacityKW sql.NullFloat64
+		var latitude, longitude, avgMonthlyBill, roofAreaSqft, plantCapacityKW, projectCost sql.NullFloat64
 		var installationDate, lastDataReceived sql.NullTime
 		var subsidyInterest, netMetering, deviceLinked, subsidyApplied, isActive sql.NullBool
 
@@ -645,9 +652,9 @@ func GetUsersBySubsidyStatus(status SubsidyStatus) ([]*User, error) {
 			&user.Role, &phone, &profileImage, &addressLine1, &addressLine2,
 			&city, &state, &pincode, &region, &latitude, &longitude, &adminID, &installerID, &pID,
 			&installationStatus, &propertyType, &avgMonthlyBill, &roofAreaSqft, &connectionType, &subsidyInterest,
-			&plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
+			&projectCost, &plantCapacityKW, &installationDate, &netMetering, &inverterBrand, &discomName, &consumerNumber,
 			&deviceLinked, &deviceID, &lastDataReceived, &subsidyApplied, &subsidyStatus, &schemeName, &applicationID,
-			&isActive, &user.CreatedAt, &user.UpdatedAt)
+			&isActive, &user.CreatedAt, &user.UpdatedAt, &personnelNexusID)
 		if err != nil {
 			return nil, err
 		}
@@ -671,6 +678,7 @@ func GetUsersBySubsidyStatus(status SubsidyStatus) ([]*User, error) {
 		user.RoofAreaSqft = nullFloat64ToFloat64(roofAreaSqft)
 		user.ConnectionType = ConnectionType(nullStringToString(connectionType))
 		user.SubsidyInterest = nullBoolToBool(subsidyInterest)
+		user.ProjectCost = nullFloat64ToFloat64(projectCost)
 		user.PlantCapacityKW = nullFloat64ToFloat64(plantCapacityKW)
 		user.InstallationDate = nullTimeToTime(installationDate)
 		user.NetMetering = nullBoolToBool(netMetering)
@@ -686,6 +694,7 @@ func GetUsersBySubsidyStatus(status SubsidyStatus) ([]*User, error) {
 		user.ApplicationID = nullStringToString(applicationID)
 		user.IsActive = nullBoolToBool(isActive)
 		user.Role = strings.ToUpper(user.Role)
+		user.PersonnelNexusID = nullStringToString(personnelNexusID)
 		users = append(users, user)
 	}
 	return users, nil
