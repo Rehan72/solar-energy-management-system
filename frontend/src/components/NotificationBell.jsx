@@ -132,11 +132,16 @@ function NotificationBell() {
             {/* Bell Icon */}
             <button
                 onClick={handleBellClick}
-                className="relative p-2 text-solar-muted hover:text-solar-primary focus:outline-none focus:ring-2 focus:ring-solar-yellow rounded-lg sun-button transition-colors"
+                className={`
+                    relative p-2 rounded-xl transition-all duration-300 group
+                    ${showDropdown 
+                        ? "bg-solar-yellow/20 ring-2 ring-solar-yellow/50" 
+                        : "bg-solar-night/30 hover:bg-solar-night/50 border border-solar-yellow/30"}
+                `}
             >
-                <Bell size={20} />
+                <Bell size={20} className={`transition-colors ${showDropdown ? 'text-solar-yellow' : 'text-solar-muted group-hover:text-solar-yellow'}`} />
                 {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold leading-none text-white bg-red-500 rounded-full border-2 border-solar-bg shadow-lg">
                         {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                 )}
@@ -144,10 +149,17 @@ function NotificationBell() {
 
             {/* Dropdown */}
             {showDropdown && (
-                <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-solar-card rounded-lg shadow-xl border border-solar-border z-50 max-h-[600px] flex flex-col">
+                <div className="
+                    absolute right-0 mt-3 w-80 md:w-96 z-50 animate-in fade-in slide-in-from-top-2 duration-200
+                    bg-solar-surface/95 dark:bg-solar-night/95 backdrop-blur-xl
+                    rounded-2xl overflow-hidden border border-solar-border/50 shadow-2xl flex flex-col
+                ">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-4 border-b border-solar-border">
-                        <h3 className="text-lg font-semibold text-solar-primary">Notifications</h3>
+                    <div className="flex items-center justify-between px-5 py-4 bg-linear-to-br from-solar-yellow/5 to-transparent border-b border-solar-border/50">
+                        <h3 className="text-sm font-bold text-solar-primary flex items-center">
+                            <Bell size={16} className="mr-2 text-solar-yellow" />
+                            Notifications
+                        </h3>
                         <div className="flex items-center gap-2">
                             {unreadCount > 0 && (
                                 <button

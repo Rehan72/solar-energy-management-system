@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { Calendar } from "lucide-react";
 import { logout, getUserRole, hasPermission } from "../lib/auth";
+import { notify } from "../lib/toast";
 
 function Navbar({ sidebarOpen, setSidebarOpen }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -56,6 +57,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
   const menu = MENU_ITEMS.filter(item => hasPermission(item.roles));
 
   const handleLogout = () => {
+    notify.success('Logged out successfully');
     logout();
   };
 
@@ -124,28 +126,35 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
             Menu
           </motion.h2>
           <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setSidebarOpen(false)}
-            className="p-2 rounded-lg backdrop-blur-sm bg-solar-night/80 border border-solar-border shadow-md hover:shadow-lg hover:bg-solar-yellow/20 hover:text-solar-yellow transition-all duration-300 sun-button"
+            className="p-2 rounded-xl bg-solar-night/60 hover:bg-solar-night/80 border border-solar-yellow/30 shadow-sm hover:shadow-md transition-all duration-300 group"
           >
-            <X size={20} />
+            <X size={20} className="text-solar-muted group-hover:text-solar-danger transition-colors" />
           </motion.button>
         </div>
 
         {/* Collapse Toggle Button */}
-        <div className={`flex ${isOpen ? 'justify-end' : 'justify-center'} p-3 border-b border-solar-border shrink-0`}>
+        <div className={`flex ${isOpen ? 'justify-end' : 'justify-center'} p-3 border-b border-solar-border/50 shrink-0`}>
           <motion.button
             variants={collapseButtonVariants}
             initial={false}
             animate={isOpen ? "open" : "closed"}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={toggleSidebar}
-            className="p-2 rounded-lg backdrop-blur-sm bg-solar-night/80 border border-solar-border shadow-md hover:shadow-lg hover:bg-solar-yellow/20 hover:text-solar-yellow transition-all duration-300 sun-button"
+            className={`
+              p-2 rounded-xl transition-all duration-300 group
+              bg-solar-night/60 hover:bg-solar-night/80 border border-solar-yellow/30
+              shadow-sm hover:shadow-solar-glow-yellow/20
+            `}
             aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
-            <Columns2 size={20} className="text-solar-muted" />
+            <Columns2 
+              size={18} 
+              className={`transition-colors ${isOpen ? 'text-solar-muted' : 'text-solar-yellow'} group-hover:text-solar-yellow`} 
+            />
           </motion.button>
         </div>
 
@@ -210,13 +219,17 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
         </nav>
 
         {/* Logout Button (Fixed at bottom) */}
-        <div className="p-3 border-t border-solar-border shrink-0">
+        <div className="p-3 border-t border-solar-border/50 shrink-0">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleLogout}
-            className={`flex items-center w-full rounded-lg group relative backdrop-blur-sm overflow-hidden transition-all duration-300 ease-in-out sun-button ${isOpen ? 'gap-3 px-3 py-3' : 'justify-center p-3'
-              } bg-solar-night/80 shadow-md border border-solar-border text-solar-muted hover:bg-solar-danger/20 hover:text-solar-danger hover:shadow-lg`}
+            className={`
+              flex items-center w-full rounded-xl group relative overflow-hidden transition-all duration-300
+              ${isOpen ? 'gap-3 px-3 py-3' : 'justify-center p-3'}
+              bg-solar-night/60 hover:bg-red-500/10 border border-solar-yellow/20 hover:border-red-500/30
+              text-solar-muted hover:text-red-500 shadow-sm hover:shadow-lg hover:shadow-red-500/5
+            `}
             title={!isOpen ? "Logout" : ""}
           >
             <motion.span

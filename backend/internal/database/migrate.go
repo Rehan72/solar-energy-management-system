@@ -205,7 +205,7 @@ func RunMigrations() error {
 		`ALTER TABLE energy_data ADD COLUMN weather_condition TEXT;`,
 		// Seed super admin if not exists
 		`INSERT OR IGNORE INTO users (id, email, password_hash, first_name, last_name, role)
-		VALUES ('00000000-0000-4000-a000-000000000001', 'superAdmin@solar.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Super', 'Admin', 'SUPER_ADMIN');`,
+		VALUES ('00000000-0000-4000-a000-000000000001', 'superadmin@solar.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Super', 'Admin', 'SUPER_ADMIN');`,
 		// Create inventory table
 		`CREATE TABLE IF NOT EXISTS inventory_items (
 			id TEXT PRIMARY KEY,
@@ -224,7 +224,7 @@ func RunMigrations() error {
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);`,
 		// Update super admin password
-		`UPDATE users SET password_hash = '$2a$10$vHv/WKOEYBysAKs4NKNA..GLvVuBi.1vAxvF3Dr5iHBSlJsNOaL1G' WHERE email = 'superAdmin@solar.com';`,
+		`UPDATE users SET password_hash = '$2a$10$vHv/WKOEYBysAKs4NKNA..GLvVuBi.1vAxvF3Dr5iHBSlJsNOaL1G' WHERE email = 'superadmin@solar.com';`,
 		// Add Personnel Nexus ID
 		`ALTER TABLE users ADD COLUMN personnel_nexus_id TEXT;`,
 	}

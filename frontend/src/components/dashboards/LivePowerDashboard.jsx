@@ -212,7 +212,7 @@ export default function LivePowerDashboard() {
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-glass-light rounded-2xl p-6 border border-solar-border/30 shadow-xl overflow-hidden relative group"
+            className="solar-glass rounded-2xl p-6 shadow-xl overflow-hidden relative group"
           >
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
               <TrendingUp size={80} />
@@ -237,7 +237,7 @@ export default function LivePowerDashboard() {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-glass-light rounded-2xl p-6 border border-solar-border/30 shadow-xl"
+          className="solar-glass rounded-2xl p-6 shadow-xl"
         >
           <h2 className="text-xl font-bold mb-6 flex items-center text-solar-primary">
             <span className="mr-3 p-2 bg-solar-orange/20 rounded-lg"><AlertTriangle className="text-solar-orange" size={20} /></span>
@@ -298,10 +298,10 @@ function PowerCard({ index, title, value, unit, icon, color, gradient }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
       whileHover={{ y: -5, scale: 1.02 }}
-      className="bg-glass-light rounded-2xl p-6 border border-solar-border/30 shadow-xl group overflow-hidden relative"
+      className="solar-glass rounded-2xl p-6 shadow-xl group overflow-hidden relative"
     >
       <div className="flex items-center justify-between mb-4 relative z-10">
-        <div className={`p-3 rounded-xl bg-gradient-to-br ${gradient} shadow-inner group-hover:shadow-lg group-hover:scale-110 transition-all duration-300`}>
+        <div className={`p-3 rounded-xl bg-linear-to-br ${gradient} shadow-inner group-hover:shadow-lg group-hover:scale-110 transition-all duration-300`}>
           <span className={color}>{icon}</span>
         </div>
         <span className="text-[10px] font-black text-solar-muted uppercase tracking-widest opacity-60">{title}</span>
@@ -310,7 +310,7 @@ function PowerCard({ index, title, value, unit, icon, color, gradient }) {
         {typeof value === 'number' ? value.toFixed(1) : value}
         <span className="text-sm font-bold ml-1 opacity-50">{unit}</span>
       </div>
-      <div className={`absolute -right-6 -bottom-6 w-24 h-24 bg-gradient-to-br ${gradient} opacity-5 group-hover:opacity-20 transition-opacity duration-500 rounded-full blur-2xl`}></div>
+      <div className={`absolute -right-6 -bottom-6 w-24 h-24 bg-linear-to-br ${gradient} opacity-5 group-hover:opacity-20 transition-opacity duration-500 rounded-full blur-2xl`}></div>
     </motion.div>
   );
 }
@@ -322,7 +322,7 @@ function MetricCard({ index, title, value, unit, icon, color }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="bg-glass-light rounded-xl p-4 border border-solar-border/30 shadow-md flex items-center space-x-4 hover:shadow-lg transition-all duration-300"
+      className="solar-glass rounded-xl p-4 shadow-md flex items-center space-x-4 hover:shadow-lg transition-all duration-300"
     >
       <div className={`p-2 rounded-lg bg-solar-card border border-solar-border/30 ${color}`}>
         {icon}

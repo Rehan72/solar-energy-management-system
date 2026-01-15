@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sun, Battery, Zap, TrendingUp, LogOut, User, RefreshCw } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../ui/stat-card'
-import { getRequest, postRequest } from '../../lib/apiService'
+import { getRequest, postRequest } from "../../lib/apiService"
+import { notify } from "../../lib/toast"
 import LivePowerDashboard from './LivePowerDashboard'
 import WeatherWidget from '../WeatherWidget'
 import FinancialWidget from './FinancialWidget'
@@ -62,6 +63,7 @@ function UserDashboard() {
   }
 
   const handleLogout = () => {
+    notify.success('Logged out successfully');
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     navigate('/login')
@@ -193,7 +195,7 @@ function UserDashboard() {
 
           {/* AI Prediction (Takes up 1 column or adjusts) */}
           {prediction && (
-            <div className="bg-solar-card rounded-lg shadow p-6 energy-card flex flex-col justify-center">
+            <div className="solar-glass rounded-2xl p-6 flex flex-col justify-center">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-semibold text-solar-primary flex items-center">
@@ -232,7 +234,7 @@ function UserDashboard() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className="lg:col-span-2 bg-solar-card/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 energy-card border border-solar-border/30"
+            className="lg:col-span-2 solar-glass rounded-2xl p-6"
           >
             <h3 className="text-lg font-bold text-solar-primary mb-6 flex items-center">
               <Zap className="w-5 h-5 text-solar-yellow mr-2" />
@@ -270,7 +272,7 @@ function UserDashboard() {
         </div >
 
         {/* System Status */}
-        < div className="mt-8 bg-solar-card rounded-lg shadow p-6 energy-card" >
+        < div className="mt-8 solar-glass rounded-2xl p-6" >
           <h3 className="text-lg font-semibold text-solar-primary mb-4">System Status</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center space-x-3">

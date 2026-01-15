@@ -22,6 +22,7 @@ function App() {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/login" element={<AuthPage />} />
           <Route path="/register" element={<AuthPage />} />
+          <Route path="/forgot-password" element={<AuthPage />} />
           <Route path="/solar-onboarding" element={<SolarOnboarding />} />
           <Route path="/onboarding" element={<Onboarding />} /> {/* New Route */}
           <Route path="/solar-installation" element={<SolarInstallationShowcase />} />

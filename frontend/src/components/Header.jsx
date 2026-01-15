@@ -14,6 +14,8 @@ function Header({ setSidebarOpen }) {
   };
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  console.log(user,"user");
+  
 
   return (
     <header className="border-b border-solar-border/50 sticky top-0 z-30 backdrop-blur-sm bg-linear-to-r from-solar-bg/90 via-solar-bg/50 to-transparent transition-all duration-300">
@@ -63,55 +65,114 @@ function Header({ setSidebarOpen }) {
             <div className="relative">
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-solar-yellow p-1 bg-solar-night/50 hover:bg-solar-night transition-all duration-300"
+                className={`
+                  flex items-center space-x-2 p-1.5 rounded-2xl transition-all duration-300
+                  ${showDropdown 
+                    ? "bg-solar-yellow/20 ring-2 ring-solar-yellow/50" 
+                    : "bg-solar-night/30 hover:bg-solar-night/50 border border-solar-yellow/30"}
+                `}
               >
-                {user.profile_image ? (
-                  <img
-                    src={user.profile_image}
-                    alt={`${user.first_name || 'User'}'s profile`}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-8 h-8 bg-solar-yellow rounded-full flex items-center justify-center">
-                    <span className="text-solar-dark text-sm font-medium">
-                      {user.first_name?.charAt(0) || user.last_name?.charAt(0) || 'U'}
-                    </span>
-                  </div>
-                )}
-                <span className="ml-2 text-solar-primary hidden md:block font-medium">
-                  {user.first_name && user.last_name
-                    ? `${user.first_name} ${user.last_name}`
-                    : user.first_name || user.last_name || 'User'}
-                </span>
+                <div className="relative">
+                  {user.profile_image ? (
+                    <img
+                      src={user.profile_image}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-xl object-cover border border-solar-yellow/30"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-linear-to-br from-solar-yellow to-solar-orange rounded-xl flex items-center justify-center shadow-solar-glow-yellow/30">
+                      <span className="text-solar-dark text-xs font-bold leading-none">
+                        {user.first_name?.charAt(0) || user.last_name?.charAt(0) || 'U'}
+                      </span>
+                    </div>
+                  )}
+                  <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-solar-success rounded-full border-2 border-solar-bg" />
+                </div>
+                
+                <div className="hidden md:flex flex-col items-start pr-2">
+                  <span className="text-sm font-semibold text-solar-primary leading-tight">
+                    {user.first_name || 'Solar'} {user.last_name || 'User'}
+                  </span>
+                  <span className="text-[10px] text-solar-muted uppercase tracking-wider font-bold">
+                    {user.role?.replace('_', ' ') || 'Member'}
+                  </span>
+                </div>
+                
+                <svg 
+                  className={`w-4 h-4 text-solar-muted transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`} 
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
 
               {/* Dropdown menu */}
               {showDropdown && (
-                <div className="absolute right-0 mt-3 w-56 solar-glass rounded-2xl py-2 z-50 animate-fade-in">
-                  <div className="px-4 py-2 border-b border-solar-border">
-                    <p className="text-sm font-medium text-solar-primary">
-                      {user.first_name && user.last_name
-                        ? `${user.first_name} ${user.last_name}`
-                        : user.first_name || user.last_name || 'User'}
-                    </p>
-                    <p className="text-xs text-solar-muted">{user.email || ''}</p>
+                <>
+                  {/* Backdrop for closing */}
+                  <div 
+                    className="fixed inset-0 z-40" 
+                    onClick={() => setShowDropdown(false)}
+                  />
+                  
+                  <div className="
+                    absolute right-0 mt-3 w-64 z-50 animate-in fade-in slide-in-from-top-2 duration-200
+                    bg-solar-surface/95 dark:bg-solar-night/95 backdrop-blur-xl
+                    rounded-2xl overflow-hidden border border-solar-border/50 shadow-2xl
+                  ">
+                    {/* User Info Header */}
+                    <div className="px-5 py-4 bg-linear-to-br from-solar-yellow/5 to-transparent border-b border-solar-border/50">
+                      <div className="flex items-center space-x-3 mb-1">
+                         <div className="w-10 h-10 bg-solar-yellow/10 rounded-xl flex items-center justify-center text-solar-yellow">
+                           <UserIcon size={20} />
+                         </div>
+                         <div className="flex flex-col">
+                           <p className="text-sm font-bold text-solar-primary leading-none mb-1">
+                             {user.first_name} {user.last_name}
+                           </p>
+                           <p className="text-xs text-solar-muted truncate max-w-[140px]">
+                             {user.email}
+                           </p>
+                         </div>
+                      </div>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="p-2 space-y-1">
+                      <button className="
+                        w-full flex items-center px-4 py-2.5 text-sm rounded-xl
+                        text-solar-primary hover:bg-solar-yellow/10 hover:text-solar-yellow
+                        transition-all duration-200 group
+                      ">
+                        <UserIcon size={18} className="mr-3 text-solar-muted group-hover:text-solar-yellow transition-colors" />
+                        My Profile
+                      </button>
+                      
+                      <button className="
+                        w-full flex items-center px-4 py-2.5 text-sm rounded-xl
+                        text-solar-primary hover:bg-solar-yellow/10 hover:text-solar-yellow
+                        transition-all duration-200 group
+                      ">
+                        <Settings size={18} className="mr-3 text-solar-muted group-hover:text-solar-yellow transition-colors" />
+                        Account Settings
+                      </button>
+                    </div>
+
+                    {/* Logout Footer */}
+                    <div className="p-2 pt-0 border-t border-solar-border/30 mt-1">
+                      <button
+                        onClick={handleLogout}
+                        className="
+                          w-full flex items-center px-4 py-2.5 text-sm rounded-xl
+                          text-red-500 hover:bg-red-500/10 transition-all duration-200 group
+                        "
+                      >
+                        <LogOut size={18} className="mr-3 opacity-70 group-hover:opacity-100" />
+                        Sign Out
+                      </button>
+                    </div>
                   </div>
-                  <button className="w-full flex items-center px-4 py-2 text-sm text-solar-primary hover:bg-solar-panel/10 sun-button">
-                    <UserIcon size={16} className="mr-2" />
-                    Profile
-                  </button>
-                  <button className="w-full flex items-center px-4 py-2 text-sm text-solar-primary hover:bg-solar-panel/10 sun-button">
-                    <Settings size={16} className="mr-2" />
-                    Settings
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center px-4 py-2 text-sm text-solar-danger hover:bg-solar-danger/10 sun-button"
-                  >
-                    <LogOut size={16} className="mr-2" />
-                    Logout
-                  </button>
-                </div>
+                </>
               )}
             </div>
           </div>

@@ -36,8 +36,12 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // List of routes that should NOT trigger automatic logout on 401
+    const isAuthRoute = originalRequest.url?.includes('/auth/login') || 
+                       originalRequest.url?.includes('/auth/register');
+
     // Handle 401 Unauthorized - Token expired or invalid
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRoute) {
       originalRequest._retry = true;
 
       // Show session expired toast
@@ -49,8 +53,8 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Show error toast for other errors
-    if (error.response?.data?.error) {
+    // Show error toast for other errors (skip for auth routes to avoid duplicates)
+    if (error.response?.data?.error && !isAuthRoute) {
       notify.error(error.response.data.error);
     }
 

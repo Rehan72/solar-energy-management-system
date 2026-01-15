@@ -32,16 +32,17 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-3 rounded-full 
-                bg-solar-card dark:bg-solar-card 
-                border border-solar-border dark:border-solar-border
-                hover:shadow-lg transition-all"
+      className="p-2 rounded-xl
+                bg-solar-night/30 hover:bg-solar-night/50 
+                border border-solar-yellow/30
+                hover:shadow-solar-glow-yellow/10 transition-all duration-300
+                group"
       aria-label="Toggle theme"
     >
       {darkMode ? (
-        <Sun className="w-5 h-5 text-solar-yellow" />
+        <Sun className="w-5 h-5 text-solar-yellow group-hover:scale-110 transition-transform" />
       ) : (
-        <Moon className="w-5 h-5 text-solar-primary" />
+        <Moon className="w-5 h-5 text-solar-muted group-hover:text-solar-primary group-hover:scale-110 transition-transform" />
       )}
     </button>
   );

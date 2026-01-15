@@ -1,10 +1,81 @@
-import { useState, useEffect, useCallback } from 'react'
-import { Activity, TrendingUp, Users, Zap, DollarSign, RefreshCw, BarChart3, Globe, MapPin, TrendingDown } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { Activity, TrendingUp, Users, Zap, DollarSign, RefreshCw, BarChart3, Globe, MapPin, TrendingDown, ChevronDown } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 import StatCard from '../../components/ui/stat-card'
 import SolarMap from '../../components/SolarMap'
 import { getRequest } from '../../lib/apiService'
+
+const CustomDropdown = ({ value, onChange, options, label, icon: Icon, minWidth = "160px" }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find(opt => opt.value === value) || options[0];
+
+  return (
+    <div className="relative" ref={dropdownRef} style={{ minWidth }}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`
+          w-full flex items-center justify-between px-4 py-2.5 rounded-xl font-bold text-xs uppercase
+          transition-all duration-300 group
+          ${isOpen 
+            ? "bg-solar-yellow/20 ring-2 ring-solar-yellow/50 border-solar-yellow/50" 
+            : "solar-glass border-solar-yellow/30 text-solar-primary hover:border-solar-yellow/60 hover:shadow-solar-glow-yellow/20"}
+        `}
+      >
+        <div className="flex items-center space-x-2">
+          {Icon && <Icon className="w-3.5 h-3.5 text-solar-yellow" />}
+          <span className="truncate">{label}: {selectedOption.label}</span>
+        </div>
+        <ChevronDown className={`w-3.5 h-3.5 text-solar-muted transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute left-0 right-0 mt-2 z-50 solar-glass border-solar-border/50 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-xl bg-solar-surface/95 dark:bg-solar-night/95"
+          >
+            <div className="p-1.5 space-y-1 max-h-60 overflow-y-auto custom-scrollbar">
+              {options.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    onChange(option.value);
+                    setIsOpen(false);
+                  }}
+                  className={`
+                    w-full flex items-center px-4 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl
+                    transition-all duration-200 text-left
+                    ${value === option.value 
+                      ? "bg-solar-yellow text-solar-dark font-black" 
+                      : "text-solar-primary hover:bg-solar-yellow/10 hover:text-solar-yellow"}
+                  `}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 export default function GlobalDashboard() {
   const [globalStats, setGlobalStats] = useState({
@@ -100,35 +171,47 @@ export default function GlobalDashboard() {
           <p className="text-solar-muted mt-2 font-medium italic">Autonomous ecosystem oversight and cross-regional telemetry analysis.</p>
         </div>
         <div className="flex items-center gap-4">
-          <select
+          <CustomDropdown
+            label="Temporal"
             value={period}
-            onChange={(e) => setPeriod(e.target.value)}
-            className="solar-input min-w-[140px]"
-          >
-            <option value="week">Temporal: 7D</option>
-            <option value="month">Temporal: 30D</option>
-            <option value="quarter">Temporal: 90D</option>
-            <option value="year">Temporal: 365D</option>
-          </select>
-          <select
+            onChange={setPeriod}
+            options={[
+              { value: 'week', label: '7D' },
+              { value: 'month', label: '30D' },
+              { value: 'quarter', label: '90D' },
+              { value: 'year', label: '365D' }
+            ]}
+            minWidth="150px"
+          />
+          <CustomDropdown
+            label="Jurisdiction"
             value={selectedRegion}
-            onChange={(e) => setSelectedRegion(e.target.value)}
-            className="solar-input min-w-[160px]"
-          >
-            <option value="">Jurisdiction: Global</option>
-            {regions.map(region => (
-              <option key={region.id} value={region.name}>{region.name}</option>
-            ))}
-          </select>
+            onChange={setSelectedRegion}
+            options={[
+              { value: '', label: 'Global' },
+              ...regions.map(r => ({ value: r.name, label: r.name }))
+            ]}
+            icon={Globe}
+            minWidth="180px"
+          />
           <button
             onClick={fetchGlobalStats}
             disabled={loading}
-            className="sun-button px-6 py-2.5"
+            className={`
+              relative overflow-hidden px-6 py-2.5 rounded-xl font-bold tracking-tight uppercase text-xs
+              transition-all duration-500 group whitespace-nowrap shrink-0
+              ${loading 
+                ? "bg-solar-night/40 border-solar-border/30 text-solar-muted cursor-not-allowed" 
+                : "solar-glass border-solar-yellow/30 text-solar-primary hover:border-solar-yellow/60 hover:shadow-solar-glow-yellow/20 active:scale-[0.98]"}
+            `}
           >
-            <div className="flex items-center space-x-2">
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              <span>Sync Feed</span>
+            <div className={`absolute inset-0 bg-linear-to-r from-solar-yellow/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+            <div className="relative flex items-center space-x-2.5">
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-solar-yellow' : 'text-solar-yellow group-hover:rotate-180 transition-transform duration-700'}`} />
+              <span>{loading ? "Synchronizing..." : "Sync Feed"}</span>
             </div>
+            {/* Animated bottom border glow */}
+            <div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-solar-yellow/50 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
           </button>
         </div>
       </div>

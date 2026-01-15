@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { LogOut, User, RefreshCw, BarChart3, Users, Activity, Settings, Shield, Globe, Zap } from 'lucide-react'
 import StatCard from '../ui/stat-card'
 import { getRequest } from '../../lib/apiService'
+import { notify } from '../../lib/toast'
 import LivePowerDashboard from './LivePowerDashboard'
 
 function SuperAdminDashboard() {
@@ -51,6 +52,7 @@ function SuperAdminDashboard() {
   }, [token, navigate])
 
   const handleLogout = () => {
+    notify.success('Logged out successfully');
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     navigate('/login')
@@ -109,7 +111,7 @@ function SuperAdminDashboard() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* System Overview */}
-        <div className="bg-solar-card rounded-lg shadow p-6 energy-card">
+        <div className="solar-glass rounded-2xl p-6">
           <div className="flex items-center space-x-2 mb-6">
             <Activity className="w-6 h-6 text-solar-success" />
             <h2 className="text-xl font-semibold text-solar-primary">System Overview</h2>
@@ -154,14 +156,14 @@ function SuperAdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-solar-card rounded-lg shadow p-6 energy-card">
+        <div className="solar-glass rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-solar-primary mb-6">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {quickActions.map((action, index) => (
               <button
                 key={index}
                 onClick={() => navigate(action.path)}
-                className="bg-solar-night/80 rounded-lg p-4 energy-card hover:bg-solar-panel/20 transition sun-button text-left"
+                className="solar-glass rounded-xl p-4 group transition-all duration-300 text-left"
               >
                 <div className="flex items-center space-x-3">
                   <action.icon className={`w-6 h-6 ${action.color}`} />
@@ -173,26 +175,26 @@ function SuperAdminDashboard() {
         </div>
 
         {/* Live Power Dashboard */}
-        <div className="bg-solar-card rounded-lg shadow p-6 energy-card">
+        <div className="solar-glass rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-solar-primary mb-4">Live Power Monitoring</h2>
           <LivePowerDashboard />
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-solar-card rounded-lg shadow p-6 energy-card">
+        <div className="solar-glass rounded-2xl p-6">
           <h2 className="text-xl font-semibold text-solar-primary mb-6">Recent Activity</h2>
           <div className="space-y-4">
-            <div className="flex items-center space-x-3 p-3 bg-solar-night/80 rounded-lg">
+            <div className="flex items-center space-x-3 p-3 solar-glass rounded-xl">
               <div className="w-2 h-2 bg-solar-success rounded-full"></div>
               <span className="text-solar-muted">New user registered in Delhi region</span>
               <span className="text-xs text-solar-muted ml-auto">2 min ago</span>
             </div>
-            <div className="flex items-center space-x-3 p-3 bg-solar-night/80 rounded-lg">
+            <div className="flex items-center space-x-3 p-3 solar-glass rounded-xl">
               <div className="w-2 h-2 bg-solar-yellow rounded-full"></div>
               <span className="text-solar-muted">Solar plant maintenance scheduled in Mumbai</span>
               <span className="text-xs text-solar-muted ml-auto">15 min ago</span>
             </div>
-            <div className="flex items-center space-x-3 p-3 bg-solar-night/80 rounded-lg">
+            <div className="flex items-center space-x-3 p-3 solar-glass rounded-xl">
               <div className="w-2 h-2 bg-solar-orange rounded-full"></div>
               <span className="text-solar-muted">Admin permissions updated for Patna region</span>
               <span className="text-xs text-solar-muted ml-auto">1 hour ago</span>

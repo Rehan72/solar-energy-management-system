@@ -1,17 +1,24 @@
-import { useState, useEffect } from "react";
 import Login from "./Login";
 import Register from "./Register";
+import ForgotPassword from "./ForgotPassword";
+import { Link, useLocation } from "react-router-dom";
 import EnergyLayer from "../components/EnergyLayer";
 import ThemeToggle from "../components/ThemeToggle";
 import BackgroundLayer from "../components/BackgroundLayer";
 import FloatingParticles from "../components/FloatingParticles";
 import SunCanvas from "../components/SunCanvas";
+import { useEffect, useState } from "react";
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
+  const location = useLocation();
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return document.documentElement.classList.contains('dark');
   });
+
+  // Determine which component to show based on the route
+  const isLoginPage = location.pathname === "/login" || location.pathname === "/auth";
+  const isRegisterPage = location.pathname === "/register";
+  const isForgotPasswordPage = location.pathname === "/forgot-password";
 
   useEffect(() => {
     // Listen for theme changes
@@ -108,39 +115,41 @@ export default function AuthPage() {
             </p>
           </div>
 
-          {/* 🔁 ADVANCED SOLAR GLOW AUTH TOGGLE */}
-          <div className="
-            flex rounded-2xl overflow-hidden mb-8
-            border border-solar-border
-            bg-solar-surface/40 backdrop-blur-xl
-            shadow-lg p-1.5
-          ">
-            <button
-              onClick={() => setIsLogin(true)}
-              className={`
-                flex-1 py-3 text-sm font-semibold transition-all duration-300
-                rounded-xl relative group
-                ${isLogin
-                  ? "bg-solar-yellow text-solar-dark shadow-solar-glow-yellow scale-[1.02]"
-                  : "text-solar-muted hover:text-solar-primary hover:bg-solar-border/30"}
-              `}
-            >
-              Login
-            </button>
-            
-            <button
-              onClick={() => setIsLogin(false)}
-              className={`
-                flex-1 py-3 text-sm font-semibold transition-all duration-300
-                rounded-xl relative group
-                ${!isLogin
-                  ? "bg-solar-yellow text-solar-dark shadow-solar-glow-yellow scale-[1.02]"
-                  : "text-solar-muted hover:text-solar-primary hover:bg-solar-border/30"}
-              `}
-            >
-              Register
-            </button>
-          </div>
+          {/* 🔁 ADVANCED SOLAR GLOW AUTH TOGGLE - Only show for login/register */}
+          {!isForgotPasswordPage && (
+            <div className="
+              flex rounded-2xl overflow-hidden mb-8
+              border border-solar-border
+              bg-solar-surface/40 backdrop-blur-xl
+              shadow-lg p-1.5
+            ">
+              <Link
+                to="/login"
+                className={`
+                  flex-1 py-3 text-sm font-semibold transition-all duration-300
+                  rounded-xl relative group text-center
+                  ${isLoginPage
+                    ? "bg-solar-yellow text-solar-dark shadow-solar-glow-yellow scale-[1.02]"
+                    : "text-solar-muted hover:text-solar-primary hover:bg-solar-border/30"}
+                `}
+              >
+                Login
+              </Link>
+              
+              <Link
+                to="/register"
+                className={`
+                  flex-1 py-3 text-sm font-semibold transition-all duration-300
+                  rounded-xl relative group text-center
+                  ${isRegisterPage
+                    ? "bg-solar-yellow text-solar-dark shadow-solar-glow-yellow scale-[1.02]"
+                    : "text-solar-muted hover:text-solar-primary hover:bg-solar-border/30"}
+                `}
+              >
+                Register
+              </Link>
+            </div>
+          )}
 
           {/* 🔐 AUTH FORM CARD */}
           <div className="solar-glass rounded-3xl overflow-hidden relative animate-fade-in">
@@ -148,7 +157,9 @@ export default function AuthPage() {
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-linear-to-r from-solar-yellow via-solar-orange to-solar-yellow animate-shimmer" />
             
             <div className="p-8 md:p-10">
-              {isLogin ? <Login /> : <Register />}
+              {isLoginPage && <Login />}
+              {isRegisterPage && <Register />}
+              {isForgotPasswordPage && <ForgotPassword />}
             </div>
           </div>
 

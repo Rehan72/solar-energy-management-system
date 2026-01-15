@@ -191,7 +191,7 @@ func GetUserByEmail(email string) (*User, error) {
 	query := `
 		SELECT id, first_name, last_name, email, password_hash, role, phone, profile_image, address_line1, address_line2, city, state, pincode, region, latitude, longitude, admin_id, installer_id, plant_id, installation_status, property_type, avg_monthly_bill, roof_area_sqft, connection_type, subsidy_interest, project_cost, plant_capacity_kw, installation_date, net_metering, inverter_brand, discom_name, consumer_number, device_linked, device_id, last_data_received, subsidy_applied, subsidy_status, scheme_name, application_id, is_active, created_at, updated_at, personnel_nexus_id
 		FROM users
-		WHERE email = ?`
+		WHERE LOWER(email) = LOWER(?)`
 	err := database.DB.QueryRow(query, email).Scan(
 		&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.PasswordHash,
 		&user.Role, &phone, &profileImage, &addressLine1, &addressLine2,

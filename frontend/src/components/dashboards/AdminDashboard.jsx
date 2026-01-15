@@ -4,6 +4,7 @@ import { LogOut, User, RefreshCw, BarChart3, Users, Activity } from 'lucide-reac
 import UserTable from '../common/UserTable'
 import StatCard from '../ui/stat-card'
 import { getRequest } from '../../lib/apiService'
+import { notify } from '../../lib/toast'
 import LivePowerDashboard from './LivePowerDashboard'
 
 function AdminDashboard() {
@@ -42,6 +43,7 @@ function AdminDashboard() {
   }, [token, navigate])
 
   const handleLogout = () => {
+    notify.success('Logged out successfully');
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     navigate('/login')
@@ -90,7 +92,7 @@ function AdminDashboard() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Analytics Section */}
-        <div className="bg-solar-card rounded-lg shadow p-6 energy-card">
+        <div className="solar-glass rounded-2xl p-6">
           <div className="flex items-center space-x-2 mb-4">
             <BarChart3 className="w-6 h-6 text-solar-success" />
             <h3 className="text-lg font-semibold text-solar-primary">System Analytics</h3>
@@ -125,7 +127,7 @@ function AdminDashboard() {
         </div>
 
         {/* Live Power Dashboard */}
-        <div className="bg-solar-card rounded-lg shadow p-6 energy-card">
+        <div className="solar-glass rounded-2xl p-6 mt-8">
           <h3 className="text-lg font-semibold text-solar-primary mb-4">Live Power Monitoring</h3>
           <LivePowerDashboard />
         </div>
