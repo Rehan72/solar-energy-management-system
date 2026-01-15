@@ -8,7 +8,17 @@ import (
 	"github.com/google/uuid"
 )
 
-// GetNotificationsHandler retrieves user notifications
+// @Summary Get user notifications
+// @Description Get current user's notifications with pagination
+// @Tags Notifications
+// @Accept json
+// @Produce json
+// @Param limit query int false "Limit"
+// @Param offset query int false "Offset"
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Security BearerAuth
+// @Router /user/notifications [get]
 func GetNotificationsHandler(c *gin.Context) {
 	userIDStr := c.GetString("user_id")
 	userID, err := uuid.Parse(userIDStr)
@@ -41,7 +51,15 @@ func GetNotificationsHandler(c *gin.Context) {
 	})
 }
 
-// GetUnreadCountHandler returns the count of unread notifications
+// @Summary Get unread count
+// @Description Get count of unread notifications for current user
+// @Tags Notifications
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]int
+// @Failure 401 {object} map[string]string
+// @Security BearerAuth
+// @Router /user/notifications/unread-count [get]
 func GetUnreadCountHandler(c *gin.Context) {
 	userIDStr := c.GetString("user_id")
 	userID, err := uuid.Parse(userIDStr)
@@ -59,7 +77,16 @@ func GetUnreadCountHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"unread_count": count})
 }
 
-// MarkAsReadHandler marks a notification as read
+// @Summary Mark as read
+// @Description Mark a specific notification as read
+// @Tags Notifications
+// @Accept json
+// @Produce json
+// @Param id path string true "Notification ID"
+// @Success 200 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Security BearerAuth
+// @Router /user/notifications/{id}/read [put]
 func MarkAsReadHandler(c *gin.Context) {
 	userIDStr := c.GetString("user_id")
 	userID, err := uuid.Parse(userIDStr)
@@ -84,7 +111,15 @@ func MarkAsReadHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Notification marked as read"})
 }
 
-// MarkAllAsReadHandler marks all notifications as read
+// @Summary Mark all as read
+// @Description Mark all notifications as read for current user
+// @Tags Notifications
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]string
+// @Failure 401 {object} map[string]string
+// @Security BearerAuth
+// @Router /user/notifications/read-all [put]
 func MarkAllAsReadHandler(c *gin.Context) {
 	userIDStr := c.GetString("user_id")
 	userID, err := uuid.Parse(userIDStr)
@@ -127,7 +162,15 @@ func DeleteNotificationHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Notification deleted"})
 }
 
-// GetPreferencesHandler retrieves user notification preferences
+// @Summary Get preferences
+// @Description Get notification preferences for current user
+// @Tags Notifications
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {object} map[string]string
+// @Security BearerAuth
+// @Router /user/notifications/preferences [get]
 func GetPreferencesHandler(c *gin.Context) {
 	userIDStr := c.GetString("user_id")
 	userID, err := uuid.Parse(userIDStr)

@@ -28,6 +28,7 @@ type UpdateSubsidyRequest struct {
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /govt/subsidies/pending [get]
 func GetPendingSubsidiesHandler(c *gin.Context) {
 	usersList, err := users.GetUsersBySubsidyStatus(users.SubsidyStatusPending)
@@ -50,6 +51,7 @@ func GetPendingSubsidiesHandler(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /govt/subsidies/history [get]
 func GetSubsidyHistoryHandler(c *gin.Context) {
 	approved, err := users.GetUsersBySubsidyStatus(users.SubsidyStatusApproved)
@@ -92,6 +94,7 @@ func GetSubsidyHistoryHandler(c *gin.Context) {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /govt/subsidies/{id}/status [put]
 func UpdateSubsidyStatusHandler(c *gin.Context) {
 	userID := c.Param("id")
@@ -142,6 +145,7 @@ func UpdateSubsidyStatusHandler(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} map[string]int
+// @Security BearerAuth
 // @Router /govt/dashboard/stats [get]
 func GetDashboardStatsHandler(c *gin.Context) {
 	pending, _ := users.GetUsersBySubsidyStatus(users.SubsidyStatusPending)

@@ -19,6 +19,7 @@ import (
 // @Produce json
 // @Success 200 {object} []Region
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/regions [get]
 func GetRegionsHandler(c *gin.Context) {
 	regions, err := GetAllRegions()
@@ -40,6 +41,7 @@ func GetRegionsHandler(c *gin.Context) {
 // @Success 201 {object} Region
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/regions [post]
 func CreateRegionHandler(c *gin.Context) {
 	var req RegionRequest
@@ -74,6 +76,7 @@ func CreateRegionHandler(c *gin.Context) {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/regions/{id} [put]
 func UpdateRegionHandler(c *gin.Context) {
 	idStr := c.Param("id")
@@ -119,6 +122,7 @@ func UpdateRegionHandler(c *gin.Context) {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/regions/{id} [delete]
 func DeleteRegionHandler(c *gin.Context) {
 	idStr := c.Param("id")

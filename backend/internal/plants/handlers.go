@@ -44,6 +44,7 @@ type UpdatePlantRequest struct {
 // @Success 201 {object} map[string]interface{}
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/plants [post]
 func CreatePlantHandler(c *gin.Context) {
 	var req CreatePlantRequest
@@ -105,6 +106,7 @@ func CreatePlantHandler(c *gin.Context) {
 // @Param region query string false "Region filter"
 // @Success 200 {object} map[string][]Plant
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/plants [get]
 func GetPlantsHandler(c *gin.Context) {
 	region := c.Query("region")
@@ -137,6 +139,7 @@ func GetPlantsHandler(c *gin.Context) {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/plants/{id} [get]
 func GetPlantHandler(c *gin.Context) {
 	idStr := c.Param("id")
@@ -173,6 +176,7 @@ func GetPlantHandler(c *gin.Context) {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/plants/{id} [put]
 func UpdatePlantHandler(c *gin.Context) {
 	idStr := c.Param("id")
@@ -256,6 +260,7 @@ func UpdatePlantHandler(c *gin.Context) {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/plants/{id} [delete]
 func DeletePlantHandler(c *gin.Context) {
 	idStr := c.Param("id")

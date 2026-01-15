@@ -26,6 +26,11 @@ const docTemplate = `{
     "paths": {
         "/admin/analytics": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get statistics for Admin dashboard",
                 "consumes": [
                     "application/json"
@@ -51,7 +56,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "$ref": "#/definitions/internal_users.GlobalStats"
+                                "$ref": "#/definitions/users.GlobalStats"
                             }
                         }
                     },
@@ -78,6 +83,11 @@ const docTemplate = `{
         },
         "/admin/devices": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get all devices in the system",
                 "consumes": [
                     "application/json"
@@ -125,6 +135,11 @@ const docTemplate = `{
         },
         "/admin/devices/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get details of a specific device",
                 "consumes": [
                     "application/json"
@@ -165,6 +180,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update device details",
                 "consumes": [
                     "application/json"
@@ -190,7 +210,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_devices.UpdateDeviceRequest"
+                            "$ref": "#/definitions/devices.UpdateDeviceRequest"
                         }
                     }
                 ],
@@ -223,6 +243,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a device",
                 "consumes": [
                     "application/json"
@@ -267,6 +292,11 @@ const docTemplate = `{
         },
         "/admin/devices/{id}/power": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get current power generation stats for a device",
                 "consumes": [
                     "application/json"
@@ -309,6 +339,11 @@ const docTemplate = `{
         },
         "/admin/installers": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a list of all installers",
                 "consumes": [
                     "application/json"
@@ -351,6 +386,11 @@ const docTemplate = `{
         },
         "/admin/users": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a list of users, optionally filtered by role",
                 "consumes": [
                     "application/json"
@@ -399,6 +439,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new user (SuperAdmin/Admin can create users/admins/installers)",
                 "consumes": [
                     "application/json"
@@ -417,7 +462,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_users.CreateUserRequest"
+                            "$ref": "#/definitions/users.CreateUserRequest"
                         }
                     }
                 ],
@@ -461,6 +506,11 @@ const docTemplate = `{
         },
         "/admin/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get detailed information for a specific user",
                 "consumes": [
                     "application/json"
@@ -510,6 +560,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update user details",
                 "consumes": [
                     "application/json"
@@ -535,7 +590,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_users.UpdateUserRequest"
+                            "$ref": "#/definitions/users.UpdateUserRequest"
                         }
                     }
                 ],
@@ -586,6 +641,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a user by ID",
                 "consumes": [
                     "application/json"
@@ -657,7 +717,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_auth.LoginRequest"
+                            "$ref": "#/definitions/auth.LoginRequest"
                         }
                     }
                 ],
@@ -665,7 +725,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_auth.LoginResponse"
+                            "$ref": "#/definitions/auth.LoginResponse"
                         }
                     },
                     "400": {
@@ -718,7 +778,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_auth.RegisterRequest"
+                            "$ref": "#/definitions/auth.RegisterRequest"
                         }
                     }
                 ],
@@ -762,6 +822,11 @@ const docTemplate = `{
         },
         "/govt/dashboard/stats": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get statistics for the government dashboard (counts of pending, approved, rejected, disbursed)",
                 "consumes": [
                     "application/json"
@@ -788,6 +853,11 @@ const docTemplate = `{
         },
         "/govt/subsidies/history": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a history of processed subsidies (Approved, Rejected, Disbursed)",
                 "consumes": [
                     "application/json"
@@ -821,6 +891,11 @@ const docTemplate = `{
         },
         "/govt/subsidies/pending": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a list of users with PENDING subsidy status",
                 "consumes": [
                     "application/json"
@@ -854,6 +929,11 @@ const docTemplate = `{
         },
         "/govt/subsidies/{id}/status": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Approve or Reject a subsidy application",
                 "consumes": [
                     "application/json"
@@ -879,7 +959,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_govt.UpdateSubsidyRequest"
+                            "$ref": "#/definitions/govt.UpdateSubsidyRequest"
                         }
                     }
                 ],
@@ -923,6 +1003,11 @@ const docTemplate = `{
         },
         "/installer/jobs": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a list of jobs available for installation",
                 "consumes": [
                     "application/json"
@@ -956,6 +1041,11 @@ const docTemplate = `{
         },
         "/installer/jobs/{id}/complete": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Mark an installation job as complete and link a device",
                 "consumes": [
                     "application/json"
@@ -981,7 +1071,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_installer.CompleteInstallationRequest"
+                            "$ref": "#/definitions/installer.CompleteInstallationRequest"
                         }
                     }
                 ],
@@ -1025,6 +1115,11 @@ const docTemplate = `{
         },
         "/installer/tickets": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get tickets assigned to current installer",
                 "consumes": [
                     "application/json"
@@ -1042,7 +1137,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_tickets.Ticket"
+                                "$ref": "#/definitions/tickets.Ticket"
                             }
                         }
                     },
@@ -1078,6 +1173,11 @@ const docTemplate = `{
         },
         "/installer/tickets/{id}/status": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update status of a ticket",
                 "consumes": [
                     "application/json"
@@ -1103,7 +1203,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_tickets.UpdateTicketRequest"
+                            "$ref": "#/definitions/tickets.UpdateTicketRequest"
                         }
                     }
                 ],
@@ -1140,6 +1240,11 @@ const docTemplate = `{
         },
         "/inventory": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a list of all inventory items",
                 "consumes": [
                     "application/json"
@@ -1159,7 +1264,7 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "#/definitions/internal_inventory.InventoryItem"
+                                    "$ref": "#/definitions/inventory.InventoryItem"
                                 }
                             }
                         }
@@ -1176,6 +1281,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new item in the inventory (Admin only)",
                 "consumes": [
                     "application/json"
@@ -1194,7 +1304,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_inventory.InventoryItem"
+                            "$ref": "#/definitions/inventory.InventoryItem"
                         }
                     }
                 ],
@@ -1229,6 +1339,11 @@ const docTemplate = `{
         },
         "/inventory/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get details of a specific inventory item",
                 "consumes": [
                     "application/json"
@@ -1253,7 +1368,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_inventory.InventoryItem"
+                            "$ref": "#/definitions/inventory.InventoryItem"
                         }
                     },
                     "404": {
@@ -1268,6 +1383,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update an inventory item (Admin only)",
                 "consumes": [
                     "application/json"
@@ -1293,7 +1413,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_inventory.InventoryItem"
+                            "$ref": "#/definitions/inventory.InventoryItem"
                         }
                     }
                 ],
@@ -1328,6 +1448,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete an inventory item (Admin only)",
                 "consumes": [
                     "application/json"
@@ -1405,6 +1530,11 @@ const docTemplate = `{
         },
         "/superadmin/admins": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a list of all administrators (SuperAdmin only)",
                 "consumes": [
                     "application/json"
@@ -1445,6 +1575,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new user (SuperAdmin/Admin can create users/admins/installers)",
                 "consumes": [
                     "application/json"
@@ -1463,7 +1598,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_users.CreateUserRequest"
+                            "$ref": "#/definitions/users.CreateUserRequest"
                         }
                     }
                 ],
@@ -1507,6 +1642,11 @@ const docTemplate = `{
         },
         "/superadmin/admins/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get detailed information for a specific user",
                 "consumes": [
                     "application/json"
@@ -1556,6 +1696,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update user details",
                 "consumes": [
                     "application/json"
@@ -1581,7 +1726,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_users.UpdateUserRequest"
+                            "$ref": "#/definitions/users.UpdateUserRequest"
                         }
                     }
                 ],
@@ -1632,6 +1777,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a user by ID",
                 "consumes": [
                     "application/json"
@@ -1685,6 +1835,11 @@ const docTemplate = `{
         },
         "/superadmin/devices": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get all devices in the system",
                 "consumes": [
                     "application/json"
@@ -1732,6 +1887,11 @@ const docTemplate = `{
         },
         "/superadmin/devices/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get details of a specific device",
                 "consumes": [
                     "application/json"
@@ -1774,6 +1934,11 @@ const docTemplate = `{
         },
         "/superadmin/devices/{id}/power": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get current power generation stats for a device",
                 "consumes": [
                     "application/json"
@@ -1816,6 +1981,11 @@ const docTemplate = `{
         },
         "/superadmin/energy/analytics": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get energy analytics and statistics",
                 "consumes": [
                     "application/json"
@@ -1833,7 +2003,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "$ref": "#/definitions/internal_energy.EnergyAnalytics"
+                                "$ref": "#/definitions/energy.EnergyAnalytics"
                             }
                         }
                     },
@@ -1860,6 +2030,11 @@ const docTemplate = `{
         },
         "/superadmin/energy/history": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get historical energy data",
                 "consumes": [
                     "application/json"
@@ -1916,6 +2091,11 @@ const docTemplate = `{
         },
         "/superadmin/energy/trend": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get aggregated energy trends (Super Admin only)",
                 "consumes": [
                     "application/json"
@@ -1949,7 +2129,7 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "#/definitions/internal_energy.AnalyticsPoint"
+                                    "$ref": "#/definitions/energy.AnalyticsPoint"
                                 }
                             }
                         }
@@ -1977,6 +2157,11 @@ const docTemplate = `{
         },
         "/superadmin/global/stats": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get global statistics for SuperAdmin",
                 "consumes": [
                     "application/json"
@@ -2008,7 +2193,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "$ref": "#/definitions/internal_users.GlobalStats"
+                                "$ref": "#/definitions/users.GlobalStats"
                             }
                         }
                     },
@@ -2035,6 +2220,11 @@ const docTemplate = `{
         },
         "/superadmin/hierarchy": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get full system hierarchy (Region -\u003e Plant -\u003e Admin -\u003e User)",
                 "consumes": [
                     "application/json"
@@ -2077,6 +2267,11 @@ const docTemplate = `{
         },
         "/superadmin/installers": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a list of all installers",
                 "consumes": [
                     "application/json"
@@ -2119,6 +2314,11 @@ const docTemplate = `{
         },
         "/superadmin/plants": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a list of all power plants",
                 "consumes": [
                     "application/json"
@@ -2146,7 +2346,7 @@ const docTemplate = `{
                             "additionalProperties": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "#/definitions/internal_plants.Plant"
+                                    "$ref": "#/definitions/plants.Plant"
                                 }
                             }
                         }
@@ -2163,6 +2363,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new power plant",
                 "consumes": [
                     "application/json"
@@ -2181,7 +2386,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_plants.CreatePlantRequest"
+                            "$ref": "#/definitions/plants.CreatePlantRequest"
                         }
                     }
                 ],
@@ -2216,6 +2421,11 @@ const docTemplate = `{
         },
         "/superadmin/plants/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get details of a specific power plant",
                 "consumes": [
                     "application/json"
@@ -2242,7 +2452,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "$ref": "#/definitions/internal_plants.Plant"
+                                "$ref": "#/definitions/plants.Plant"
                             }
                         }
                     },
@@ -2276,6 +2486,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update plant details",
                 "consumes": [
                     "application/json"
@@ -2301,7 +2516,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_plants.UpdatePlantRequest"
+                            "$ref": "#/definitions/plants.UpdatePlantRequest"
                         }
                     }
                 ],
@@ -2343,6 +2558,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a power plant",
                 "consumes": [
                     "application/json"
@@ -2405,6 +2625,11 @@ const docTemplate = `{
         },
         "/superadmin/regions": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a list of all regions",
                 "consumes": [
                     "application/json"
@@ -2422,7 +2647,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_regions.Region"
+                                "$ref": "#/definitions/regions.Region"
                             }
                         }
                     },
@@ -2438,6 +2663,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new region",
                 "consumes": [
                     "application/json"
@@ -2456,7 +2686,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_regions.RegionRequest"
+                            "$ref": "#/definitions/regions.RegionRequest"
                         }
                     }
                 ],
@@ -2464,7 +2694,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/internal_regions.Region"
+                            "$ref": "#/definitions/regions.Region"
                         }
                     },
                     "400": {
@@ -2490,6 +2720,11 @@ const docTemplate = `{
         },
         "/superadmin/regions/{id}": {
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update region details",
                 "consumes": [
                     "application/json"
@@ -2515,7 +2750,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_regions.RegionRequest"
+                            "$ref": "#/definitions/regions.RegionRequest"
                         }
                     }
                 ],
@@ -2523,7 +2758,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_regions.Region"
+                            "$ref": "#/definitions/regions.Region"
                         }
                     },
                     "400": {
@@ -2556,6 +2791,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a region by ID",
                 "consumes": [
                     "application/json"
@@ -2618,6 +2858,11 @@ const docTemplate = `{
         },
         "/superadmin/stats/regional": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get statistics grouped by region",
                 "consumes": [
                     "application/json"
@@ -2660,6 +2905,11 @@ const docTemplate = `{
         },
         "/superadmin/users": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a list of users, optionally filtered by role",
                 "consumes": [
                     "application/json"
@@ -2710,6 +2960,11 @@ const docTemplate = `{
         },
         "/user/devices": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get all devices for the current user",
                 "consumes": [
                     "application/json"
@@ -2764,6 +3019,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new device for the current user",
                 "consumes": [
                     "application/json"
@@ -2782,7 +3042,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_devices.CreateDeviceRequest"
+                            "$ref": "#/definitions/devices.CreateDeviceRequest"
                         }
                     }
                 ],
@@ -2817,6 +3077,11 @@ const docTemplate = `{
         },
         "/user/devices/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get details of a specific device",
                 "consumes": [
                     "application/json"
@@ -2857,6 +3122,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update device details",
                 "consumes": [
                     "application/json"
@@ -2882,7 +3152,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_devices.UpdateDeviceRequest"
+                            "$ref": "#/definitions/devices.UpdateDeviceRequest"
                         }
                     }
                 ],
@@ -2915,6 +3185,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a device",
                 "consumes": [
                     "application/json"
@@ -2959,6 +3234,11 @@ const docTemplate = `{
         },
         "/user/devices/{id}/power": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get current power generation stats for a device",
                 "consumes": [
                     "application/json"
@@ -3001,6 +3281,11 @@ const docTemplate = `{
         },
         "/user/devices/{id}/regenerate-key": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Regenerate the API key for a device",
                 "consumes": [
                     "application/json"
@@ -3043,6 +3328,11 @@ const docTemplate = `{
         },
         "/user/energy/analytics": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get energy analytics and statistics",
                 "consumes": [
                     "application/json"
@@ -3060,7 +3350,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "$ref": "#/definitions/internal_energy.EnergyAnalytics"
+                                "$ref": "#/definitions/energy.EnergyAnalytics"
                             }
                         }
                     },
@@ -3087,6 +3377,11 @@ const docTemplate = `{
         },
         "/user/energy/history": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get historical energy data",
                 "consumes": [
                     "application/json"
@@ -3141,8 +3436,232 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/notifications": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get current user's notifications with pagination",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get user notifications",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/notifications/preferences": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get notification preferences for current user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get preferences",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/notifications/read-all": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mark all notifications as read for current user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark all as read",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/notifications/unread-count": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get count of unread notifications for current user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Get unread count",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/notifications/{id}/read": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Mark a specific notification as read",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Mark as read",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Notification ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/user/onboarding": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Complete user onboarding process",
                 "consumes": [
                     "application/json"
@@ -3161,7 +3680,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_users.OnboardingRequest"
+                            "$ref": "#/definitions/users.OnboardingRequest"
                         }
                     }
                 ],
@@ -3207,6 +3726,11 @@ const docTemplate = `{
         },
         "/user/profile": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get profile of the currently logged-in user",
                 "consumes": [
                     "application/json"
@@ -3249,6 +3773,11 @@ const docTemplate = `{
         },
         "/user/solar-profile": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get solar profile for the current user",
                 "consumes": [
                     "application/json"
@@ -3289,6 +3818,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update solar-specific profile settings for the user",
                 "consumes": [
                     "application/json"
@@ -3307,7 +3841,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_users.UpdateSolarProfileRequest"
+                            "$ref": "#/definitions/users.UpdateSolarProfileRequest"
                         }
                     }
                 ],
@@ -3360,6 +3894,11 @@ const docTemplate = `{
         },
         "/user/tickets": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get current user's tickets",
                 "consumes": [
                     "application/json"
@@ -3377,7 +3916,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/internal_tickets.Ticket"
+                                "$ref": "#/definitions/tickets.Ticket"
                             }
                         }
                     },
@@ -3402,6 +3941,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new support ticket",
                 "consumes": [
                     "application/json"
@@ -3420,7 +3964,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_tickets.CreateTicketRequest"
+                            "$ref": "#/definitions/tickets.CreateTicketRequest"
                         }
                     }
                 ],
@@ -3428,7 +3972,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/internal_tickets.Ticket"
+                            "$ref": "#/definitions/tickets.Ticket"
                         }
                     },
                     "400": {
@@ -3461,8 +4005,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/weather": {
+        "/user/weather": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get current weather and forecast for a location",
                 "consumes": [
                     "application/json"
@@ -3492,16 +4041,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/internal_weather.WeatherResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/weather.WeatherResponse"
                         }
                     }
                 }
@@ -3509,7 +4049,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "internal_auth.LoginRequest": {
+        "auth.LoginRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -3520,7 +4060,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_auth.LoginResponse": {
+        "auth.LoginResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -3529,7 +4069,7 @@ const docTemplate = `{
                 "user": {}
             }
         },
-        "internal_auth.RegisterRequest": {
+        "auth.RegisterRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -3571,7 +4111,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_devices.CreateDeviceRequest": {
+        "devices.CreateDeviceRequest": {
             "type": "object",
             "required": [
                 "name"
@@ -3588,7 +4128,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_devices.UpdateDeviceRequest": {
+        "devices.UpdateDeviceRequest": {
             "type": "object",
             "properties": {
                 "is_active": {
@@ -3602,7 +4142,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_energy.AnalyticsPoint": {
+        "energy.AnalyticsPoint": {
             "type": "object",
             "properties": {
                 "label": {
@@ -3616,27 +4156,27 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_energy.EnergyAnalytics": {
+        "energy.EnergyAnalytics": {
             "type": "object",
             "properties": {
                 "battery_level": {
-                    "$ref": "#/definitions/internal_energy.EnergyStats"
+                    "$ref": "#/definitions/energy.EnergyStats"
                 },
                 "consumed": {
-                    "$ref": "#/definitions/internal_energy.EnergyStats"
+                    "$ref": "#/definitions/energy.EnergyStats"
                 },
                 "generated": {
-                    "$ref": "#/definitions/internal_energy.EnergyStats"
+                    "$ref": "#/definitions/energy.EnergyStats"
                 },
                 "grid_export": {
-                    "$ref": "#/definitions/internal_energy.EnergyStats"
+                    "$ref": "#/definitions/energy.EnergyStats"
                 },
                 "savings": {
-                    "$ref": "#/definitions/internal_energy.SavingsStats"
+                    "$ref": "#/definitions/energy.SavingsStats"
                 }
             }
         },
-        "internal_energy.EnergyStats": {
+        "energy.EnergyStats": {
             "type": "object",
             "properties": {
                 "average": {
@@ -3653,7 +4193,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_energy.SavingsStats": {
+        "energy.SavingsStats": {
             "type": "object",
             "properties": {
                 "co2_reduction_kg": {
@@ -3667,7 +4207,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_govt.UpdateSubsidyRequest": {
+        "govt.UpdateSubsidyRequest": {
             "type": "object",
             "required": [
                 "status"
@@ -3686,7 +4226,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_installer.CompleteInstallationRequest": {
+        "installer.CompleteInstallationRequest": {
             "type": "object",
             "required": [
                 "device_id"
@@ -3703,7 +4243,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_inventory.InventoryItem": {
+        "inventory.InventoryItem": {
             "type": "object",
             "properties": {
                 "brand": {
@@ -3754,7 +4294,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_plants.CreatePlantRequest": {
+        "plants.CreatePlantRequest": {
             "type": "object",
             "required": [
                 "capacity_kw",
@@ -3800,7 +4340,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_plants.Plant": {
+        "plants.Plant": {
             "type": "object",
             "properties": {
                 "capacity_kw": {
@@ -3848,7 +4388,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_plants.UpdatePlantRequest": {
+        "plants.UpdatePlantRequest": {
             "type": "object",
             "properties": {
                 "capacity_kw": {
@@ -3886,7 +4426,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_regions.Region": {
+        "regions.Region": {
             "type": "object",
             "properties": {
                 "capacity_mw": {
@@ -3933,7 +4473,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_regions.RegionRequest": {
+        "regions.RegionRequest": {
             "type": "object",
             "required": [
                 "country",
@@ -3977,7 +4517,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_tickets.CreateTicketRequest": {
+        "tickets.CreateTicketRequest": {
             "type": "object",
             "required": [
                 "description",
@@ -3992,7 +4532,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_tickets.Ticket": {
+        "tickets.Ticket": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -4012,7 +4552,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "$ref": "#/definitions/internal_tickets.TicketStatus"
+                    "$ref": "#/definitions/tickets.TicketStatus"
                 },
                 "subject": {
                     "type": "string"
@@ -4029,7 +4569,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_tickets.TicketStatus": {
+        "tickets.TicketStatus": {
             "type": "string",
             "enum": [
                 "OPEN",
@@ -4044,18 +4584,18 @@ const docTemplate = `{
                 "StatusClosed"
             ]
         },
-        "internal_tickets.UpdateTicketRequest": {
+        "tickets.UpdateTicketRequest": {
             "type": "object",
             "required": [
                 "status"
             ],
             "properties": {
                 "status": {
-                    "$ref": "#/definitions/internal_tickets.TicketStatus"
+                    "$ref": "#/definitions/tickets.TicketStatus"
                 }
             }
         },
-        "internal_users.CreateUserRequest": {
+        "users.CreateUserRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -4186,7 +4726,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_users.GlobalStats": {
+        "users.GlobalStats": {
             "type": "object",
             "properties": {
                 "active_admins": {
@@ -4224,7 +4764,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_users.OnboardingRequest": {
+        "users.OnboardingRequest": {
             "type": "object",
             "required": [
                 "address_line1",
@@ -4268,7 +4808,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_users.UpdateSolarProfileRequest": {
+        "users.UpdateSolarProfileRequest": {
             "type": "object",
             "properties": {
                 "application_id": {
@@ -4336,7 +4876,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_users.UpdateUserRequest": {
+        "users.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "address_line1": {
@@ -4446,7 +4986,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_weather.ForecastItem": {
+        "weather.ForecastItem": {
             "type": "object",
             "properties": {
                 "cloud_cover": {
@@ -4466,7 +5006,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_weather.WeatherData": {
+        "weather.WeatherData": {
             "type": "object",
             "properties": {
                 "cloud_cover": {
@@ -4510,16 +5050,16 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_weather.WeatherResponse": {
+        "weather.WeatherResponse": {
             "type": "object",
             "properties": {
                 "current": {
-                    "$ref": "#/definitions/internal_weather.WeatherData"
+                    "$ref": "#/definitions/weather.WeatherData"
                 },
                 "forecast": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/internal_weather.ForecastItem"
+                        "$ref": "#/definitions/weather.ForecastItem"
                     }
                 }
             }

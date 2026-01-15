@@ -27,6 +27,7 @@ type UpdateTicketRequest struct {
 // @Failure 400 {object} map[string]string
 // @Failure 401 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/tickets [post]
 func CreateTicketHandler(c *gin.Context) {
 	user, exists := c.Get("user")
@@ -60,6 +61,7 @@ func CreateTicketHandler(c *gin.Context) {
 // @Success 200 {object} []Ticket
 // @Failure 401 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/tickets [get]
 func GetUserTicketsHandler(c *gin.Context) {
 	user, exists := c.Get("user")
@@ -87,6 +89,7 @@ func GetUserTicketsHandler(c *gin.Context) {
 // @Failure 401 {object} map[string]string
 // @Failure 403 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /installer/tickets [get]
 func GetInstallerTicketsHandler(c *gin.Context) {
 	user, exists := c.Get("user")
@@ -121,6 +124,7 @@ func GetInstallerTicketsHandler(c *gin.Context) {
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /installer/tickets/{id}/status [put]
 func UpdateTicketStatusHandler(c *gin.Context) {
 	id := c.Param("id")

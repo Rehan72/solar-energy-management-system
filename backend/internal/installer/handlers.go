@@ -22,6 +22,7 @@ type CompleteInstallationRequest struct {
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /installer/jobs [get]
 func GetAvailableJobsHandler(c *gin.Context) {
 	jobs, err := users.GetUsersByInstallationStatus(users.InstallationStatusPlanned)
@@ -48,6 +49,7 @@ func GetAvailableJobsHandler(c *gin.Context) {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /installer/jobs/{id}/complete [post]
 func CompleteInstallationHandler(c *gin.Context) {
 	userID := c.Param("id")

@@ -25,6 +25,7 @@ type UpdateDeviceRequest struct {
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/devices [get]
 func GetDevicesHandler(c *gin.Context) {
 	userIDStr, exists := c.Get("user_id")
@@ -63,6 +64,7 @@ func GetDevicesHandler(c *gin.Context) {
 // @Param id path string true "Device ID"
 // @Success 200 {object} map[string]interface{}
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/devices/{id} [get]
 // @Router /admin/devices/{id} [get]
 // @Router /superadmin/devices/{id} [get]
@@ -93,6 +95,7 @@ func GetDeviceHandler(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/devices/{id} [put]
 // @Router /admin/devices/{id} [put]
 func UpdateDeviceHandler(c *gin.Context) {
@@ -146,6 +149,7 @@ func UpdateDeviceHandler(c *gin.Context) {
 // @Param id path string true "Device ID"
 // @Success 200 {object} map[string]string
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/devices/{id} [delete]
 // @Router /admin/devices/{id} [delete]
 func DeleteDeviceHandler(c *gin.Context) {
@@ -173,6 +177,7 @@ func DeleteDeviceHandler(c *gin.Context) {
 // @Param id path string true "Device ID"
 // @Success 200 {object} map[string]interface{}
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/devices/{id}/regenerate-key [post]
 func RegenerateAPIKeyHandler(c *gin.Context) {
 	deviceID := c.Param("id")
@@ -214,6 +219,7 @@ func RegenerateAPIKeyHandler(c *gin.Context) {
 // @Success 201 {object} map[string]interface{}
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/devices [post]
 func CreateUserDeviceHandler(c *gin.Context) {
 	userIDStr, exists := c.Get("user_id")
@@ -268,6 +274,7 @@ func CreateUserDeviceHandler(c *gin.Context) {
 // @Param id path string true "Device ID"
 // @Success 200 {object} map[string]interface{}
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/devices/{id}/power [get]
 // @Router /admin/devices/{id}/power [get]
 // @Router /superadmin/devices/{id}/power [get]
@@ -364,6 +371,7 @@ func GetDevicePowerHandler(c *gin.Context) {
 // @Param status query string false "Status filter (ACTIVE/INACTIVE)"
 // @Success 200 {object} map[string]interface{}
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /admin/devices [get]
 // @Router /superadmin/devices [get]
 func GetAllDevicesHandler(c *gin.Context) {

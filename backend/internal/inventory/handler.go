@@ -23,6 +23,7 @@ func NewHandler(repo *Repository) *Handler {
 // @Success 201 {object} map[string]interface{}
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /inventory [post]
 func (h *Handler) CreateItem(c *gin.Context) {
 	var item InventoryItem
@@ -49,6 +50,7 @@ func (h *Handler) CreateItem(c *gin.Context) {
 // @Produce json
 // @Success 200 {object} map[string][]InventoryItem
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /inventory [get]
 func (h *Handler) GetAllItems(c *gin.Context) {
 	items, err := h.Repo.GetAllItems(c.Request.Context())
@@ -68,6 +70,7 @@ func (h *Handler) GetAllItems(c *gin.Context) {
 // @Param id path string true "Item ID"
 // @Success 200 {object} InventoryItem
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /inventory/{id} [get]
 func (h *Handler) GetItem(c *gin.Context) {
 	id := c.Param("id")
@@ -90,6 +93,7 @@ func (h *Handler) GetItem(c *gin.Context) {
 // @Success 200 {object} map[string]string
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /inventory/{id} [put]
 func (h *Handler) UpdateItem(c *gin.Context) {
 	id := c.Param("id")
@@ -116,6 +120,7 @@ func (h *Handler) UpdateItem(c *gin.Context) {
 // @Param id path string true "Item ID"
 // @Success 200 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /inventory/{id} [delete]
 func (h *Handler) DeleteItem(c *gin.Context) {
 	id := c.Param("id")

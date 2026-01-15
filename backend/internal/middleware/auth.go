@@ -20,8 +20,9 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		if tokenString == authHeader {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Bearer token required"})
+		// Support both cases: with or without "Bearer " prefix for easier testing
+		if tokenString == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Empty token"})
 			c.Abort()
 			return
 		}

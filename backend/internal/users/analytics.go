@@ -74,6 +74,7 @@ type PublicRegionHierarchy struct {
 // @Success 200 {object} map[string]GlobalStats
 // @Failure 403 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/global/stats [get]
 func GetGlobalStatsHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
@@ -102,6 +103,7 @@ func GetGlobalStatsHandler(c *gin.Context) {
 // @Success 200 {object} map[string]GlobalStats
 // @Failure 403 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /admin/analytics [get]
 func GetAdminStatsHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
@@ -243,6 +245,7 @@ func GetStats(adminID string, region string, period string) (*GlobalStats, error
 // @Success 200 {object} map[string]interface{}
 // @Failure 403 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/stats/regional [get]
 func GetRegionalStatsHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
@@ -293,6 +296,7 @@ func GetRegionalStatsHandler(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Failure 403 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/hierarchy [get]
 func GetSystemHierarchyHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")

@@ -28,6 +28,7 @@ type AnalyticsPoint struct {
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/energy/history [get]
 // @Router /superadmin/energy/history [get]
 func GetEnergyHistoryHandler(c *gin.Context) {
@@ -74,6 +75,7 @@ func GetEnergyHistoryHandler(c *gin.Context) {
 // @Success 200 {object} map[string]EnergyAnalytics
 // @Failure 401 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/energy/analytics [get]
 // @Router /superadmin/energy/analytics [get]
 func GetEnergyAnalyticsHandler(c *gin.Context) {
@@ -239,6 +241,7 @@ type SavingsStats struct {
 // @Success 200 {object} map[string][]AnalyticsPoint
 // @Failure 403 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/energy/trend [get]
 func GetGlobalEnergyTrendHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")

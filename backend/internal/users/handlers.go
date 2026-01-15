@@ -122,6 +122,7 @@ type UpdateSolarProfileRequest struct {
 // @Failure 400 {object} map[string]string
 // @Failure 403 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /admin/users [post]
 // @Router /superadmin/admins [post]
 func CreateUserHandler(c *gin.Context) {
@@ -207,6 +208,7 @@ func CreateUserHandler(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Failure 403 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /admin/users [get]
 // @Router /superadmin/users [get]
 func GetUsersHandler(c *gin.Context) {
@@ -274,6 +276,7 @@ func GetUsersHandler(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Failure 403 {object} map[string]string
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /admin/users/{id} [get]
 // @Router /superadmin/admins/{id} [get]
 func GetUserHandler(c *gin.Context) {
@@ -304,6 +307,7 @@ func GetUserHandler(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]string
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/profile [get]
 func GetCurrentUserHandler(c *gin.Context) {
 	currentUserID := c.GetString("user_id")
@@ -333,6 +337,7 @@ func GetCurrentUserHandler(c *gin.Context) {
 // @Failure 403 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /admin/users/{id} [put]
 // @Router /superadmin/admins/{id} [put]
 func UpdateUserHandler(c *gin.Context) {
@@ -466,6 +471,7 @@ func UpdateUserHandler(c *gin.Context) {
 // @Failure 401 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/solar-profile [put]
 func UpdateSolarProfileHandler(c *gin.Context) {
 	currentUserID := c.GetString("user_id")
@@ -546,6 +552,7 @@ func UpdateSolarProfileHandler(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Failure 401 {object} map[string]string
 // @Failure 404 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/solar-profile [get]
 func GetSolarProfileHandler(c *gin.Context) {
 	currentUserID := c.GetString("user_id")
@@ -598,6 +605,7 @@ func GetSolarProfileHandler(c *gin.Context) {
 // @Success 200 {object} map[string]string
 // @Failure 403 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /admin/users/{id} [delete]
 // @Router /superadmin/admins/{id} [delete]
 func DeleteUserHandler(c *gin.Context) {
@@ -630,6 +638,7 @@ func DeleteUserHandler(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Failure 403 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/admins [get]
 func GetAdminsHandler(c *gin.Context) {
 	currentUserRole := c.GetString("role")
@@ -657,6 +666,7 @@ func GetAdminsHandler(c *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Failure 403 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /superadmin/installers [get]
 // @Router /admin/installers [get]
 func GetInstallersHandler(c *gin.Context) {

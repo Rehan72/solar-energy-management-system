@@ -33,6 +33,7 @@ type OnboardingRequest struct {
 // @Failure 400 {object} map[string]string
 // @Failure 401 {object} map[string]string
 // @Failure 500 {object} map[string]string
+// @Security BearerAuth
 // @Router /user/onboarding [post]
 func CompleteOnboarding(c *gin.Context) {
 	userID := c.GetString("user_id") // Assuming AuthMiddleware sets this
