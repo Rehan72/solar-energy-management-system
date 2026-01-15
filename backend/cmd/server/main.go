@@ -8,6 +8,7 @@ import (
 	"sems-backend/internal/energy"
 	"sems-backend/internal/govt"
 	installerPkg "sems-backend/internal/installer"
+	"sems-backend/internal/inventory"
 	"sems-backend/internal/middleware"
 	"sems-backend/internal/notifications"
 	"sems-backend/internal/plants"
@@ -145,6 +146,22 @@ func main() {
 		// Tickets
 		user.GET("/tickets", tickets.GetUserTicketsHandler)
 		user.POST("/tickets", tickets.CreateTicketHandler)
+	}
+
+	// Initialize Inventory
+	inventoryRepo := inventory.NewRepository(database.DB)
+	inventoryH := inventory.NewHandler(inventoryRepo)
+
+	// Inventory Routes (Accessible to all authenticated users for reading, Admins for writing)
+	inventoryGroup := r.Group("/inventory")
+	inventoryGroup.Use(middleware.AuthMiddleware())
+	{
+		inventoryGroup.GET("/", inventoryH.GetAllItems)
+		inventoryGroup.GET("/:id", inventoryH.GetItem)
+		// Write access restricted to ADMIN and SUPER_ADMIN
+		inventoryGroup.POST("/", middleware.RequireRole("ADMIN", "SUPER_ADMIN"), inventoryH.CreateItem)
+		inventoryGroup.PUT("/:id", middleware.RequireRole("ADMIN", "SUPER_ADMIN"), inventoryH.UpdateItem)
+		inventoryGroup.DELETE("/:id", middleware.RequireRole("ADMIN", "SUPER_ADMIN"), inventoryH.DeleteItem)
 	}
 
 	// INSTALLER Routes

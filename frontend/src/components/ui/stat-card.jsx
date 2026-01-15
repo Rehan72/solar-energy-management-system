@@ -15,8 +15,7 @@ export default function StatCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      whileHover={{ y: -5, scale: 1.02 }}
-      className={`bg-glass-light rounded-xl p-6 energy-card border border-solar-border/50 shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden ${className}`}
+      className={`bg-glass-light rounded-xl p-6 energy-card border border-solar-border/50 shadow-lg hover:bg-solar-yellow/5 transition-all duration-300 group relative overflow-hidden ${className}`}
     >
       <div className="flex items-center justify-between relative z-10">
         <div className="flex-1">

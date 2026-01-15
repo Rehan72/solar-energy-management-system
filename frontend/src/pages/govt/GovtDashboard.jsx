@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import DataTable from "../../components/common/DataTable";
 import {
   Card,
   CardContent,
@@ -9,14 +10,7 @@ import {
   CardDescription
 } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "../../components/ui/table";
+
 import { Badge } from "../../components/ui/badge";
 import {
   Activity,
@@ -26,7 +20,8 @@ import {
   FileText,
   User,
   MapPin,
-  Calendar
+  Calendar,
+  Eye
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -145,7 +140,7 @@ export default function GovtDashboard() {
             <p className="text-xs text-red-700 dark:text-red-300">Applications denied</p>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-slate-900 border-blue-200 dark:border-blue-900">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-blue-900 dark:text-blue-100">
@@ -174,46 +169,59 @@ export default function GovtDashboard() {
               No pending applications at the moment. Good job!
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Applicant</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>System Details</TableHead>
-                  <TableHead>Applied Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pendingSubsidies.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{user.first_name} {user.last_name}</span>
-                        <span className="text-xs text-slate-500">{user.email}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-400">
-                        <MapPin className="h-3 w-3" />
-                        <span>{user.city}, {user.state}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <Badge variant="outline" className="mr-2">
-                          {user.plant_capacity_kw} kW
-                        </Badge>
-                        <span className="text-slate-500">{user.connection_type}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-400">
-                        <Calendar className="h-3 w-3" />
-                        <span>{new Date(user.created_at).toLocaleDateString()}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right space-x-2">
+            <DataTable
+              columns={[
+                {
+                  header: 'Applicant',
+                  cell: (user) => (
+                    <div className="flex flex-col">
+                      <span className="font-medium">{user.first_name} {user.last_name}</span>
+                      <span className="text-xs text-slate-500">{user.email}</span>
+                    </div>
+                  )
+                },
+                {
+                  header: 'Location',
+                  cell: (user) => (
+                    <div className="flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-400">
+                      <MapPin className="h-3 w-3" />
+                      <span>{user.city}, {user.state}</span>
+                    </div>
+                  )
+                },
+                {
+                  header: 'System Details',
+                  cell: (user) => (
+                    <div className="text-sm">
+                      <Badge variant="outline" className="mr-2">
+                        {user.plant_capacity_kw} kW
+                      </Badge>
+                      <span className="text-slate-500">{user.connection_type}</span>
+                    </div>
+                  )
+                },
+                {
+                  header: 'Applied Date',
+                  accessorKey: 'created_at',
+                  cell: (user) => (
+                    <div className="flex items-center space-x-1 text-sm text-slate-600 dark:text-slate-400">
+                      <Calendar className="h-3 w-3" />
+                      <span>{new Date(user.created_at).toLocaleDateString()}</span>
+                    </div>
+                  )
+                },
+                {
+                  header: 'Actions',
+                  cell: (user) => (
+                    <div className="space-x-2 text-right">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 mr-2"
+                        onClick={() => window.location.href = `/users/${user.id}?view=true`}
+                      >
+                        <Eye className="w-4 h-4 mr-1" /> View
+                      </Button>
                       <Button
                         size="sm"
                         variant="ghost"
@@ -229,11 +237,14 @@ export default function GovtDashboard() {
                       >
                         Approve
                       </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    </div>
+                  ),
+                  className: "text-right"
+                }
+              ]}
+              data={pendingSubsidies}
+              emptyMessage="No pending applications at the moment. Good job!"
+            />
           )}
         </CardContent>
       </Card>

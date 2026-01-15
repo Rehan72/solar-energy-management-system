@@ -52,14 +52,14 @@ export default function Plants() {
       header: 'Plant Entity',
       cell: (row) => (
         <div className="flex items-center space-x-3 py-1">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-solar-panel to-blue-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-solar-panel to-blue-600 flex items-center justify-center shadow-lg transition-transform">
             <Zap className="w-5 h-5 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-solar-primary text-sm tracking-tight">{row.name}</span>
+            <span className="font-bold text-solar-primary group-hover:text-solar-dark text-sm tracking-tight">{row.name}</span>
             <div className="flex items-center space-x-1">
-              <MapPin className="w-2 h-2 text-solar-muted" />
-              <span className="text-[10px] text-solar-muted font-medium">{row.location}</span>
+              <MapPin className="w-2 h-2 text-solar-muted group-hover:text-solar-dark/70" />
+              <span className="text-[10px] text-solar-muted group-hover:text-solar-dark/70 font-medium">{row.location}</span>
             </div>
           </div>
         </div>
@@ -78,9 +78,9 @@ export default function Plants() {
       header: 'Power Capacity',
       cell: (row) => (
         <div className="flex flex-col">
-          <span className="text-xs font-black text-solar-primary">{row.capacity_kw} <span className="text-[9px] text-solar-muted">kW</span></span>
-          <div className="w-16 h-1 bg-solar-muted/10 rounded-full mt-1 overflow-hidden">
-            <div className="h-full bg-solar-yellow" style={{ width: `${Math.min((row.current_output_kw / row.capacity_kw) * 100, 100)}%` }}></div>
+          <span className="text-xs font-black text-solar-primary group-hover:text-solar-dark">{row.capacity_kw} <span className="text-[9px] text-solar-muted group-hover:text-solar-dark/70">kW</span></span>
+          <div className="w-16 h-1 bg-solar-muted/10 group-hover:bg-solar-dark/20 rounded-full mt-1 overflow-hidden">
+            <div className="h-full bg-solar-yellow group-hover:bg-solar-dark" style={{ width: `${Math.min((row.current_output_kw / row.capacity_kw) * 100, 100)}%` }}></div>
           </div>
         </div>
       )
@@ -188,7 +188,7 @@ export default function Plants() {
           </div>
         </div>
       </div>
-       <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold sun-glow-text">Solar Plant Management</h1>
           <p className="text-solar-muted mt-1">Monitor and manage all solar energy plants</p>
@@ -201,7 +201,7 @@ export default function Plants() {
             <RefreshCw className="w-4 h-4" />
             <span>Refresh Data</span>
           </button>
-          <button 
+          <button
             onClick={() => navigate('/plants/create')}
             className="flex items-center space-x-2 px-4 py-2 text-white font-semibold rounded-lg transition sun-button"
           >

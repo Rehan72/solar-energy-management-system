@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getRequest } from '../../lib/apiService'
+import DataTable from '../common/DataTable'
 
 export default function RegionTable() {
   const [regions, setRegions] = useState([])
@@ -42,39 +43,38 @@ export default function RegionTable() {
         </div>
       ) : (
         <>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-solar-textSecondaryLight dark:text-solar-textSecondaryDark border-b border-solar-gold">
-                <th className="text-left py-2">Region</th>
-                <th>Plants</th>
-                <th>Capacity (MW)</th>
-                <th>Admins</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {regions.map((r, index) => (
-                <tr key={r.id || index} className="border-b border-solar-gold last:border-none">
-                  <td className="py-3 text-solar-textPrimaryLight dark:text-solar-textPrimaryDark">
-                    {r.name} - {r.state}
-                  </td>
-                  <td className="text-center text-solar-textPrimaryLight dark:text-solar-textPrimaryDark">
-                    {r.expected_plants || 0}
-                  </td>
-                  <td className="text-center text-solar-textPrimaryLight dark:text-solar-textPrimaryDark">
-                    {r.capacity_mw || 0}
-                  </td>
-                  <td className="text-center text-solar-textPrimaryLight dark:text-solar-textPrimaryDark">
-                    1
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <DataTable
+            columns={[
+              {
+                header: 'Region',
+                accessorKey: 'name',
+                cell: (r) => `${r.name} - ${r.state}`
+              },
+              {
+                header: 'Plants',
+                accessorKey: 'expected_plants',
+                className: 'text-center',
+                cell: (r) => r.expected_plants || 0
+              },
+              {
+                header: 'Capacity (MW)',
+                accessorKey: 'capacity_mw',
+                className: 'text-center',
+                cell: (r) => r.capacity_mw || 0
+              },
+              {
+                header: 'Admins',
+                className: 'text-center',
+                cell: () => 1
+              }
+            ]}
+            data={regions}
+            showPagination={false}
+          />
 
           {/* Summary Row */}
           <div className="mt-4 pt-4 border-t border-solar-gold">
-            <div className="flex justify-between font-semibold">
+            <div className="flex justify-between font-semibold px-4">
               <span className="text-solar-textPrimaryLight dark:text-solar-textPrimaryDark">Total</span>
               <span className="text-solar-textPrimaryLight dark:text-solar-textPrimaryDark">{totalPlants}</span>
               <span className="text-solar-textPrimaryLight dark:text-solar-textPrimaryDark">{totalCapacity} MW</span>

@@ -35,7 +35,7 @@ export default function Regions() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this region?')) return
-    
+
     try {
       setDeletingId(id)
       await deleteRequest(`/superadmin/regions/${id}`)
@@ -67,9 +67,9 @@ export default function Regions() {
             <MapPin className="w-5 h-5 text-white" />
           </div>
           <div>
-            <div className="text-sm font-semibold text-solar-primary">{row.name}</div>
+            <div className="text-sm font-semibold text-solar-primary group-hover:text-solar-dark">{row.name}</div>
             {row.description && (
-              <div className="text-xs text-solar-muted truncate max-w-xs">{row.description}</div>
+              <div className="text-xs text-solar-muted group-hover:text-solar-dark/70 truncate max-w-xs">{row.description}</div>
             )}
           </div>
         </div>
@@ -80,8 +80,8 @@ export default function Regions() {
       accessorKey: 'state',
       cell: (row) => (
         <div>
-          <div className="text-sm text-solar-primary">{row.state}</div>
-          <div className="text-xs text-solar-muted">{row.country}</div>
+          <div className="text-sm text-solar-primary group-hover:text-solar-dark">{row.state}</div>
+          <div className="text-xs text-solar-muted group-hover:text-solar-dark/70">{row.country}</div>
         </div>
       ),
     },
@@ -96,7 +96,7 @@ export default function Regions() {
       header: 'Users',
       accessorKey: 'expected_users',
       cell: (row) => (
-        <div className="flex items-center text-sm text-solar-yellow font-semibold">
+        <div className="flex items-center text-sm text-solar-yellow group-hover:text-solar-dark font-semibold">
           <Users className="w-4 h-4 mr-1" />
           {row.expected_users || 0}
         </div>
@@ -106,7 +106,7 @@ export default function Regions() {
       header: 'Plants',
       accessorKey: 'expected_plants',
       cell: (row) => (
-        <div className="flex items-center text-sm text-solar-success font-semibold">
+        <div className="flex items-center text-sm text-solar-success group-hover:text-solar-dark font-semibold">
           <Zap className="w-4 h-4 mr-1" />
           {row.expected_plants || 0}
         </div>
@@ -116,7 +116,7 @@ export default function Regions() {
       header: 'Capacity (MW)',
       accessorKey: 'capacity_mw',
       cell: (row) => (
-        <div className="flex items-center text-sm text-solar-panel font-semibold">
+        <div className="flex items-center text-sm text-solar-panel group-hover:text-solar-dark font-semibold">
           {row.capacity_mw || 0}
         </div>
       ),
@@ -134,21 +134,21 @@ export default function Regions() {
       header: 'Actions',
       cell: (row) => (
         <div className="flex items-center space-x-2">
-          <button 
+          <button
             onClick={() => navigate(`/regions/${row.id}`)}
             className="p-2 bg-solar-card hover:bg-solar-panel/10 rounded-lg text-solar-muted hover:text-solar-panel transition-all shadow-sm border border-solar-border/30"
             title="View Details"
           >
             <Eye className="w-4 h-4" />
           </button>
-          <button 
+          <button
             onClick={() => navigate(`/regions/${row.id}/edit`)}
             className="p-2 bg-solar-card hover:bg-solar-yellow/10 rounded-lg text-solar-muted hover:text-solar-yellow transition-all shadow-sm border border-solar-border/30"
             title="Edit Region"
           >
             <Edit className="w-4 h-4" />
           </button>
-          <button 
+          <button
             onClick={() => handleDelete(row.id)}
             disabled={deletingId === row.id}
             className="p-2 bg-solar-card hover:bg-solar-danger/10 rounded-lg text-solar-muted hover:text-solar-danger transition-all shadow-sm border border-solar-border/30 disabled:opacity-50"
@@ -186,7 +186,7 @@ export default function Regions() {
             <RefreshCw className="w-4 h-4" />
             <span>Refresh Regions</span>
           </button>
-          <button 
+          <button
             onClick={() => navigate('/regions/create')}
             className="flex items-center space-x-2 px-4 py-2 text-white font-semibold rounded-lg transition sun-button"
           >

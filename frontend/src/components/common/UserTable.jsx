@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import axios from 'axios'
 import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Edit, Trash2, Plus } from 'lucide-react'
+import DataTable from './DataTable'
+import { Edit, Trash2, Plus, Eye } from 'lucide-react'
 import UserForm from './UserForm'
 
 const API_BASE_URL = 'http://localhost:8080'
@@ -52,46 +52,58 @@ function UserTable({ users, onUserChange, currentUserRole, endpoint }) {
         </Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Created At</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.first_name} {user.last_name}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role}</TableCell>
-              <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
-              <TableCell>
-                <div className="flex space-x-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(user)}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDelete(user.id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <DataTable
+        columns={[
+          {
+            header: 'Name',
+            cell: (user) => `${user.first_name} ${user.last_name}`
+          },
+          {
+            header: 'Email',
+            accessorKey: 'email'
+          },
+          {
+            header: 'Role',
+            accessorKey: 'role'
+          },
+          {
+            header: 'Created At',
+            accessorKey: 'created_at',
+            cell: (user) => new Date(user.created_at).toLocaleDateString()
+          },
+          {
+            header: 'Actions',
+            cell: (user) => (
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.href = `/users/${user.id}?view=true`}
+                >
+                  <Eye className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEdit(user)}
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDelete(user.id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            )
+          }
+        ]}
+        data={users}
+        showPagination={true}
+      />
 
       {showForm && (
         <UserForm

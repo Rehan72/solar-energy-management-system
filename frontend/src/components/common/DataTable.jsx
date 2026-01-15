@@ -135,17 +135,17 @@ function DataTable({
                     key={rowIndex}
                     onClick={() => onRowClick?.(row)}
                     className={cn(
-                      "border-solar-border transition-colors",
+                      "border-solar-border transition-all duration-300",
                       onRowClick ? "cursor-pointer" : "",
                       rowIndex % 2 === 0 ? "bg-transparent" : "bg-solar-night/10 dark:bg-solar-bg/30",
-                      "hover:bg-solar-orange/30"
+                      "hover:!bg-solar-yellow hover:!text-solar-dark hover:!shadow-solar-glow-yellow hover:!font-bold hover:scale-[1.02] hover:relative hover:z-10 group [&_td:first-child]:rounded-l-xl [&_td:last-child]:rounded-r-xl"
                     )}
                   >
                     {columns.map((column, colIndex) => (
                       <TableCell
                         key={colIndex}
                         className={cn(
-                          "text-solar-textPrimaryLight dark:text-solar-textPrimaryDark",
+                          "text-solar-textPrimaryLight dark:text-solar-textPrimaryDark group-hover:!text-solar-dark group-hover:font-bold",
                           column.cellClassName || ""
                         )}
                       >

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Shield, UserPlus, Search, Filter, RefreshCw, MapPin, Mail, Calendar, Edit, Trash2, Eye } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import StatCard from '../../components/ui/stat-card'
-import CardTable from '../../components/common/CardTable'
+import DataTable from '../../components/common/DataTable'
 import SearchBar from '../../components/common/Search'
 import SunLoader from '../../components/SunLoader'
 import { getRequest, deleteRequest } from '../../lib/apiService'
@@ -19,7 +19,7 @@ export default function Installers() {
     try {
       // Fetch specifically for Super Admin to see all
       const response = await getRequest('/superadmin/installers')
-      
+
       const installersData = (response.data.installers || []).map(inst => ({
         ...inst,
         name: `${inst.first_name || ''} ${inst.last_name || ''}`.trim(),
@@ -43,10 +43,10 @@ export default function Installers() {
 
   const handleDeleteInstaller = async (installer) => {
     if (!confirm('Are you sure you want to delete this installer? This action cannot be undone.')) return
-    
+
     try {
       // Using generic delete user endpoint
-      await deleteRequest(`/superadmin/admins/${installer.id}`) 
+      await deleteRequest(`/superadmin/admins/${installer.id}`)
       fetchInstallers()
     } catch (error) {
       console.error('Failed to delete installer:', error)
@@ -67,8 +67,8 @@ export default function Installers() {
 
   // Filter Logic
   const filteredInstallers = installers.filter(inst => {
-    const matchesSearch = inst.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          inst.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = inst.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inst.email.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesRegion = filterRegion === 'ALL' || inst.region === filterRegion
     return matchesSearch && matchesRegion
   })
@@ -98,7 +98,7 @@ export default function Installers() {
               <span>Resync</span>
             </div>
           </button>
-          <button 
+          <button
             onClick={() => navigate('/installers/create')}
             className="sun-button px-6 py-2.5 border-solar-orange/30 hover:border-solar-orange/50 shadow-solar-orange/10"
           >
@@ -169,22 +169,58 @@ export default function Installers() {
         </div>
       </div>
 
-      {/* Installers Card Table */}
-      <CardTable
-        users={filteredInstallers}
-        title="Installers"
-        subtitle="No installers found."
-        onEdit={handleEditInstaller}
-        onView={handleViewInstaller}
-        onDelete={handleDeleteInstaller}
-        showPagination={true}
-        paginationInfo={{
-          currentPageItems: filteredInstallers.length,
-          totalItems: filteredInstallers.length,
-          previousPage: false,
-          nextPage: false,
-        }}
-      />
+      {/* Installers DataTable */}
+      <div className="bg-white dark:bg-solar-bgActive border border-solar-borderLight dark:border-solar-bgActive rounded-xl p-6">
+        <DataTable
+          columns={[
+            { header: 'Name', accessorKey: 'name' },
+            { header: 'Email', accessorKey: 'email' },
+            { header: 'Phone', accessorKey: 'phone' },
+            { header: 'Region', accessorKey: 'region' },
+            {
+              header: 'Status',
+              accessorKey: 'status',
+              cell: (inst) => (
+                <span className={`px-2 py-1 rounded text-xs font-semibold ${inst.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                  }`}>
+                  {inst.status}
+                </span>
+              )
+            },
+            { header: 'Joined', accessorKey: 'joinDate' },
+            {
+              header: 'Actions',
+              cell: (inst) => (
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleViewInstaller(inst)}
+                    className="p-1 hover:text-blue-600 transition-colors"
+                    title="View Details"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleEditInstaller(inst)}
+                    className="p-1 hover:text-solar-accent transition-colors"
+                    title="Edit"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteInstaller(inst)}
+                    className="p-1 hover:text-red-500 transition-colors"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              )
+            }
+          ]}
+          data={filteredInstallers}
+          showPagination={true}
+        />
+      </div>
     </div>
   )
 }

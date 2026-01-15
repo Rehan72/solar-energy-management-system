@@ -62,16 +62,16 @@ export default function Users() {
       header: 'User Identity',
       cell: (row) => (
         <div className="flex items-center space-x-3 py-1">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-solar-yellow to-solar-orange flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-110">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-solar-yellow to-solar-orange flex items-center justify-center shadow-lg transform transition-transform">
             <span className="text-white font-black text-xs">
               {(row.first_name || row.email || '?').charAt(0).toUpperCase()}
             </span>
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-solar-primary text-sm tracking-tight">
+            <span className="font-bold text-solar-primary group-hover:text-solar-dark text-sm tracking-tight">
               {row.first_name && row.last_name ? `${row.first_name} ${row.last_name}` : (row.email || 'N/A')}
             </span>
-            <span className="text-[10px] text-solar-muted font-medium">{row.email}</span>
+            <span className="text-[10px] text-solar-muted group-hover:text-solar-dark/70 font-medium">{row.email}</span>
           </div>
         </div>
       )

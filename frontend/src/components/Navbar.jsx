@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, User, X, Columns2, SheetIcon, Users, User2Icon, OrigamiIcon, LogOut, Cpu, Zap, Activity, Inspect } from "lucide-react";
+import { Home, User, X, Columns2, SheetIcon, Users, User2Icon, OrigamiIcon, LogOut, Cpu, Zap, Activity, Inspect, Package } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Calendar } from "lucide-react";
-import { logout, getUserRole } from "../lib/auth";
+import { logout, getUserRole, hasPermission } from "../lib/auth";
 
 function Navbar({ sidebarOpen, setSidebarOpen }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -15,50 +15,45 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
     setIsOpen((prev) => !prev);
   };
 
-  // Menu for regular users (solar customers)
-  const userMenu = [
-    { name: "My Devices", path: "/devices", icon: <Cpu size={18} /> },
-    { name: "Energy Analytics", path: "/energy-analytics", icon: <Zap size={18} /> },
-    { name: "Profile", path: "/profile", icon: <User size={18} /> },
+
+
+  // Unified Menu Configuration
+  const MENU_ITEMS = [
+    // Dashboards
+    { name: "Dashboard", path: "/dashboard", icon: <Home size={18} />, roles: ["SUPER_ADMIN"] },
+    { name: "Govt Portal", path: "/govt/dashboard", icon: <Home size={18} />, roles: ["GOVT", "SUPER_ADMIN"] },
+    { name: "Installer Portal", path: "/installer/dashboard", icon: <Home size={18} />, roles: ["INSTALLER", "SUPER_ADMIN"] },
+
+    // Core Management
+    { name: "Regions", path: "/regions", icon: <OrigamiIcon size={18} />, roles: ["SUPER_ADMIN"] },
+    { name: "Plants", path: "/plants", icon: <Zap size={18} />, roles: ["SUPER_ADMIN", "ADMIN"] },
+    { name: "Inventory", path: "/admin/inventory", icon: <Package size={18} />, roles: ["SUPER_ADMIN", "ADMIN"] },
+
+    // Device Management
+    { name: "All Devices", path: "/superadmin/all-devices", icon: <Cpu size={18} />, roles: ["SUPER_ADMIN"] },
+    { name: "Devices", path: "/admin/devices", icon: <Cpu size={18} />, roles: ["ADMIN", "SUPER_ADMIN"] },
+    { name: "My Devices", path: "/devices", icon: <Cpu size={18} />, roles: ["USER", "SUPER_ADMIN"] },
+
+    // Analytics
+    { name: "Global Energy", path: "/superadmin/all-energy", icon: <Zap size={18} />, roles: ["SUPER_ADMIN"] },
+    { name: "My Energy", path: "/energy-analytics", icon: <Zap size={18} />, roles: ["USER", "SUPER_ADMIN"] },
+
+    // User Management
+    { name: "Admins", path: "/admins", icon: <Users size={18} />, roles: ["SUPER_ADMIN"] },
+    { name: "Users", path: "/users", icon: <User2Icon size={18} />, roles: ["SUPER_ADMIN", "ADMIN"] },
+    { name: "Installers", path: "/installers", icon: <Inspect size={18} />, roles: ["SUPER_ADMIN"] },
+
+    // Tools & Reports
+    { name: "Reports", path: "/reports", icon: <SheetIcon size={18} />, roles: ["SUPER_ADMIN", "ADMIN"] },
+    { name: "Simulator", path: "/tool/simulator", icon: <Activity size={18} />, roles: ["SUPER_ADMIN", "ADMIN", "INSTALLER"] },
+
+    // Profile
+    { name: "Profile", path: "/superadmin/profile", icon: <User size={18} />, roles: ["SUPER_ADMIN"] },
+    { name: "My Profile", path: "/profile", icon: <User size={18} />, roles: ["USER", "SUPER_ADMIN"] },
   ];
 
-  // Menu for admins (platform administrators)
-  const adminMenu = [
-    { name: "Dashboard", path: "/dashboard", icon: <Home size={18} /> },
-    { name: "Regions", path: "/regions", icon: <OrigamiIcon size={18} /> },
-    { name: "Plants", path: "/plants", icon: <Zap size={18} /> },
-    { name: "Devices", path: "/admin/devices", icon: <Cpu size={18} /> },
-    { name: "Admins", path: "/admins", icon: <Users size={18} /> },
-    { name: "Users", path: "/users", icon: <User2Icon size={18} /> },
-    { name: "Reports", path: "/reports", icon: <SheetIcon size={18} /> },
-    // { name: "Event", path: "/event", icon: <Calendar size={18} /> },
-    { name: "Simulator", path: "/tool/simulator", icon: <Activity size={18} /> },
-  ];
-
-  // Menu for super admins (full system access)
-  const superAdminMenu = [
-    { name: "Dashboard", path: "/dashboard", icon: <Home size={18} /> },
-    { name: "Regions", path: "/regions", icon: <OrigamiIcon size={18} /> },
-    { name: "Plants", path: "/plants", icon: <Zap size={18} /> },
-    { name: "All Devices", path: "/superadmin/all-devices", icon: <Cpu size={18} /> },
-    { name: "Energy Analytics", path: "/superadmin/all-energy", icon: <Zap size={18} /> },
-    { name: "Admins", path: "/admins", icon: <Users size={18} /> },
-    { name: "Users", path: "/users", icon: <User2Icon size={18} /> },
-    {name:"Installer",path:"/installers",icon:<Inspect size={18}/>},
-    { name: "Reports", path: "/reports", icon: <SheetIcon size={18} /> },
-    // { name: "Event", path: "/event", icon: <Calendar size={18} /> },
-    { name: "Simulator", path: "/tool/simulator", icon: <Activity size={18} /> },
-    { name: "Profile", path: "/superadmin/profile", icon: <User size={18} /> },
-  ];
-
-  // Build menu based on user role
-  const getMenu = () => {
-    if (userRole === "SUPER_ADMIN") return superAdminMenu;
-    if (userRole === "ADMIN") return adminMenu;
-    return userMenu;
-  };
-
-  const menu = getMenu();
+  // Filter menu based on permissions
+  const menu = MENU_ITEMS.filter(item => hasPermission(item.roles));
 
   const handleLogout = () => {
     logout();
@@ -172,8 +167,8 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                 <Link
                   to={item.path}
                   className={`flex items-center rounded-xl group relative overflow-hidden transition-all duration-300 ease-in-out ${active
-                      ? 'bg-solar-yellow text-solar-dark shadow-solar-glow-yellow scale-[1.02] font-bold'
-                      : 'hover:bg-solar-yellow/10 hover:text-solar-yellow text-solar-muted'
+                    ? 'bg-solar-yellow text-solar-dark shadow-solar-glow-yellow scale-[1.02] font-bold'
+                    : 'hover:bg-solar-yellow/10 hover:text-solar-yellow text-solar-muted'
                     } ${isOpen ? 'gap-3 px-3 py-4' : 'justify-center p-3'
                     }`}
                   title={!isOpen ? item.name : ""}

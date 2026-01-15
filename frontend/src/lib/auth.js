@@ -15,6 +15,13 @@ export const getUserRole = () => {
   return user?.role || null;
 };
 
+// Check if user has permission
+export const hasPermission = (allowedRoles) => {
+  if (!allowedRoles || allowedRoles.length === 0) return true;
+  const userRole = getUserRole();
+  return userRole && allowedRoles.includes(userRole);
+};
+
 // Check if user is authenticated
 export const isAuthenticated = () => {
   const token = getToken();
@@ -26,7 +33,7 @@ export const isAuthenticated = () => {
 export const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  
+
   // Redirect to login page
   window.location.href = "/login";
 };
@@ -35,7 +42,7 @@ export const logout = () => {
 export const isTokenExpired = () => {
   const token = getToken();
   if (!token) return true;
-  
+
   try {
     // Decode JWT token (assuming it's a standard JWT)
     const payload = JSON.parse(atob(token.split(".")[1]));

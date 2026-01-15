@@ -2,82 +2,106 @@
 @import "tailwindcss";
 
 @theme {
-  --color-solar-primary: var(--solar-primary);
-  --color-solar-secondary: var(--solar-secondary);
-  --color-solar-yellow: var(--solar-yellow);
-  --color-solar-orange: var(--solar-orange);
-  --color-solar-bg: var(--solar-bg);
-  --color-solar-surface: var(--solar-surface);
-  --color-solar-card: var(--solar-card);
+  --color-solar-60: var(--solar-60);
+  --color-solar-30: var(--solar-30);
+  --color-solar-10: var(--solar-10);
+
+  /* Remap legacy to 60-30-10 */
+  --color-solar-primary: var(--solar-text-ink);
+  /* Use Ink for text */
+  --color-solar-secondary: var(--solar-muted-ink);
+  /* Use Muted Ink */
+  --color-solar-yellow: var(--solar-10);
+  --color-solar-orange: var(--solar-10);
+  --color-solar-bg: var(--solar-60);
+  --color-solar-surface: var(--solar-30);
+  --color-solar-card: var(--solar-30);
   --color-solar-border: var(--solar-border);
-  --color-solar-night: var(--solar-night);
-  --color-solar-muted: var(--solar-muted);
-  --color-solar-success: var(--solar-success);
-  --color-solar-warning: var(--solar-warning);
-  --color-solar-danger: var(--solar-danger);
-  --color-solar-panel: var(--solar-panel);
-  --color-solar-dark: var(--solar-dark);
-  
-  --background-image-solar-gradient: linear-gradient(135deg, #FFD166 0%, #F4A261 50%, #2ECC71 100%);
-  
-  --shadow-solar-glow-yellow: 0 0 20px rgba(245, 158, 11, 0.3), 0 0 40px rgba(245, 158, 11, 0.1);
+  --color-solar-night: var(--solar-30);
+  --color-solar-muted: var(--solar-muted-ink);
+  /* Fixed: Muted text visible */
+
+  --color-solar-success: var(--solar-10);
+  --color-solar-warning: var(--solar-10);
+  --color-solar-danger: var(--solar-10);
+  --color-solar-panel: var(--solar-30);
+  --color-solar-dark: #020617;
+  /* Fixed: Dark ink for buttons */
+
+  --background-image-solar-gradient: linear-gradient(135deg, var(--solar-10) 0%, var(--solar-10) 100%);
+
+  --shadow-solar-glow-yellow: 0 0 20px rgba(var(--solar-10-rgb), 0.3), 0 0 40px rgba(var(--solar-10-rgb), 0.1);
 }
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  --energy-x: 0px;
-  --energy-y: 0px;
 
-  /* ☀️ Solar Theme Tokens (Light Mode) */
-  --solar-primary: #0f172a;
-  --solar-secondary: #334155;
-  --solar-yellow: #f59e0b;
-  --solar-orange: #ea580c;
-  --solar-bg: #f8fafc;
-  --solar-surface: #ffffff;
-  --solar-card: #ffffff;
-  --solar-border: #e2e8f0;
-  --solar-night: #f1f5f9;
-  --solar-muted: #64748b;
-  
-  /* Status Colors */
-  --solar-success: #10b981;
-  --solar-warning: #f59e0b;
-  --solar-danger: #ef4444;
-  --solar-panel: #1e40af;
-  --solar-dark: #0f172a;
+  /* 
+     ☀️ 60-30-10 PALETTE (LIGHT MODE)
+     60% Dominant:  #f8fafc (Slate 50) - Backgrounds
+     30% Secondary: #ffffff (White)    - Cards, Surfaces, Sidebars
+     10% Accent:    #f59e0b (Amber 500) - Actions, Highlights, Focus
+  */
+  --solar-60: #f8fafc;
+  --solar-30: #ffffff;
+  --solar-10: #f59e0b;
+
+  /* RGB Values for RGBA usage */
+  --solar-60-rgb: 248, 250, 252;
+  --solar-30-rgb: 255, 255, 255;
+  --solar-10-rgb: 245, 158, 11;
+
+  /* Legacy Mappings */
+  --solar-primary: var(--solar-text-ink);
+  --solar-text-ink: #0f172a;
+  /* Slate 900 - High Contrast Ink */
+  --solar-muted-ink: #64748b;
+  /* Slate 500 - Medium Contrast Ink */
+  --solar-dark: #020617;
+  /* Always Dark */
+
+  --solar-border: #cbd5e1;
+  /* Slate 300 - Visible Borders */
 
   /* Glassmorphism (Light) */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(226, 232, 240, 0.8);
+  --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .dark {
-  /* 🌑 Solar Theme Tokens (Dark Mode) */
-  --solar-primary: #f8fafc;
-  --solar-secondary: #cbd5e1;
-  --solar-yellow: #fcd34d;
-  --solar-orange: #fb923c;
-  --solar-bg: #0b1120;
-  --solar-surface: #1e293b;
-  --solar-card: #1e293b;
-  --solar-border: #334155;
-  --solar-night: #0f172a;
-  --solar-muted: #94a3b8;
+  /* 
+     🌑 60-30-10 PALETTE (DARK MODE)
+     60% Dominant:  #020617 (Slate 950) - Backgrounds, Deep Space
+     30% Secondary: #1e293b (Slate 800) - Cards, Surfaces
+     10% Accent:    #fbbf24 (Amber 400) - Glowing Highlights
+  */
+  --solar-60: #020617;
+  --solar-30: #1e293b;
+  --solar-10: #fbbf24;
 
-  /* Darker Status Colors for contrast */
-  --solar-success: #34d399;
-  --solar-warning: #fbbf24;
-  --solar-danger: #f87171;
-  --solar-panel: #3b82f6;
+  /* RGB Values for RGBA usage */
+  --solar-60-rgb: 2, 6, 23;
+  --solar-30-rgb: 30, 41, 59;
+  --solar-10-rgb: 251, 191, 36;
+
+  --solar-text-ink: #f8fafc;
+  /* Slate 50 */
+  --solar-muted-ink: #94a3b8;
+  /* Slate 400 */
+  --solar-dark: #020617;
+  /* Keep dark */
+
+  --solar-border: #334155;
+  /* Slate 700 */
 
   /* Glassmorphism (Dark) */
-  --glass-bg: rgba(15, 23, 42, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  --glass-bg: rgba(30, 41, 59, 0.95);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
 }
 
 html {
@@ -88,70 +112,73 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: var(--solar-bg);
-  color: var(--solar-primary);
+  background-color: var(--solar-60);
+  color: var(--solar-text-ink);
   overflow-x: hidden;
-  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
-              color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark body {
-  background-image: radial-gradient(
-      at 0% 0%,
-      rgba(245, 158, 11, 0.03) 0px,
-      transparent 50%
-    ),
-    radial-gradient(at 100% 100%, rgba(30, 58, 138, 0.05) 0px, transparent 50%);
+  /* Subtle texture for 60% area if desired, but keeping clean for strict rule */
+  background-image: none;
 }
 
-/* 💠 Premium Glassmorphism */
+/* 💠 Premium Glassmorphism -> Flattened to 30% style */
 .solar-glass {
-  background: var(--glass-bg);
+  background: var(--solar-30);
+  /* Solid backbone, glass overlay if needed */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--solar-border);
   box-shadow: var(--glass-shadow);
   transition: all 0.3s ease;
 }
 
 .solar-glass:hover {
-  border-color: rgba(245, 158, 11, 0.4);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 0 20px rgba(245, 158, 11, 0.1);
+  border-color: var(--solar-10);
+  /* Accent on hover */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-/* 🌟 Solar Glow Effects */
+/* 🌟 Solar Glow Effects -> Mapped to Accent (10%) */
 .sun-glow-text {
-  color: var(--solar-primary);
+  color: var(--solar-10);
   text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
 }
 
 .dark .sun-glow-text {
-  text-shadow: 0 0 20px rgba(252, 211, 77, 0.5);
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
 }
 
 .solar-glow-yellow {
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2), 0 0 40px rgba(245, 158, 11, 0.1);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
 }
 
-/* ⚡ Input Fields */
+/* ⚡ Input Fields -> 30% Surface */
 .solar-input {
-  @apply w-full px-4 py-3 bg-solar-night/50 border border-solar-border rounded-xl transition-all duration-300;
-  color: var(--solar-primary);
+  @apply w-full px-4 py-3 border rounded-xl transition-all duration-300;
+  background-color: var(--solar-30);
+  /* 30% */
+  border-color: var(--solar-border);
+  color: var(--solar-text-ink);
 }
 
 .solar-input:focus {
-  @apply outline-none border-solar-yellow ring-4 ring-solar-yellow/10 bg-solar-surface;
+  @apply outline-none ring-2;
+  border-color: var(--solar-10);
+  --tw-ring-color: rgba(245, 158, 11, 0.2);
 }
 
 .dark .solar-input {
-  @apply bg-solar-night/30;
+  background-color: var(--solar-30);
 }
 
 /* 🔘 Premium Solar Button */
 .sun-button {
   @apply relative overflow-hidden px-6 py-3 font-semibold rounded-xl transition-all duration-300 transform active:scale-95;
-  background: linear-gradient(135deg, var(--solar-yellow) 0%, var(--solar-orange) 100%);
-  color: var(--solar-dark);
+  background: linear-gradient(135deg, var(--solar-10) 0%, var(--solar-10) 100%);
+  color: var(--solar-60);
 }
 
 .sun-button::after {
@@ -161,8 +188,8 @@ body {
 }
 
 .sun-button:hover {
-  @apply -translate-y-1 shadow-lg;
-  box-shadow: 0 10px 25px -5px rgba(234, 88, 12, 0.4), 0 8px 10px -6px rgba(234, 88, 12, 0.2);
+  @apply shadow-lg;
+  box-shadow: 0 10px 25px -5px rgba(var(--solar-10-rgb), 0.4), 0 8px 10px -6px rgba(var(--solar-10-rgb), 0.2);
 }
 
 .sun-button:hover::after {
@@ -171,7 +198,7 @@ body {
 }
 
 .vibrant-gradient {
-  background: linear-gradient(135deg, var(--solar-yellow) 0%, var(--solar-orange) 100%);
+  background: linear-gradient(135deg, var(--solar-10) 0%, var(--solar-10) 100%);
   position: relative;
   overflow: hidden;
 }
@@ -183,11 +210,9 @@ body {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.2) 0%,
-    transparent 60%
-  );
+  background: radial-gradient(circle,
+      rgba(255, 255, 255, 0.2) 0%,
+      transparent 60%);
   animation: rotate 10s linear infinite;
 }
 
@@ -202,20 +227,19 @@ body {
 }
 
 .dark body {
-  background-color: #0b1120;
-  background-image: radial-gradient(
-      at 0% 0%,
-      rgba(245, 158, 11, 0.05) 0px,
-      transparent 50%
-    ),
-    radial-gradient(at 100% 100%, rgba(30, 58, 138, 0.05) 0px, transparent 50%);
-  color: #ffffff;
+  background-color: var(--solar-60);
+  background-image: radial-gradient(at 0% 0%,
+      rgba(var(--solar-10-rgb), 0.05) 0px,
+      transparent 50%),
+    radial-gradient(at 100% 100%, rgba(var(--solar-10-rgb), 0.05) 0px, transparent 50%);
+  color: var(--solar-30);
 }
 
 
 
 /* Energy Animations */
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0px) rotate(0deg);
@@ -235,18 +259,20 @@ body {
 }
 
 @keyframes glow {
+
   0%,
   100% {
-    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 215, 0, 0.3);
+    text-shadow: 0 0 5px rgba(var(--solar-10-rgb), 0.5), 0 0 10px rgba(var(--solar-10-rgb), 0.3);
   }
 
   50% {
-    text-shadow: 0 0 20px rgba(255, 215, 0, 0.8),
-      0 0 30px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.4);
+    text-shadow: 0 0 20px rgba(var(--solar-10-rgb), 0.8),
+      0 0 30px rgba(var(--solar-10-rgb), 0.6), 0 0 40px rgba(var(--solar-10-rgb), 0.4);
   }
 }
 
 @keyframes pulse-bg {
+
   0%,
   100% {
     opacity: 0.3;
@@ -281,7 +307,7 @@ body {
   position: absolute;
   width: 4px;
   height: 4px;
-  background: radial-gradient(circle, #ffd700, #ffa500);
+  background: radial-gradient(circle, var(--solar-10), var(--solar-10));
   border-radius: 50%;
   animation: float 6s ease-in-out infinite;
 }
@@ -302,7 +328,7 @@ body {
   position: absolute;
   width: 6px;
   height: 6px;
-  background: radial-gradient(circle, #ffd166 0%, transparent 70%);
+  background: radial-gradient(circle, var(--solar-10) 0%, transparent 70%);
   border-radius: 50%;
   opacity: 0.7;
   animation: floatEnergy 8s linear infinite;
@@ -335,12 +361,10 @@ body {
   left: 50%;
   width: 130%;
   height: 220%;
-  background: linear-gradient(
-    120deg,
-    transparent 40%,
-    rgba(255, 209, 102, 0.18) 50%,
-    transparent 60%
-  );
+  background: linear-gradient(120deg,
+      transparent 40%,
+      rgba(255, 209, 102, 0.18) 50%,
+      transparent 60%);
   transform: translateX(-50%) rotate(12deg);
   animation: moveRay 10s linear infinite;
 }
@@ -375,6 +399,7 @@ body {
 }
 
 @keyframes pulseDark {
+
   0%,
   100% {
     opacity: 0.35;
@@ -387,6 +412,7 @@ body {
 
 /* ♿ ACCESSIBILITY */
 @media (prefers-reduced-motion: reduce) {
+
   .energy-particle,
   .light-ray,
   .pulse-overlay {
@@ -403,6 +429,7 @@ body {
 }
 
 @keyframes pulseDark {
+
   0%,
   100% {
     opacity: 0.35;
@@ -428,6 +455,7 @@ body {
 }
 
 @keyframes pulseDark {
+
   0%,
   100% {
     opacity: 0.35;
@@ -503,6 +531,7 @@ body {
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 0.35;
@@ -526,6 +555,7 @@ body {
 
 /* Solar pulse animation */
 @keyframes solar-pulse {
+
   0%,
   100% {
     box-shadow: 0 0 15px rgba(212, 174, 85, 0.5),
@@ -559,6 +589,7 @@ body {
 
 /* Enhanced bounce for particles */
 @keyframes bounce {
+
   0%,
   100% {
     transform: translateY(0);
@@ -578,9 +609,12 @@ body {
 /* Multi-layer glow effect */
 .multi-glow {
   box-shadow:
-    /* Inner glow */ inset 0 0 10px rgba(255, 255, 255, 0.3),
-    /* Middle glow */ 0 0 15px rgba(212, 174, 85, 0.5),
-    /* Outer glow */ 0 0 30px rgba(212, 174, 85, 0.3);
+    /* Inner glow */
+    inset 0 0 10px rgba(255, 255, 255, 0.3),
+    /* Middle glow */
+    0 0 15px rgba(212, 174, 85, 0.5),
+    /* Outer glow */
+    0 0 30px rgba(212, 174, 85, 0.3);
 }
 
 .multi-glow:hover {
@@ -602,12 +636,10 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent);
   transition: left 0.5s ease;
 }
 
@@ -616,16 +648,15 @@ body {
 }
 
 .sun-button:hover {
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 40px rgba(255, 165, 0, 0.4),
-    0 0 60px rgba(245, 158, 11, 0.2);
-  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(var(--solar-10-rgb), 0.6), 0 0 40px rgba(var(--solar-10-rgb), 0.4),
+    0 0 60px rgba(var(--solar-10-rgb), 0.2);
 }
 
 /* Sun glow button */
 .sun-glow-button {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #f59e0b 0%, #ffd700 50%, #f59e0b 100%);
+  background: linear-gradient(135deg, var(--solar-10) 0%, var(--solar-10) 50%, var(--solar-10) 100%);
   background-size: 200% 200%;
   animation: sun-button-shine 3s ease-in-out infinite;
   transition: all 0.3s ease;
@@ -633,12 +664,12 @@ body {
 
 .sun-glow-button:hover {
   background-position: 100% 50%;
-  box-shadow: 0 0 25px rgba(255, 215, 0, 0.7), 0 0 50px rgba(255, 165, 0, 0.5),
-    0 0 75px rgba(245, 158, 11, 0.3);
-  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(var(--solar-10-rgb), 0.7), 0 0 50px rgba(var(--solar-10-rgb), 0.5),
+    0 0 75px rgba(var(--solar-10-rgb), 0.3);
 }
 
 @keyframes sun-button-shine {
+
   0%,
   100% {
     background-position: 0% 50%;
@@ -669,14 +700,12 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    rgba(255, 248, 220, 0.5),
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 248, 220, 0.5),
+      rgba(255, 255, 255, 0.3),
+      transparent);
   transition: left 0.5s ease;
   z-index: 1;
   pointer-events: none;
@@ -690,12 +719,10 @@ body {
 .sun-button:hover {
   box-shadow: 0 0 25px rgba(255, 215, 0, 0.6), 0 0 50px rgba(255, 165, 0, 0.4),
     0 0 75px rgba(245, 158, 11, 0.2);
-  transform: translateY(-2px);
 }
 
 /* Active/pressed state */
 .sun-button:active {
-  transform: translateY(1px);
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 165, 0, 0.6),
     0 0 45px rgba(245, 158, 11, 0.4);
 }
@@ -704,12 +731,10 @@ body {
 .sun-button-primary {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(
-    135deg,
-    var(--solar-yellow) 0%,
-    #ffd700 50%,
-    var(--solar-orange) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--solar-yellow) 0%,
+      #ffd700 50%,
+      var(--solar-orange) 100%);
   background-size: 200% 200%;
   animation: sun-button-shine 3s ease-in-out infinite;
   transition: all 0.3s ease;
@@ -723,14 +748,12 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    rgba(255, 255, 255, 0.6),
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      rgba(255, 255, 255, 0.6),
+      rgba(255, 255, 255, 0.4),
+      transparent);
   transition: left 0.5s ease;
 }
 
@@ -742,16 +765,15 @@ body {
   background-position: 100% 50%;
   box-shadow: 0 0 30px rgba(255, 215, 0, 0.7), 0 0 60px rgba(255, 165, 0, 0.5),
     0 0 90px rgba(245, 158, 11, 0.3);
-  transform: translateY(-2px);
 }
 
 .sun-button-primary:active {
-  transform: translateY(1px);
   box-shadow: 0 0 20px rgba(255, 215, 0, 0.9), 0 0 40px rgba(255, 165, 0, 0.7),
     0 0 60px rgba(245, 158, 11, 0.5);
 }
 
 @keyframes sun-button-shine {
+
   0%,
   100% {
     background-position: 0% 50%;
@@ -777,14 +799,12 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 215, 0, 0.2),
-    rgba(255, 215, 0, 0.3),
-    rgba(255, 215, 0, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(var(--solar-10-rgb), 0.2),
+      rgba(var(--solar-10-rgb), 0.3),
+      rgba(var(--solar-10-rgb), 0.2),
+      transparent);
   transition: left 0.5s ease;
 }
 
@@ -793,8 +813,8 @@ body {
 }
 
 .sun-button-secondary:hover {
-  border-color: var(--solar-yellow);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 165, 0, 0.2);
+  border-color: var(--solar-10);
+  box-shadow: 0 0 20px rgba(var(--solar-10-rgb), 0.4), 0 0 40px rgba(var(--solar-10-rgb), 0.2);
   transform: translateY(-2px);
 }
 
@@ -805,14 +825,12 @@ body {
 }
 
 .sun-button-active {
-  background: linear-gradient(
-    135deg,
-    rgba(245, 158, 11, 0.2) 0%,
-    rgba(255, 215, 0, 0.1) 100%
-  ) !important;
-  border-color: var(--solar-yellow) !important;
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.2),
-    inset 0 0 10px rgba(245, 158, 11, 0.1) !important;
+  background: linear-gradient(135deg,
+      rgba(var(--solar-10-rgb), 0.2) 0%,
+      rgba(var(--solar-10-rgb), 0.1) 100%) !important;
+  border-color: var(--solar-10) !important;
+  box-shadow: 0 0 15px rgba(var(--solar-10-rgb), 0.2),
+    inset 0 0 10px rgba(var(--solar-10-rgb), 0.1) !important;
 }
 
 .sun-button-active::after {
@@ -822,9 +840,9 @@ body {
   top: 20%;
   height: 60%;
   width: 3px;
-  background: var(--solar-yellow);
+  background: var(--solar-10);
   border-radius: 0 4px 4px 0;
-  box-shadow: 0 0 10px var(--solar-yellow);
+  box-shadow: 0 0 10px var(--solar-10);
 }
 
 /* ==============================
@@ -845,13 +863,11 @@ body {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--solar-yellow),
-    var(--solar-orange),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      var(--solar-10),
+      var(--solar-10),
+      transparent);
   transform: translateX(-100%);
   transition: transform 0.6s ease;
 }
@@ -861,8 +877,8 @@ body {
 }
 
 .energy-card:hover {
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.2), 0 0 60px rgba(245, 158, 11, 0.1);
-  transform: translateY(-4px);
+  box-shadow: 0 0 30px rgba(var(--solar-10-rgb), 0.2), 0 0 60px rgba(var(--solar-10-rgb), 0.1);
+  background-color: rgba(var(--solar-10-rgb), 0.05);
 }
 
 /* ==============================
@@ -871,39 +887,38 @@ body {
 
 /* Enhanced glow text with sun reflection */
 .sun-glow-text {
-  background: linear-gradient(180deg, #ffd700 0%, #f59e0b 50%, #ea580c 100%);
+  background: linear-gradient(180deg, var(--solar-10) 0%, var(--solar-10) 50%, var(--solar-10) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 165, 0, 0.3);
+  text-shadow: 0 0 30px rgba(var(--solar-10-rgb), 0.5), 0 0 60px rgba(var(--solar-10-rgb), 0.3);
   animation: sun-glow-pulse 2s ease-in-out infinite;
 }
 
 @keyframes sun-glow-pulse {
+
   0%,
   100% {
-    text-shadow: 0 0 30px rgba(255, 215, 0, 0.5),
-      0 0 60px rgba(255, 165, 0, 0.3);
+    text-shadow: 0 0 30px rgba(var(--solar-10-rgb), 0.5),
+      0 0 60px rgba(var(--solar-10-rgb), 0.3);
     filter: brightness(1);
   }
 
   50% {
-    text-shadow: 0 0 50px rgba(255, 215, 0, 0.8),
-      0 0 100px rgba(255, 165, 0, 0.5);
+    text-shadow: 0 0 50px rgba(var(--solar-10-rgb), 0.8),
+      0 0 100px rgba(var(--solar-10-rgb), 0.5);
     filter: brightness(1.3);
   }
 }
 
 /* Sun reflection text animation */
 .sun-reflection-text {
-  background: linear-gradient(
-    135deg,
-    #f59e0b 0%,
-    #ffd700 30%,
-    #fcd34d 50%,
-    #ffd700 70%,
-    #f59e0b 100%
-  );
+  background: linear-gradient(135deg,
+      var(--solar-10) 0%,
+      var(--solar-10) 30%,
+      var(--solar-10) 50%,
+      var(--solar-10) 70%,
+      var(--solar-10) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -919,12 +934,10 @@ body {
   left: -100%;
   width: 50%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent);
   transform: skewX(-20deg);
   animation: sun-flash 4s ease-in-out infinite;
 }
@@ -947,6 +960,7 @@ body {
 }
 
 @keyframes sun-flash {
+
   0%,
   40% {
     left: -100%;
@@ -981,12 +995,10 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 215, 0, 0.1),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 215, 0, 0.1),
+      transparent);
   transition: left 0.5s ease;
 }
 
@@ -996,7 +1008,8 @@ body {
 
 .stat-card:hover {
   box-shadow: 0 0 25px rgba(255, 215, 0, 0.3), 0 0 50px rgba(245, 158, 11, 0.2);
-  transform: translateY(-4px);
+  background-color: rgba(var(--solar-10-rgb), 0.05);
+  /* Slight accent tint on hover */
 }
 
 /* ==============================
@@ -1009,6 +1022,7 @@ body {
 }
 
 @keyframes sun-pulse {
+
   0%,
   100% {
     filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
@@ -1089,11 +1103,9 @@ body {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  background: linear-gradient(
-    135deg,
-    rgba(245, 158, 11, 0.2) 0%,
-    rgba(255, 215, 0, 0.1) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(245, 158, 11, 0.2) 0%,
+      rgba(255, 215, 0, 0.1) 100%);
 }
 
 /* Sun reflection effect for active buttons */
@@ -1104,20 +1116,19 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    rgba(255, 248, 220, 0.6),
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      rgba(255, 248, 220, 0.6),
+      rgba(255, 255, 255, 0.4),
+      transparent);
   animation: sun-active-shine 2s ease-in-out infinite;
   z-index: 1;
   pointer-events: none;
 }
 
 @keyframes sun-active-shine {
+
   0%,
   100% {
     left: -100%;
@@ -1159,20 +1170,16 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    to bottom,
-    var(--solar-yellow),
-    var(--solar-orange)
-  );
+  background: linear-gradient(to bottom,
+      var(--solar-yellow),
+      var(--solar-orange));
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(
-    to bottom,
-    var(--solar-orange),
-    var(--solar-yellow)
-  );
+  background: linear-gradient(to bottom,
+      var(--solar-orange),
+      var(--solar-yellow));
 }
 
 /* Animations */
@@ -1187,6 +1194,7 @@ html {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);
@@ -1210,14 +1218,12 @@ html {
 
 /* Sun reflection text effect */
 .sun-reflection-text {
-  background: linear-gradient(
-    135deg,
-    #f59e0b 0%,
-    #ffd700 30%,
-    #fcd34d 50%,
-    #ffd700 70%,
-    #f59e0b 100%
-  );
+  background: linear-gradient(135deg,
+      #f59e0b 0%,
+      #ffd700 30%,
+      #fcd34d 50%,
+      #ffd700 70%,
+      #f59e0b 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -1232,12 +1238,10 @@ html {
   left: -100%;
   width: 50%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent);
   transform: skewX(-20deg);
   animation: sun-flash 4s ease-in-out infinite;
 }
@@ -1260,6 +1264,7 @@ html {
 }
 
 @keyframes sun-flash {
+
   0%,
   40% {
     left: -100%;
@@ -1279,15 +1284,16 @@ html {
 
 /* Enhanced glow text with sun reflection */
 .sun-glow-text {
-  background: linear-gradient(180deg, #ffd700 0%, #f59e0b 50%, #ea580c 100%);
+  background: linear-gradient(180deg, var(--solar-10) 0%, var(--solar-10) 50%, var(--solar-10) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 165, 0, 0.3);
+  text-shadow: 0 0 30px rgba(var(--solar-10-rgb), 0.5), 0 0 60px rgba(var(--solar-10-rgb), 0.3);
   animation: sun-glow-pulse 2s ease-in-out infinite;
 }
 
 @keyframes sun-glow-pulse {
+
   0%,
   100% {
     text-shadow: 0 0 30px rgba(255, 215, 0, 0.5),
@@ -1296,8 +1302,8 @@ html {
   }
 
   50% {
-    text-shadow: 0 0 50px rgba(255, 215, 0, 0.8),
-      0 0 100px rgba(255, 165, 0, 0.5);
+    text-shadow: 0 0 50px rgba(var(--solar-10-rgb), 0.8),
+      0 0 100px rgba(var(--solar-10-rgb), 0.5);
     filter: brightness(1.3);
   }
 }
@@ -1347,6 +1353,7 @@ html {
 
 /* Toast icon pulse animation */
 @keyframes toast-icon-pulse {
+
   0%,
   100% {
     transform: scale(1);
@@ -1365,12 +1372,10 @@ html {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--solar-yellow),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      var(--solar-yellow),
+      transparent);
   opacity: 0.5;
 }
 
@@ -1393,13 +1398,11 @@ html {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--solar-yellow),
-    var(--solar-orange),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      var(--solar-yellow),
+      var(--solar-orange),
+      transparent);
   transform: translateX(-100%);
   transition: transform 0.6s ease;
 }

@@ -13,6 +13,9 @@ import Users from "../pages/superAdmin/Users";
 import CreateUser from "../pages/superAdmin/CreateUser";
 import CreateInstaller from "../pages/superAdmin/CreateInstaller";
 import Installers from "../pages/superAdmin/Installers";
+import Inventory from "../pages/admin/Inventory";
+import InventoryForm from "../components/inventory/InventoryForm";
+import InventoryDetail from "../pages/admin/InventoryDetail";
 import UserDetail from "../pages/superAdmin/UserDetail";
 import EditUser from "../pages/superAdmin/EditUser";
 import AdminDetail from "../pages/superAdmin/AdminDetail";
@@ -194,19 +197,19 @@ export default [
   {
     element: Profile,
     path: `/profile`,
-    allowedRoles: ["USER"],
+    allowedRoles: ["USER", "SUPER_ADMIN"],
     exact: true
   },
   {
     element: Devices,
     path: `/devices`,
-    allowedRoles: ["USER"],
+    allowedRoles: ["USER", "SUPER_ADMIN"],
     exact: true
   },
   {
     element: EnergyAnalytics,
     path: `/energy-analytics`,
-    allowedRoles: ["USER"],
+    allowedRoles: ["USER", "SUPER_ADMIN"],
     exact: true
   },
   {
@@ -220,7 +223,7 @@ export default [
   {
     element: GovtDashboard,
     path: `/govt/dashboard`,
-    allowedRoles: ["GOVT"],
+    allowedRoles: ["GOVT", "SUPER_ADMIN"],
     exact: true
   },
 
@@ -228,7 +231,13 @@ export default [
   {
     element: InstallerDashboard,
     path: `/installer/dashboard`,
-    allowedRoles: ["INSTALLER"],
+    allowedRoles: ["INSTALLER", "SUPER_ADMIN"],
+    exact: true
+  },
+  {
+    element: Inventory,
+    path: `/admin/inventory`,
+    allowedRoles: ["ADMIN", "SUPER_ADMIN"],
     exact: true
   },
   {

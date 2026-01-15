@@ -212,12 +212,11 @@ const CardTable = ({
               relative rounded-2xl border transition-all duration-300 ease-in-out
               backdrop-blur-sm overflow-hidden cursor-pointer
               group energy-card
-              ${isRowSelected(user.id) 
-                ? 'bg-solar-yellow/10 border-solar-yellow/30 ring-2 ring-solar-yellow/20' 
+              ${isRowSelected(user.id)
+                ? 'bg-solar-yellow/10 border-solar-yellow/30 ring-2 ring-solar-yellow/20'
                 : 'bg-solar-card dark:bg-solar-card border-solar-border dark:border-solar-border'
               }
-              hover:shadow-xl hover:scale-[1.02]
-              hover:border-l-4 hover:border-l-solar-orange
+              hover:!bg-solar-yellow hover:!text-solar-dark hover:!shadow-solar-glow-yellow hover:!font-bold hover:scale-[1.02]
               ${isExpanded(user.id) ? 'border-l-4 border-l-solar-orange' : ''}
             `}
           >
@@ -230,8 +229,8 @@ const CardTable = ({
                 {/* Left Section - Checkbox and Basic Info */}
                 <div className="flex items-start gap-4 flex-1 min-w-0">
                   <div className="flex items-start gap-3 shrink-0">
-                    <div 
-                      data-prevent-expand 
+                    <div
+                      data-prevent-expand
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Checkbox
@@ -240,11 +239,11 @@ const CardTable = ({
                         className="mt-1 data-[state=checked]:bg-solar-yellow data-[state=checked]:border-solar-yellow"
                       />
                     </div>
-                    
+
                     {/* User Avatar */}
                     {user.picture || user.profile_image ? (
-                      <img 
-                        src={user.picture || user.profile_image} 
+                      <img
+                        src={user.picture || user.profile_image}
                         alt={user.name}
                         className="w-12 h-12 rounded-full border-2 border-solar-yellow/30 object-cover"
                       />
@@ -254,14 +253,13 @@ const CardTable = ({
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-3 flex-wrap">
-                      <h3 className={`text-xl font-bold truncate ${
-                        isRowSelected(user.id) 
-                          ? 'text-solar-primary dark:text-solar-primary' 
-                          : 'text-solar-primary dark:text-solar-primary'
-                      }`}>
+                      <h3 className={`text-xl font-bold truncate ${isRowSelected(user.id)
+                        ? 'text-solar-primary dark:text-solar-primary'
+                        : 'text-solar-primary dark:text-solar-primary'
+                        }`}>
                         {user.name}
                       </h3>
                       <div className="flex items-center gap-2 flex-wrap">
@@ -309,7 +307,7 @@ const CardTable = ({
                 </div>
 
                 {/* Right Section - Actions and Expand Indicator */}
-                <div 
+                <div
                   className="flex items-center gap-2 shrink-0 ml-4"
                 >
                   {/* Expand Indicator - Clickable */}
@@ -320,8 +318,8 @@ const CardTable = ({
                     }}
                     className={`
                       flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300
-                      ${isExpanded(user.id) 
-                        ? 'bg-solar-orange/20 text-solar-orange hover:bg-solar-orange/30' 
+                      ${isExpanded(user.id)
+                        ? 'bg-solar-orange/20 text-solar-orange hover:bg-solar-orange/30'
                         : 'bg-solar-yellow/20 text-solar-orange hover:bg-solar-yellow/30'
                       }
                     `}
@@ -333,10 +331,10 @@ const CardTable = ({
                       <ChevronRight className="h-4 w-4" />
                     )}
                   </button>
-                  
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button 
+                      <button
                         onClick={(e) => e.stopPropagation()}
                         className="flex items-center justify-center w-8 h-8 rounded-full bg-solar-yellow/20 text-solar-orange hover:bg-solar-yellow/40 hover:text-solar-orange transition-all duration-300"
                         title="Actions"
@@ -344,8 +342,8 @@ const CardTable = ({
                         <MoreHorizontal className="h-4 w-4" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent 
-                      align="end" 
+                    <DropdownMenuContent
+                      align="end"
                       className="bg-[#Ffffff] dark:bg-solar-card border-solar-border dark:border-solar-border shadow-lg"
                     >
                       <DropdownMenuLabel className="text-solar-primary dark:text-solar-primary">
@@ -374,7 +372,7 @@ const CardTable = ({
                         Export Data
                       </DropdownMenuItem>
                       <DropdownMenuSeparator className="bg-solar-border dark:bg-solar-border" />
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => handleDelete(user)}
                         className="flex items-center gap-2 text-solar-danger hover:bg-red-500/10 cursor-pointer"
                       >
@@ -416,7 +414,7 @@ const CardTable = ({
                           {user.role}
                         </Badge>
                       </div>
-                     
+
                     </div>
                   </div>
 
@@ -449,7 +447,7 @@ const CardTable = ({
                       Address Info
                     </h4>
                     <div className="space-y-2">
-                      
+
                       <div className="flex justify-between">
                         <span className="text-solar-muted">Address Line 1:</span>
                         <span className="text-solar-primary font-medium">{user.address_line1}</span>
@@ -500,7 +498,7 @@ const CardTable = ({
               </>
             )}
           </p>
-          
+
           {showPagination && paginationInfo && (
             <div className="flex items-center space-x-2">
               <Button

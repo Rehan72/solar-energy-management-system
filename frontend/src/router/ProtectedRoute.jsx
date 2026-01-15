@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { isAuthenticated, isTokenExpired, logout, getUserRole } from '../lib/auth';
+import { isAuthenticated, isTokenExpired, logout, getUserRole, hasPermission } from '../lib/auth';
 import { notify } from '../lib/toast';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -13,7 +13,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     // Check if token exists and is not expired
     const checkAuth = () => {
       const token = localStorage.getItem('token');
-      
+
       if (!token) {
         setIsAuth(false);
         setLoading(false);
@@ -52,8 +52,9 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   // Check role-based access if roles are specified
+  // Check role-based access if roles are specified
   if (allowedRoles && allowedRoles.length > 0) {
-    if (!userRole || !allowedRoles.includes(userRole)) {
+    if (!hasPermission(allowedRoles)) {
       // Redirect to dashboard if user doesn't have required role
       return <Navigate to="/dashboard" replace />;
     }
@@ -64,12 +65,12 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   // If user is logged in, role is USER, and no plant_id (incomplete profile)
   // And we are NOT already on the onboarding page
   if (isAuth && userRole === 'USER' && !user.plant_id && location.pathname !== '/onboarding') {
-      return <Navigate to="/onboarding" replace />;
+    return <Navigate to="/onboarding" replace />;
   }
-  
+
   // If user HAS completed onboarding but tries to go back to /onboarding, redirect to dashboard
   if (isAuth && userRole === 'USER' && user.plant_id && location.pathname === '/onboarding') {
-      return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
